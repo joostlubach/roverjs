@@ -53,13 +53,28 @@ export default class App extends React.Component<*, Props, *> {
 		})
 	}
 
+	async programError() {
+		if (window.localStorage.programErrorShown) { return }
+
+		window.localStorage.programErrorShown = 'true'
+		await MessageBox.show({
+			title:   "Error in your program",
+			message: "There is an error in your program.\n\nClick on the red circles to see the error.",
+			buttons: [
+				{label: "Oh no!"}
+			]
+		})
+	}
+
 	componentWillMount() {
 		levelStore.load()
 		simulatorStore.on('done', this.onSimulatorDone)
+		programStore.on('error', this.onProgramError)
 	}
 
 	componentWillUnmount() {
 		simulatorStore.removeListeners()
+		programStore.removeListeners()
 	}
 
 	render() {
@@ -155,6 +170,10 @@ export default class App extends React.Component<*, Props, *> {
 		} else {
 			this.levelIncomplete()
 		}
+	}
+
+	onProgramError = () => {
+		this.programError()
 	}
 
 }

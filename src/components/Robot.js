@@ -92,13 +92,13 @@ const rotateAnim = jssKeyframes('rotate', {
 	'100%': {transform: 'rotateZ(-360deg)'},
 })
 
-const scaleAnim = jssKeyframes('jump', {
+const scaleAnim = jssKeyframes('scale', {
 	'0%':   {transform: 'scale(1)', animationTimingFunction: 'ease-out'},
 	'50%':  {transform: 'scale(2)', fill: colors.green.string(), animationTimingFunction: 'ease-in'},
 	'100%': {transform: 'scale(1)'},
 })
 
-const shameAnim = jssKeyframes('jump', {
+const shameAnim = jssKeyframes('shame', {
 	'0%':   {transform: 'scale(1)', animationTimingFunction: 'ease-out'},
 	'50%':  {transform: 'scale(0.8)', fill: colors.red.string(), animationTimingFunction: 'ease-in'},
 	'100%': {transform: 'scale(1)'},

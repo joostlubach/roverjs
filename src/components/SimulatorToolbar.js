@@ -23,7 +23,7 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 
 				{this.renderFPSSlider()}
 
-				{!running && state != null && this.renderResetButton()}
+				{!running && state != null && this.renderRestartButton()}
 			</div>
 		)
 	}
@@ -49,12 +49,12 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 		)
 	}
 
-	renderResetButton() {
+	renderRestartButton() {
 		return (
 			<ToolbarButton
-				icon='reset'
-				label="RESET"
-				onTap={this.onResetTap}
+				icon='restart'
+				label="RESTART"
+				onTap={this.onRestartTap}
 			/>
 		)
 	}
@@ -78,7 +78,7 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 		simulatorStore.pause()
 	}
 
-	onResetTap = () => {
+	onRestartTap = () => {
 		simulatorStore.reset()
 	}
 

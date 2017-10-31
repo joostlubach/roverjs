@@ -1,5 +1,6 @@
 // @flow
 
+import EventEmitter from 'events'
 import {observable, autorun, action} from 'mobx'
 import {Program, ProgramBuilder, Level} from '../program'
 import type {ASTNodeLocation} from '../program'
@@ -10,9 +11,10 @@ export type CodeError = {
 	loc:     ASTNodeLocation | {start: ASTNodeLocation, end:   ASTNodeLocation},
 }
 
-export default class ProgramStore {
+export default class ProgramStore extends EventEmitter {
 
 	constructor() {
+		super()
 		autorun(() => { this.saveCode() })
 	}
 
@@ -80,6 +82,8 @@ export default class ProgramStore {
 		simulatorStore.reset()
 		if (success) {
 			simulatorStore.simulate(program)
+		} else {
+			this.emit('error')
 		}
 	}
 

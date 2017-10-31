@@ -3,7 +3,7 @@
 import React from 'react'
 import {observer} from 'mobx-react'
 import {jss, layout, colors, fonts, shadows} from '../styles'
-import {SVG, Markdown, Button} from '.'
+import {SVG, Markdown, ToolbarButton, Button, MessageBox} from '.'
 import {levelStore, programStore} from '../stores'
 
 export type Props = {}
@@ -13,6 +13,21 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
 
 	props: Props
 
+	async confirmAndReset() {
+		const confirmed = await MessageBox.show({
+			title:   "Reset level",
+			message: "Are you sure you want to reset to the original level code?",
+			buttons: [
+				{label: "Yes, I'm sure", result: true},
+				{label: "No, keep this", result: false}
+			]
+		})
+
+		if (confirmed) {
+			programStore.resetCode()
+		}
+	}
+
 	render() {
 		return (
 			<div className={$.toolbar}>
@@ -21,6 +36,7 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
 					{this.renderIntro()}
 					{this.renderLevelSelector()}
 				</div>
+				{this.renderResetButton()}
 			</div>
 		)
 	}
@@ -54,8 +70,22 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
 		)
 	}
 
+	renderResetButton() {
+		return (
+			<ToolbarButton
+				icon='reset'
+				label="RESET"
+				onTap={this.onResetTap}
+			/>
+		)
+	}
+
 	onLevelTap = (level: Level) => {
 		programStore.loadLevel(level)
+	}
+
+	onResetTap = () => {
+		this.confirmAndReset()
 	}
 
 }

@@ -59,10 +59,12 @@ const $ = jss({
 
 	icon: {
 		width:  36,
-		height: 36
+		height: 36,
+		fill:   colors.fg.inverted
 	},
 
 	label: {
+		color:         colors.fg.inverted,
 		font:          fonts.smallCaps,
 		textTransform: 'small-caps',
 		fontWeight:    500

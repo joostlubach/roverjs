@@ -3,7 +3,7 @@
 import React from 'react'
 import {observer} from 'mobx-react'
 import {CodeMirror, Marker, Gutter, GutterMarker, LineWidget, LineClass} from './codemirror'
-import {jss, colors, layout, fonts} from '../styles'
+import {jss, jssKeyframes, colors, layout, fonts} from '../styles'
 import {programStore, simulatorStore} from '../stores'
 import type {ASTNodeLocation} from '../program'
 
@@ -44,11 +44,12 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 
 	render() {
 		const {className} = this.props
+		const hasErrors = programStore.errors.length > 0
 
 		return (
 			<CodeMirror
 				ref={el => { this.editor = el }}
-				className={[$.codeEditor, className]}
+				className={[$.codeEditor, hasErrors && $.withErrors, className]}
 				mode='javascript'
 				value={programStore.code}
 				onChange={this.onEditorChange.bind(this)}
@@ -184,6 +185,12 @@ function getErrorLocation(error: CodeError): {start: ASTNodeLocation, end: ASTNo
 	return {start, end, empty}
 }
 
+const errorAnim = jssKeyframes('error', {
+	'0%':   {animationTimingFunction: 'ease-out'},
+	'50%':  {backgroundColor: colors.red.alpha(0.05).string(), animationTimingFunction: 'ease-in'},
+	'100%': {},
+})
+
 const $ = jss({
 	codeEditor: {
 		...layout.flex.column,
@@ -191,6 +198,12 @@ const $ = jss({
 		'& .CodeMirror-gutter.errors': {
 			width: 12
 		},
+	},
+
+	withErrors: {
+		'& .CodeMirror': {
+			animation: `${errorAnim} 1s linear infinite`
+		}
 	},
 
 	currentLineSuccess: {

@@ -232,7 +232,7 @@ const $ = jss({
 	},
 
 	message: {
-
+		textAlign: 'center'
 	},
 
 	buttons: {

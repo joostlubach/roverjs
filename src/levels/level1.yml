@@ -21,11 +21,15 @@ initialCode: |-
   // The second function takes one argument, which should be
   // the direction to turn to ('left' or 'right').
   //
-  // Press ▶︎ play to see Rover move forward and turn to the
+  // Press ▶︎ PLAY to see Rover move forward and turn to the
   // right:
 
   move()
   turn('right')
 
+  // Rover cannot walk through obstacles (trees, water).
   // Can you get Rover to the flag?
-  // Note: if you want to reset, use the ♺ Reset button.
+
+  // Note: if you want to reset, use the ♺ RESTART button.
+  // If you want to reset this code to the original level
+  // code, use the RESET button above.
