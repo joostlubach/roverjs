@@ -17,34 +17,40 @@ export default class App extends React.Component<*, Props, *> {
 	async levelComplete() {
 		levelStore.completeLevel(3)
 
+		const nextLevelAvailable = levelStore.levels.length > programStore.level.id
 		const nextLevel = await MessageBox.show({
 			title:   "Level completed",
-			message: "You completed the level",
-			buttons: [
+			message: nextLevelAvailable
+				? "You completed the level!"
+				: "You finished all the levels, well done!",
+			buttons: nextLevelAvailable ? [
 				{label: "Try again", result: false},
 				{label: "Next level", result: true},
+			] : [
+				{label: "Look at your victory", result: null}
 			]
 		})
 
-		if (nextLevel) {
+		if (nextLevel === true) {
 			levelStore.next()
-		} else {
+		} else if (nextLevel === false) {
 			simulatorStore.reset()
 		}
 	}
 
 	async levelIncomplete(reason: string) {
+		if (window.localStorage.levelIncompleteBoxShown) { return }
+
+		window.localStorage.levelIncompleteBoxShown = 'true'
 		await MessageBox.show({
 			title:   "Level incomplete",
 			message: reason === 'not-enough-apples'
 				? "Rover did make it to the flag, but he did not eat enough apples!"
 				: "Rover did not make it to the flag!",
 			buttons: [
-				{label: "Try again"}
+				{label: "Oh no!"}
 			]
 		})
-
-		simulatorStore.reset()
 	}
 
 	componentWillMount() {

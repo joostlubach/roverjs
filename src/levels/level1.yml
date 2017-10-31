@@ -28,3 +28,4 @@ initialCode: |-
   turn('right')
 
   // Can you get Rover to the flag?
+  // Note: if you want to reset, use the ♺ Reset button.
