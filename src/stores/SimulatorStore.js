@@ -14,7 +14,7 @@ export default class SimulatorStore extends EventEmitter {
 	currentLine: ?Step<*> = null
 
 	@observable
-	stepSucceeded: boolean = true
+	stepResult: boolean = true
 
 	@observable
 	state: ?ProgramState = null
@@ -81,14 +81,14 @@ export default class SimulatorStore extends EventEmitter {
 	}
 
 	@action
-	onSimulatorStep = (line: number, success, state: ProgramState) => {
+	onSimulatorStep = (line: number, result: any, state: ProgramState) => {
 		this.currentLine = line
-		this.stepSucceeded = success
+		this.stepResult = result
 		this.state = state
 	}
 
 	@action
-	onSimulatorDone = finished => {
+	onSimulatorDone = (finished: boolean, reason: ?string) => {
 		this.simulator.removeAllListeners()
 		this.simulator = null
 
@@ -97,7 +97,7 @@ export default class SimulatorStore extends EventEmitter {
 		this.done = true
 		this.finished = finished
 
-		this.emit('done', finished)
+		this.emit('done', finished, reason)
 	}
 
 }

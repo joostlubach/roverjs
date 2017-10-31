@@ -54,12 +54,17 @@ export default class Program {
 		case 'right': x += 1; break
 		}
 
-		if (this.canMoveTo(x, y)) {
-			this.state.position = {x, y}
-			return true
-		} else {
-			return false
+		if (!this.canMoveTo(x, y)) { return false }
+		this.state.position = {x, y}
+
+		const item = this.level.itemAt(x, y)
+		if (item != null && item.type === 'apple') {
+			this.state.apples += 1
+			this.level.removeItem(item)
+			return 'happy'
 		}
+
+		return true
 	}
 
 	@recordable
@@ -101,7 +106,10 @@ export default class Program {
 		if (goalPosition == null) { return false }
 
 		const {x, y} = goalPosition
-		return this.robotAt(x, y)
+		if (!this.robotAt(x, y)) { return false }
+
+		if (this.level.goalApples == null) { return true }
+		return this.state.apples === this.level.goalApples
 	}
 
 	//------
@@ -112,6 +120,7 @@ export default class Program {
 
 	reset() {
 		this.state = this.defaultState()
+		this.level.reset()
 		this.currentStepIndex = 0
 	}
 
@@ -128,10 +137,10 @@ export default class Program {
 		if (this.done) { return [null, false] }
 
 		const step = this.steps[this.currentStepIndex]
-		const success = step.action.apply(this, step.args)
+		const result = step.action.apply(this, step.args)
 		this.currentStepIndex++
 
-		return [step, success]
+		return [step, result]
 	}
 
 	get done(): boolean {

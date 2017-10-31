@@ -4,6 +4,7 @@ import {observable, reaction, action} from 'mobx'
 import levels from '../levels'
 import type {Level} from '../program'
 import {programStore} from '.'
+import URL from 'url'
 
 export default class LevelStore {
 
@@ -42,6 +43,8 @@ export default class LevelStore {
 	}
 
 	isLevelSelectable(level: Level) {
+		const url = URL.parse(document.location.href, true)
+		if (url.query.dbg != null) { return true }
 		return level.id <= this.levelScores.size + 1
 	}
 

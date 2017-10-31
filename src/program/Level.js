@@ -22,12 +22,14 @@ export default class Level {
 		if (raw.goal != null) {
 			level.goalPosition = {x: raw.goal[0], y: raw.goal[1]}
 		}
+		level.goalApples = raw.goalApples
 
 		if (raw.items != null) {
 			level.items = raw.items.map(([x, y, type]) => {
 				return Item.create(type, {x, y})
 			})
 		}
+		level.originalItems = level.items
 
 		level.initialCode = raw.initialCode
 		return level
@@ -40,12 +42,27 @@ export default class Level {
 	startPosition:  Position
 	startDirection: Direction
 
-	initialCode:    string = ''
-	items:          Item[] = []
 	goalPosition:   ?Position = null
+	goalApples: ?number = null
+
+	initialCode:    string = ''
+	originalItems:  Item[] = []
+	items:          Item[] = []
 
 	itemAt(x: number, y: number): ?Item {
 		return this.items.find(({position}) => position.x === x && position.y === y)
+	}
+
+	removeItem(item: Item) {
+		this.items = this.items.filter(i => i !== item)
+	}
+
+	hasApples() {
+		return this.items.filter(item => item instanceof Apple).length > 0
+	}
+
+	reset() {
+		this.items = this.originalItems
 	}
 
 }

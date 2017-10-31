@@ -3,7 +3,7 @@
 import React from 'react'
 import {observer} from 'mobx-react'
 import {jss, colors, layout, shadows} from '../styles'
-import {Panels, Grid, ItemSprite, Robot, Goal, CodeEditor, CodeToolbar, SimulatorToolbar, MessageBox} from '.'
+import {Panels, Grid, Inventory, ItemSprite, Robot, Goal, CodeEditor, CodeToolbar, SimulatorToolbar, MessageBox} from '.'
 import {levelStore, viewStateStore, programStore, simulatorStore} from '../stores'
 import type {Item} from '../program'
 
@@ -39,7 +39,7 @@ export default class App extends React.Component<*, Props, *> {
 	}
 
 	async levelIncomplete(reason: string) {
-		if (window.localStorage.levelIncompleteBoxShown) { return }
+		if (reason !== 'not-enough-apples' && window.localStorage.levelIncompleteBoxShown) { return }
 
 		window.localStorage.levelIncompleteBoxShown = 'true'
 		await MessageBox.show({
@@ -104,11 +104,15 @@ export default class App extends React.Component<*, Props, *> {
 	}
 
 	renderMain() {
+		const {level} = programStore
+		const hasApples = level != null && level.hasApples
+
 		return (
 			<div className={$.main}>
 				<SimulatorToolbar/>
 				<div className={$.gridContainer}>
 					{this.renderGrid()}
+					{hasApples && <Inventory/>}
 				</div>
 			</div>
 		)
@@ -164,11 +168,11 @@ export default class App extends React.Component<*, Props, *> {
 		programStore.runProgram(e.metaKey)
 	}
 
-	onSimulatorDone = finished => {
+	onSimulatorDone = (finished: boolean, reason: string) => {
 		if (finished) {
 			this.levelComplete()
 		} else {
-			this.levelIncomplete()
+			this.levelIncomplete(reason)
 		}
 	}
 
@@ -196,6 +200,10 @@ const $ = jss({
 	gridContainer: {
 		flex: [1, 0, 0],
 		...layout.flex.center,
+
+		'& > :not(:last-child)': {
+			marginBottom: layout.padding.l
+		}
 	},
 
 	codePanel: {
@@ -212,5 +220,6 @@ const $ = jss({
 		backgroundColor: colors.purple,
 		backgroundImage: colors.bevelGradient('left'),
 		boxShadow:       shadows.horizontal(2)
-	}
+	},
+
 })

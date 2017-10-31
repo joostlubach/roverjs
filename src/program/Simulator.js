@@ -66,7 +66,14 @@ export default class Simulator extends EventEmitter {
 	}
 
 	emitDone() {
-		this.emit('done', this.program.isFinished())
+		const finished = this.program.isFinished()
+		if (finished) { this.emit('done', true, null) }
+
+		const reason = this.program.state.apples < this.program.level.goalApples
+			? 'not-enough-apples'
+			: 'not-at-goal'
+
+		this.emit('done', false, reason)
 	}
 
 }

@@ -1,0 +1,17 @@
+rows:    5
+columns: 5
+
+start:      [0, 2, 'right']
+goal:       [4, 2]
+goalApples: 3
+
+items:
+  - [1, 3, 'apple']
+  - [2, 3, 'apple']
+  - [3, 3, 'apple']
+
+initialCode: |-
+  // Rover really likes apples. It makes no sense for a robot
+  // to like apples, but Rover just does.
+  //
+  // Make Rover eat all the apples before going to the flag!
