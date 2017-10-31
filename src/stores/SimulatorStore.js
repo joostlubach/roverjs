@@ -1,10 +1,11 @@
 // @flow
 
+import EventEmitter from 'events'
 import {observable, action} from 'mobx'
 import {Simulator} from '../program'
 import type {Program, ProgramState} from '../program'
 
-export default class SimulatorStore {
+export default class SimulatorStore extends EventEmitter {
 
 	@observable
 	simulator: ?Simulator = null
@@ -46,6 +47,8 @@ export default class SimulatorStore {
 	@action
 	simulate(program: Program) {
 		this.reset()
+
+		this.running = true
 		this.simulator = new Simulator(program)
 		this.simulator.on('reset', this.onSimulatorReset)
 		this.simulator.on('step', this.onSimulatorStep)
@@ -93,6 +96,8 @@ export default class SimulatorStore {
 		this.running = false
 		this.done = true
 		this.finished = finished
+
+		this.emit('done', finished)
 	}
 
 }

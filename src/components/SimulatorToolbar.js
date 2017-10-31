@@ -9,7 +9,7 @@ import {programStore, simulatorStore} from '../stores'
 export type Props = {}
 
 @observer
-export default class Toolbar extends React.Component<*, Props, *> {
+export default class SimulatorToolbar extends React.Component<*, Props, *> {
 
 	props: Props
 
@@ -18,15 +18,12 @@ export default class Toolbar extends React.Component<*, Props, *> {
 
 		return (
 			<div className={$.toolbar}>
-				<div className={$.left}>
-					{!running && this.renderPlayButton()}
-					{running && this.renderPauseButton()}
-					{!running && state != null && this.renderResetButton()}
-				</div>
+				{!running && this.renderPlayButton()}
+				{running && this.renderPauseButton()}
 
-				<div className={$.right}>
-					{this.renderFPSSlider()}
-				</div>
+				{this.renderFPSSlider()}
+
+				{!running && state != null && this.renderResetButton()}
 			</div>
 		)
 	}
@@ -90,10 +87,11 @@ export default class Toolbar extends React.Component<*, Props, *> {
 const $ = jss({
 	toolbar: {
 		position: 'relative',
-
-		...layout.flex.row,
-		alignItems:     'center',
+		height:   96,
+		
+		...layout.row(),
 		justifyContent: 'space-between',
+		padding:        layout.padding.s,
 
 		borderBottom: [1, 'solid', colors.white.alpha(0.2)],
 		boxShadow:    shadows.toolbar,
@@ -101,15 +99,5 @@ const $ = jss({
 		background: colors.bg.toolbar,
 		color:      colors.fg.inverted,
 		'& svg':    {fill: colors.fg.inverted}
-	},
-
-	left: {
-		...layout.row(),
-		padding: layout.padding.s
-	},
-
-	right: {
-		...layout.row(),
-		padding: layout.padding.s
-	},
+	}
 })

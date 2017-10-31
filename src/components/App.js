@@ -3,9 +3,9 @@
 import React from 'react'
 import {observer} from 'mobx-react'
 import {jss, colors, layout, shadows} from '../styles'
-import {Panels, Grid, ItemSprite, Robot, Goal, CodeEditor, Toolbar} from '.'
-import {viewStateStore, programStore, simulatorStore} from '../stores'
-import type {Item} from '../program}'
+import {Panels, Grid, ItemSprite, Robot, Goal, CodeEditor, CodeToolbar, SimulatorToolbar, MessageBox} from '.'
+import {levelStore, viewStateStore, programStore, simulatorStore} from '../stores'
+import type {Item} from '../program'
 
 export type Props = {}
 
@@ -13,6 +13,48 @@ export type Props = {}
 export default class App extends React.Component<*, Props, *> {
 
 	props: Props
+
+	async levelComplete() {
+		levelStore.completeLevel(3)
+
+		const nextLevel = await MessageBox.show({
+			title:   "Level completed",
+			message: "You completed the level",
+			buttons: [
+				{label: "Try again", result: false},
+				{label: "Next level", result: true},
+			]
+		})
+
+		if (nextLevel) {
+			levelStore.next()
+		} else {
+			simulatorStore.reset()
+		}
+	}
+
+	async levelIncomplete(reason: string) {
+		await MessageBox.show({
+			title:   "Level incomplete",
+			message: reason === 'not-enough-apples'
+				? "Rover did make it to the flag, but he did not eat enough apples!"
+				: "Rover did not make it to the flag!",
+			buttons: [
+				{label: "Try again"}
+			]
+		})
+
+		simulatorStore.reset()
+	}
+
+	componentWillMount() {
+		levelStore.load()
+		simulatorStore.on('done', this.onSimulatorDone)
+	}
+
+	componentWillUnmount() {
+		simulatorStore.removeListeners()
+	}
 
 	render() {
 		return (
@@ -26,6 +68,7 @@ export default class App extends React.Component<*, Props, *> {
 					main={this.renderMain()}
 					splitter={this.renderSplitter()}
 				/>
+				<MessageBox.Host/>
 			</div>
 		)
 	}
@@ -33,6 +76,7 @@ export default class App extends React.Component<*, Props, *> {
 	renderCodePanel() {
 		return (
 			<div className={$.codePanel}>
+				<CodeToolbar/>
 				<CodeEditor className={$.codeEditor}/>
 			</div>
 		)
@@ -41,7 +85,7 @@ export default class App extends React.Component<*, Props, *> {
 	renderMain() {
 		return (
 			<div className={$.main}>
-				<Toolbar/>
+				<SimulatorToolbar/>
 				<div className={$.gridContainer}>
 					{this.renderGrid()}
 				</div>
@@ -77,6 +121,7 @@ export default class App extends React.Component<*, Props, *> {
 					direction={direction}
 					transitionDuration={transitionDuration}
 					jumpForJoy={simulatorStore.finished}
+					shame={simulatorStore.done && !simulatorStore.finished}
 				/>
 			</Grid>
 		)
@@ -98,6 +143,14 @@ export default class App extends React.Component<*, Props, *> {
 		programStore.runProgram(e.metaKey)
 	}
 
+	onSimulatorDone = finished => {
+		if (finished) {
+			this.levelComplete()
+		} else {
+			this.levelIncomplete()
+		}
+	}
+
 }
 
 const $ = jss({
@@ -105,7 +158,9 @@ const $ = jss({
 		height: '100vh',
 
 		...layout.flex.row,
-		background: colors.bg.light
+		backgroundColor:  colors.bg.grid,
+		backgroundImage:  'url(/images/bg.png)',
+		backgroundRepeat: 'repeat'
 	},
 
 	main: {
@@ -116,10 +171,6 @@ const $ = jss({
 	gridContainer: {
 		flex: [1, 0, 0],
 		...layout.flex.center,
-
-		backgroundColor:  colors.bg.grid,
-		backgroundImage:  'url(/images/bg.png)',
-		backgroundRepeat: 'repeat'
 	},
 
 	codePanel: {

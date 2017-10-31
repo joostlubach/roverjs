@@ -26,7 +26,7 @@ export const bg = {
 	medium:        new Color('#F9F9F9'),
 	dark:          new Color('#EDEDED'),
 
-	toolbar:       new Color('#333333'),
+	toolbar:       new Color('#444').alpha(0.9),
 	grid:          purple.darken(0.4),
 
 	overlay:       black.alpha(0.4)

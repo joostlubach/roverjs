@@ -14,7 +14,7 @@ export default class ViewStateStore {
 
 	@observable
 	panelSizes: PanelSizes = {
-		left: 260
+		left: 620
 	}
 
 	load() {

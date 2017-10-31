@@ -2,7 +2,7 @@
 
 <html>
   <head>
-    <title>HYF - Robot</title>
+    <title>HYF - Rover the Robot</title>
     <link rel="stylesheet" type="text/css" href="/main.css"/>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">

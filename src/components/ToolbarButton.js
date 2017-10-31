@@ -33,13 +33,13 @@ const $ = jss({
 		...layout.flex.column,
 		alignItems:     'center',
 		justifyContent: 'space-around',
-		padding:        layout.padding.s,
+		padding:        layout.padding.xs,
 
 		border:       [1, 'solid', colors.transparent],
 		borderRadius: layout.radius.m,
 
 		cursor: 'pointer',
-		
+
 		'&:hover': {
 			borderColor: colors.fg.inverted.alpha(0.2)
 		}
@@ -58,8 +58,8 @@ const $ = jss({
 	},
 
 	icon: {
-		width:  48,
-		height: 48
+		width:  36,
+		height: 36
 	},
 
 	label: {

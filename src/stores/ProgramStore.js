@@ -1,9 +1,9 @@
 // @flow
 
-import {observable, autorun} from 'mobx'
+import {observable, autorun, action} from 'mobx'
 import {Program, ProgramBuilder, Level} from '../program'
-import {simulatorStore} from '.'
 import type {ASTNodeLocation} from '../program'
+import {simulatorStore} from '.'
 
 export type CodeError = {
 	message: string,
@@ -13,20 +13,14 @@ export type CodeError = {
 export default class ProgramStore {
 
 	constructor() {
-		this.code = window.localStorage.code || ''
-		autorun(() => {
-			window.localStorage.code = this.code
-		})
-
-		this.level = new Level(5, 5, {x: 0, y: 4}, 'up')
-		this.level.goalPosition = {x: 4, y: 0}
+		autorun(() => { this.saveCode() })
 	}
 
 	@observable
-	code: string = ''
+	level: ?Level = null
 
 	@observable
-	level: ?Level = null
+	code: string = ''
 
 	@observable
 	program: ?Program = null
@@ -34,6 +28,40 @@ export default class ProgramStore {
 	@observable
 	errors: CodeError[] = []
 
+	@action
+	loadLevel(level: Level) {
+		this.level = level
+		this.loadCode()
+	}
+
+	isActiveLevel(level: Level) {
+		return this.level === level
+	}
+
+	loadCode() {
+		const codes = JSON.parse(window.localStorage.codes || '[]')
+		this.code = codes[this.level.id]
+		if (this.code == null) {
+			this.code = this.level.initialCode
+		}
+		simulatorStore.reset()
+	}
+
+	saveCode() {
+		if (this.level == null) { return }
+
+		const codes = JSON.parse(window.localStorage.codes || '[]')
+		codes[this.level.id] = this.code
+		window.localStorage.codes = JSON.stringify(codes)
+	}
+
+	@action
+	resetCode() {
+		if (this.level == null) { return }
+		this.code = this.level.initialCode
+	}
+
+	@action
 	runProgram() {
 		if (this.level == null) { return }
 		if (simulatorStore.inProgress) { return }

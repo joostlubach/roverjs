@@ -13,12 +13,14 @@ export type Props = SpriteProps & {
 
 	direction:          Direction,
 	transitionDuration: number,
-	jumpForJoy:         boolean
+	jumpForJoy:         boolean,
+	shame:              boolean
 }
 
 export const defaultProps = {
 	transitionDuration: 0,
-	jumpForJoy:         false
+	jumpForJoy:         false,
+	shame:              false
 }
 
 type State = {
@@ -63,7 +65,7 @@ export default class Robot extends React.Component<*, Props, *> {
 	}
 
 	render() {
-		const {transitionDuration, jumpForJoy} = this.props
+		const {transitionDuration, jumpForJoy, shame} = this.props
 		const {animate} = this.state
 		const style = {
 			transform:          `rotateZ(${this.directionDegrees}deg)`,
@@ -77,7 +79,7 @@ export default class Robot extends React.Component<*, Props, *> {
 		return (
 			<Sprite className={[$.robot]} {...{x, y}} style={style}>
 				<div className={[$.svgContainer, jumpForJoy && $.jumpingForJoy1]}>
-					<SVG className={[$.svg, jumpForJoy && $.jumpingForJoy2]} name='robot'/>
+					<SVG className={[$.svg, shame && $.shaming, jumpForJoy && $.jumpingForJoy2]} name='robot'/>
 				</div>
 			</Sprite>
 		)
@@ -96,6 +98,12 @@ const scaleAnim = jssKeyframes('jump', {
 	'100%': {transform: 'scale(1)'},
 })
 
+const shameAnim = jssKeyframes('jump', {
+	'0%':   {transform: 'scale(1)', animationTimingFunction: 'ease-out'},
+	'50%':  {transform: 'scale(0.8)', fill: colors.red.string(), animationTimingFunction: 'ease-in'},
+	'100%': {transform: 'scale(1)'},
+})
+
 const $ = jss({
 	robot: {
 		...layout.transition(['top', 'left', 'transform'], 0)
@@ -110,6 +118,10 @@ const $ = jss({
 		width:  '88%',
 		height: '88%',
 		fill:   colors.fg.normal
+	},
+
+	shaming: {
+		animation: `${shameAnim} linear 1s infinite`
 	},
 
 	jumpingForJoy1: {

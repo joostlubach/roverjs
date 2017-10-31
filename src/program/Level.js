@@ -4,28 +4,43 @@ import type {Position, Direction} from '.'
 
 export default class Level {
 
-	constructor(rows: number, columns: number, startPosition: Position, startDirection: Direction) {
+	constructor(id: number, rows: number, columns: number, startPosition: Position, startDirection: Direction) {
+		this.id = id
 		this.rows = rows
 		this.columns = columns
 		this.startPosition = startPosition
 		this.startDirection = startDirection
 	}
 
-	static fromJSON(json: string) {
-		const {rows, columns, startPosition, startDirection, goalPosition, items} = JSON.parse(json)
+	static deserialize(id: number, raw: Object) {
+		const level = new Level(id)
+		level.rows = raw.rows
+		level.columns = raw.columns
+		level.startPosition  = {x: raw.start[0], y: raw.start[1]}
+		level.startDirection = raw.start[2]
 
-		const level = new Level(rows, columns, startPosition, startDirection)
-		level.goalPosition = goal
-		level.items = items
+		if (raw.goal != null) {
+			level.goalPosition = {x: raw.goal[0], y: raw.goal[1]}
+		}
+
+		if (raw.items != null) {
+			level.items = raw.items.map(([x, y, type]) => {
+				return Item.create(type, {x, y})
+			})
+		}
+
+		level.initialCode = raw.initialCode
 		return level
 	}
 
+	id:      number
 	rows:    number
 	columns: number
 
 	startPosition:  Position
 	startDirection: Direction
 
+	initialCode:    string = ''
 	items:          Item[] = []
 	goalPosition:   ?Position = null
 
@@ -39,6 +54,15 @@ export class Item {
 
 	constructor(position: Position) {
 		this.position = position
+	}
+
+	static create(type: string, position: Position) {
+		const ItemClass = itemClasses.find(C => new C().type === type)
+		if (ItemClass == null) {
+			throw new TypeError(`Item type \`${type}\` unknown`)
+		}
+
+		return new ItemClass(position)
 	}
 
 	type:     string
@@ -61,3 +85,5 @@ export class Apple extends Item {
 	type     = 'apple'
 	blocking = false
 }
+
+const itemClasses = [Water, Tree, Apple]

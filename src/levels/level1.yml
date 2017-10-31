@@ -1,0 +1,30 @@
+rows:    4
+columns: 4
+
+start: [0, 3, 'up']
+goal:  [3, 0]
+
+items:
+  - [0, 0, 'tree']
+  - [0, 1, 'tree']
+  - [1, 0, 'tree']
+  - [3, 3, 'water']
+
+initialCode: |-
+  // Hello! Meet Rover, he's a robot. You can program Rover
+  // through JavaScript. Rover understands two commands,
+  // which are JavaScript functions:
+  //
+  // - move()
+  // - turn(direction)
+  //
+  // The second function takes one argument, which should be
+  // the direction to turn to ('left' or 'right').
+  //
+  // Press ▶︎ play to see Rover move forward and turn to the
+  // right:
+
+  move()
+  turn('right')
+
+  // Can you get Rover to the flag?
