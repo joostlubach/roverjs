@@ -4,9 +4,10 @@ import React from 'react'
 import {jss, jssKeyframes, colors, layout} from '../styles'
 import {Sprite, SVG} from '.'
 import type {Props as SpriteProps} from './Sprite'
-import type {Direction} from '../program'
+import type {Position, Direction} from '../program'
 
 export type Props = SpriteProps & {
+	failedPosition:     ?Position,
 	direction:          Direction,
 	transitionDuration: number,
 	jumpForJoy:         boolean,
@@ -20,7 +21,8 @@ export const defaultProps = {
 }
 
 type State = {
-	degrees: number
+	failedPosition: ?Position,
+	degrees:        number
 }
 
 export default class Robot extends React.Component<*, Props, *> {
@@ -29,28 +31,66 @@ export default class Robot extends React.Component<*, Props, *> {
 		super(props)
 
 		this.state = {
-			degrees: degreesForDirection(props.direction)
+			failedPosition: null,
+			degrees:        degreesForDirection(props.direction)
 		}
 	}
 
 	props: Props
 	static defaultProps = defaultProps
 
+	state: State
+
+	//------
+	// Failed simulation
+
+	failedTimeout: ?number = null
+
+	simulateFailed(failedPosition: Position) {
+		if (this.failedTimeout != null) { return }
+
+		// Simulate a move that fails.
+		this.setState({failedPosition})
+		this.failedTimeout = setTimeout(() => {
+			this.setState({failedPosition: null})
+		}, this.props.transitionDuration * 0.2)
+		setTimeout(() => {
+			this.stopFailedSimulation()
+		}, this.props.transitionDuration)
+	}
+
+	stopFailedSimulation() {
+		clearTimeout(this.failedTimeout)
+		this.failedTimeout = null
+		this.setState({failedPosition: null})
+	}
+
+	//------
+	// Component lifecycle
+
 	componentWillReceiveProps(props: Props) {
 		if (props.direction !== this.props.direction) {
 			this.setState({degrees: degreesForDirection(props.direction, this.props.direction, this.state.degrees)})
 		}
+
+		if (props.failedPosition != null) {
+			this.simulateFailed(props.failedPosition)
+		} else {
+			this.stopFailedSimulation()
+		}
 	}
 
 	render() {
-		const {x, y, transitionDuration, jumpForJoy, shame} = this.props
+		const {transitionDuration, jumpForJoy, shame} = this.props
+
+		const position = this.state.failedPosition || this.props.position
 		const style = {
 			transform:          `rotateZ(${this.state.degrees}deg)`,
 			transitionDuration: `${transitionDuration}ms`
 		}
 
 		return (
-			<Sprite className={[$.robot]} {...{x, y}} style={style}>
+			<Sprite className={[$.robot]} position={position} style={style}>
 				<div className={[$.svgContainer, jumpForJoy && $.jumpingForJoy1]}>
 					<SVG className={[$.svg, shame && $.shaming, jumpForJoy && $.jumpingForJoy2]} name='robot'/>
 				</div>

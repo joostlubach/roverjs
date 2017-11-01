@@ -127,6 +127,9 @@ export default class App extends React.Component<*, Props, *> {
 		const position = state == null
 			? level.startPosition
 			: state.position
+		const failedPosition = state == null
+			? null
+			: state.failedPosition
 		const direction = state == null
 			? level.startDirection
 			: state.direction
@@ -134,16 +137,14 @@ export default class App extends React.Component<*, Props, *> {
 			? simulatorStore.simulator.frameDuration
 			: 0
 
-		const goal = level.goalPosition
-
 		return (
 			<Grid rows={level.rows} columns={level.columns}>
 				{level.items.map((item, index) => this.renderSprite(item, index))}
 
-				{goal != null && <Goal x={goal.x} y={goal.y} type='goal'/>}
+				{level.goalPosition != null && <Goal position={level.goalPosition} type='goal'/>}
 				<Robot
-					x={position.x}
-					y={position.y}
+					position={position}
+					failedPosition={failedPosition}
 					direction={direction}
 					transitionDuration={transitionDuration}
 					jumpForJoy={simulatorStore.finished}

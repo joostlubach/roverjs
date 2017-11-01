@@ -14,10 +14,10 @@ export default class ItemSprite extends React.Component<*, Props, *> {
 	props: Props
 
 	render() {
-		const {position: {x, y}, type} = this.props.item
+		const {position, type} = this.props.item
 
 		return (
-			<Sprite className={$.sprite} {...{x, y}}>
+			<Sprite className={$.sprite} position={position}>
 				<SVG className={$.svg} name={type}/>
 			</Sprite>
 		)

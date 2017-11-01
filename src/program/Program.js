@@ -10,9 +10,10 @@ export type Step<T: any[]> = {
 }
 
 export type ProgramState = {
-	position:  Position,
-	direction: Direction,
-	apples:    number
+	position:       Position,
+	direction:      Direction,
+	failedPosition: ?Position,
+	apples:         number
 }
 
 export type ProgramResult =  {
@@ -39,9 +40,10 @@ export default class Program {
 
 	defaultState() {
 		return {
-			position:  this.level.startPosition,
-			direction: this.level.startDirection,
-			apples:    0
+			position:       this.level.startPosition,
+			direction:      this.level.startDirection,
+			failedPosition: null,
+			apples:         0
 		}
 	}
 
@@ -51,7 +53,7 @@ export default class Program {
 	interfaceMethods = ['move', 'turn', 'isFinished', 'robotAt', 'position', 'itemAt']
 
 	@recordable
-	move() {
+	move(): boolean {
 		let {x, y} = this.state.position
 
 		switch (this.state.direction) {
@@ -61,21 +63,24 @@ export default class Program {
 		case 'right': x += 1; break
 		}
 
-		if (!this.canMoveTo(x, y)) { return false }
+		if (!this.canMoveTo(x, y)) {
+			this.state.failedPosition = {x, y}
+			return false
+		}
+
 		this.state.position = {x, y}
 
 		const item = this.level.itemAt(x, y)
 		if (item != null && item.type === 'apple') {
 			this.state.apples += 1
 			this.level.removeItem(item)
-			return 'happy'
 		}
 
 		return true
 	}
 
 	@recordable
-	turn(direction: TurnDirection) {
+	turn(direction: TurnDirection): boolean {
 		let newDir
 		switch (this.state.direction) {
 		case 'up':    newDir = direction === 'left' ? 'left' : 'right'; break
@@ -146,22 +151,32 @@ export default class Program {
 		this.currentStepIndex = 0
 	}
 
+	prepState() {
+		this.state.failedPosition = null
+	}
+
+	perform<T: any[]>(action: (...args: T) => void, args: T) {
+		this.prepState()
+		return action.apply(this, args)
+	}
+
 	record<T: any[]>(action: (...args: T) => void, args: T, line: ?number) {
 		if (action.recordable) {
 			this.steps.push({action, args, line})
 			this.currentStepIndex = this.steps.length
 		}
 
-		return action.apply(this, args)
+		return this.perform(action, args)
 	}
 
 	step(): [?Step<*>, boolean] {
 		if (this.done || this.isFinished()) {
+			this.prepState()
 			return [null, this.isFinished()]
 		}
 
 		const step = this.steps[this.currentStepIndex]
-		const result = step.action.apply(this, step.args)
+		const result = this.perform(step.action, step.args)
 		this.currentStepIndex++
 
 		return [step, result]

@@ -122,13 +122,13 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 	// Current line
 
 	renderCurrentLineClass() {
-		const {currentLine, stepResult} = simulatorStore
-		if (currentLine == null) { return null }
+		const {currentStep, stepSuccess} = simulatorStore
+		if (currentStep == null) { return null }
 
 		return (
 			<LineClass
-				line={currentLine}
-				className={stepResult ? $.currentLineSuccess : $.currentLineFailure}
+				line={currentStep.line}
+				className={stepSuccess ? $.currentLineSuccess : $.currentLineFailure}
 			/>
 		)
 	}

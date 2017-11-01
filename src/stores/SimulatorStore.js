@@ -11,10 +11,10 @@ export default class SimulatorStore extends EventEmitter {
 	simulator: ?Simulator = null
 
 	@observable
-	currentLine: ?Step<*> = null
+	currentStep: ?Step<*> = null
 
 	@observable
-	stepResult: boolean = true
+	stepSuccess: boolean = true
 
 	@observable
 	state: ?ProgramState = null
@@ -73,7 +73,7 @@ export default class SimulatorStore extends EventEmitter {
 
 	@action
 	onSimulatorReset = (state: ProgramState) => {
-		this.currentLine = null
+		this.currentStep = null
 		this.state = state
 		this.running = false
 		this.done = false
@@ -82,18 +82,19 @@ export default class SimulatorStore extends EventEmitter {
 	}
 
 	@action
-	onSimulatorStep = (line: number, result: any, state: ProgramState) => {
-		this.currentLine = line
-		this.stepResult = result
+	onSimulatorStep = (step: Step<*>, success: boolean, state: ProgramState) => {
+		this.currentStep = step
+		this.stepSuccess = success
 		this.state = state
 	}
 
 	@action
 	onSimulatorDone = (result: ProgramResult) => {
-		this.currentLine = null
+		this.currentStep = null
 		this.running = false
 		this.done = true
 		this.active = false
+		this.state = result.state
 		this.finished = result.finished
 
 		this.emit('done', result)

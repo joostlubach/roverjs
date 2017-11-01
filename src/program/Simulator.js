@@ -62,7 +62,7 @@ export default class Simulator extends EventEmitter {
 	}
 
 	emitStep(step: Step<*>, success: boolean) {
-		this.emit('step', step.line, success, this.program.state)
+		this.emit('step', step, success, this.program.state)
 	}
 
 	emitDone() {

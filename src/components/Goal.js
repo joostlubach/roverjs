@@ -12,9 +12,9 @@ export default class Robot extends React.Component<*, Props, *> {
 	props: Props
 
 	render() {
-		const {x, y} = this.props
+		const {position} = this.props
 		return (
-			<Sprite className={$.goal} {...{x, y}}>
+			<Sprite className={$.goal} position={position}>
 				<SVG className={$.svg} name='goal'/>
 			</Sprite>
 		)

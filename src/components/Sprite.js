@@ -3,10 +3,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {jss, layout} from '../styles'
+import type {Position} from '../program'
 
 export type Props = {
-	x: number,
-	y: number,
+	position: Position,
 
 	children?:  any,
 	className?: ClassNameProp,
@@ -22,7 +22,7 @@ export default class Sprite extends React.Component<*, Props, *> {
 	}
 
 	render() {
-		const {className, style, x, y, children} = this.props
+		const {className, style, position: {x, y}, children} = this.props
 		const bounds = this.context.spriteBounds(x, y)
 
 		return (
