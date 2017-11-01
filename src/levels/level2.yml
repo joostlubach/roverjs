@@ -32,14 +32,32 @@ initialCode: |-
   // flag in only three lines of code?
 
 scoring:
-  - score: 2
-    regexp:   for\s*\(.*;.*;.*\)
-    message: |-
-      You haven't used a `for` loop in your code.
-      
-      To get three stars, use a `for` loop...
+  tests:
+    forLoop:
+      regexp: for\s*\(.*;.*;.*\)
+    short:
+      maxLines: 3
 
-  - score:    2
-    maxLines: 3
-    message: |-
-      Try to use only three lines of code for your program...    
+  scores:
+    - score: 1
+      forLoop: false
+      short:   false
+      message: |-
+        Okay, you finished, but your program is too long, and you
+        haven't used a `for` loop.
+
+        To get three stars, use a `for` loop...
+
+    - score: 2
+      forLoop: true
+      short:   false
+      message: |-
+        Great, but try to use only three lines of code for your program...    
+
+    - score: 2
+      forLoop: false
+      short:   true
+      message: |-
+        You haven't used a `for` loop in your code.
+        
+        To get three stars, use a `for` loop...

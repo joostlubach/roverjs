@@ -68,7 +68,7 @@ export default class Level {
 		this.items = this.items.filter(i => i !== item)
 	}
 
-	hasApples() {
+	get hasApples(): boolean {
 		return this.items.filter(item => item instanceof Apple).length > 0
 	}
 
@@ -78,19 +78,40 @@ export default class Level {
 
 }
 
-function parseScoring(raw: any[]): Scoring[] {
-	return raw.map(({score, message = null, ...condition}) => {
-		return {score, message, condition: buildScoringCondition(condition)}
-	})
+function parseScoring(raw: Object): Scoring[] {
+	const tests = parseScoringTests(raw.tests)
+	return raw.scores.map(({score, message = null, ...conditions}) => ({
+		score,
+		message,
+		condition: buildScoringCondition(conditions, tests)
+	}))
 }
 
-function buildScoringCondition(condition: Object) {
+function parseScoringTests(raw: Object) {
+	const tests = {}
+	for (const key in raw) {
+		tests[key] = parseScoringTest(raw[key])
+	}
+	return tests
+}
+
+function parseScoringTest(test: Object): (program: Program) => boolean {
+	if ('regexp' in test) {
+		return program => new RegExp(test.regexp).test(program.meaningfulCode)
+	} else if ('maxLines' in test) {
+		return program => program.linesOfCode <= test.maxLines
+	} else if ('minLines' in test) {
+		return program => program.linesOfCode >= test.minLines
+	} else {
+		return () => false
+	}
+}
+
+function buildScoringCondition(conditions: Object, tests: Object) {
 	return program => {
-		if ('regexp' in condition && new RegExp(condition.regexp).test(program.code)) {
-			return false
-		}
-		if ('maxLines' in condition && program.linesOfCode <= condition.maxLines) {
-			return false
+		for (const key in conditions) {
+			const test = tests[key] || (() => false)
+			if (test(program) !== conditions[key]) { return false }
 		}
 
 		return true

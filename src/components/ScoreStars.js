@@ -15,7 +15,8 @@ export type Props = {
 }
 export const defaultProps = {
 	starSize: 48,
-	padding:  layout.padding.m
+	padding:  layout.padding.m,
+	animated: true,
 }
 
 type State = {

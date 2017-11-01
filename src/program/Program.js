@@ -44,6 +44,13 @@ export default class Program {
 	code:  string
 	state: ProgramState
 
+	get meaningfulCode(): string {
+		return this.code
+			.split('\n')
+			.filter(line => !/^\s*(\/\/.*)?$/.test(line))
+			.join('\n')
+	}
+
 	get linesOfCode(): number {
 		const lines = this.code
 			.split('\n')

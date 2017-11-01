@@ -14,16 +14,22 @@ export default class App extends React.Component<*, Props, *> {
 
 	props: Props
 
-	async levelFinished(score: number, message: ?string) {
+	async levelFinished(score: number, scoreMessage: ?string) {
 		levelStore.completeLevel(score)
+
+		const title = "Level completed"
+		const scoring = (
+			<Scoring
+				className={$.scoring}
+				score={score}
+				message={scoreMessage || "**Excellent!**"}
+			/>
+		)
 
 		const nextLevelAvailable = levelStore.levels.length > programStore.level.id
 		const nextLevel = await MessageBox.show({
-			title:   "Level completed",
-			message: nextLevelAvailable
-				? null
-				: "You finished all the levels, well done!",
-			body:    <Scoring className={$.scoring} score={score} message={message}/>,
+			title,
+			body:    scoring,
 			buttons: nextLevelAvailable ? [
 				{label: "Try again", result: false},
 				{label: "Next level", result: true},
