@@ -44,7 +44,7 @@ export const placeholder = fg.normal.alpha(0.3)
 export const border = {
 	light:    new Color('#eee'),
 	medium:   new Color('#ccc'),
-	darl:     new Color('#aaa'),
+	dark:     new Color('#aaa'),
 	grid:     amber
 }
 

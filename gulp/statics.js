@@ -6,7 +6,7 @@ import config from './config'
 export default function statics(_, modifyStream) {
 	const filterRegexp = config.production ? /\.dev\..*$/ : /\.prod\..*$/
 	const renamer = path => {
-		 path.basename = path.basename.replace(/(\.prod|\.dev)$/, '')
+		path.basename = path.basename.replace(/(\.prod|\.dev)$/, '')
 	}
 
 	let stream = Gulp
