@@ -6,6 +6,7 @@ import {CodeMirror, Marker, Gutter, GutterMarker, LineWidget, LineClass} from '.
 import {jss, jssKeyframes, colors, layout, fonts} from '../styles'
 import {programStore, simulatorStore} from '../stores'
 import type {ASTNodeLocation} from '../program'
+import type CodeMirrorEl from 'codemirror'
 
 import 'codemirror/mode/javascript/javascript'
 
@@ -14,7 +15,9 @@ export type Props = {
 }
 
 type State = {
-	focusedErrorLine: ?number
+	focusedErrorLine: ?number,
+	readOnlyRanges:   Array<{start: number, end: number}>,
+	codeMirror:       ?CodeMirrorEl,
 }
 
 @observer
@@ -23,7 +26,9 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 	props: Props
 
 	state: State = {
-		focusedErrorLine: null
+		focusedErrorLine: null,
+		readOnlyRanges:   [],
+		codeMirror:       null
 	}
 
 	editor: ?Editor
@@ -40,7 +45,46 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 	}
 
 	//------
+	// Read only
+
+	updateReadOnlyRanges(code: string, codeMirror: CodeMirrorEl) {
+		this.setState({readOnlyRanges: this.calculateReadOnlyRanges(code, codeMirror)})
+	}
+
+	calculateReadOnlyRanges(code: string, codeMirror: CodeMirrorEl): Array<{start: number, end: number}> {
+		const ranges = []
+
+		let start = 0
+		while ((start = code.indexOf('----', start)) !== -1) {
+			let end = code.indexOf('++++', start)
+			if (end === -1) { end = code.length }
+
+			const startLine = codeMirror.posFromIndex(start).line
+			const endLine   = codeMirror.posFromIndex(end).line
+			ranges.push({start: startLine, end: endLine})
+
+			start = end + 1
+		}
+
+		return ranges
+	}
+
+	get readOnlyLines(): number[] {
+		const lines = new Set()
+		for (const {start, end} of this.state.readOnlyRanges) {
+			for (let line = start; line <= end; line++) {
+				lines.add(line)
+			}
+		}
+		return Array.from(lines)
+	}
+
+	//------
 	// Rendering
+
+	componentWillReact() {
+		// this.setState({readOnlyRanges: this.calculateReadOnlyRanges()})
+	}
 
 	render() {
 		const {className} = this.props
@@ -54,6 +98,9 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 				value={programStore.code}
 				onChange={this.onEditorChange.bind(this)}
 
+				onCodeMirrorSetUp={cm => { this.setState({codeMirror: cm}) }}
+				onValueSet={this.onValueSet}
+
 				options={{
 					cursorScrollMargin: 50
 				}}
@@ -61,6 +108,8 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 				{this.renderCurrentLineClass()}
 				{this.renderErrorMarkers()}
 				{this.renderFocusedErrorLineWidgets()}
+				{this.renderReadOnlyMarkers()}
+				{this.renderReadOnlyLineClasses()}
 
 				<Gutter name='errors'>
 					{this.renderErrorGutterMarkers()}
@@ -82,6 +131,27 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 				className={stepResult ? $.currentLineSuccess : $.currentLineFailure}
 			/>
 		)
+	}
+
+	renderReadOnlyMarkers() {
+		return this.state.readOnlyRanges.map(({start, end}) => (
+			<Marker
+				key={`readonly-${start}-${end}`}
+				from={{line: start, ch: 0}}
+				to={{line: end + 1, ch: 0}}
+				options={{readOnly: true}}
+			/>
+		))
+	}
+
+	renderReadOnlyLineClasses() {
+		return this.readOnlyLines.map(line => (
+			<LineClass
+				key={`readonly-${line}`}
+				line={line}
+				className={$.readOnlyLine}
+			/>
+		))
 	}
 
 	//------
@@ -155,6 +225,14 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 	onEditorChange = (value: string) => {
 		programStore.code = value
 		programStore.errors = []
+
+		if (this.state.codeMirror != null) {
+			this.updateReadOnlyRanges(value, this.state.codeMirror)
+		}
+	}
+
+	onValueSet = (value: string, codeMirror: ?CodeMirrorEl) => {
+		this.updateReadOnlyRanges(value, codeMirror)
 	}
 
 	onErrorGutterMarkerTap = (line: number) => {
@@ -212,6 +290,10 @@ const $ = jss({
 
 	currentLineFailure: {
 		background: colors.red
+	},
+
+	readOnlyLine: {
+		backgroundColor: colors.black.alpha(0.2)
 	},
 
 	errorGutterMarker: {

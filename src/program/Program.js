@@ -15,6 +15,13 @@ export type ProgramState = {
 	apples:    number
 }
 
+export type ProgramResult =  {
+	finished:        boolean,
+	atGoal:          boolean,
+	hasEnoughApples: boolean,
+	state:           ProgramState,
+}
+
 export type TurnDirection = 'left' | 'right'
 
 export default class Program {
@@ -86,8 +93,8 @@ export default class Program {
 	}
 
 	canMoveTo(x: number, y: number) {
-		if (x < 0 || x > this.level.columns) { return false }
-		if (y < 0 || y > this.level.rows) { return false }
+		if (x < 0 || x >= this.level.columns) { return false }
+		if (y < 0 || y >= this.level.rows) { return false }
 
 		const item = this.level.itemAt(x, y)
 		return item == null || !item.blocking
@@ -101,15 +108,30 @@ export default class Program {
 		return this.state.position
 	}
 
-	isFinished(): boolean {
+	isAtGoal(): boolean {
 		const {goalPosition} = this.level
 		if (goalPosition == null) { return false }
 
 		const {x, y} = goalPosition
-		if (!this.robotAt(x, y)) { return false }
+		return this.robotAt(x, y)
+	}
 
+	hasEnoughApples(): boolean {
 		if (this.level.goalApples == null) { return true }
-		return this.state.apples === this.level.goalApples
+		return this.state.apples >= this.level.goalApples
+	}
+
+	isFinished(): boolean {
+		return this.isAtGoal() && this.hasEnoughApples()
+	}
+
+	get result(): ProgramResult {
+		return {
+			finished:        this.isFinished(),
+			atGoal:          this.isAtGoal(),
+			hasEnoughApples: this.hasEnoughApples(),
+			state:           this.state
+		}
 	}
 
 	//------
@@ -134,7 +156,9 @@ export default class Program {
 	}
 
 	step(): [?Step<*>, boolean] {
-		if (this.done) { return [null, false] }
+		if (this.done || this.isFinished()) {
+			return [null, this.isFinished()]
+		}
 
 		const step = this.steps[this.currentStepIndex]
 		const result = step.action.apply(this, step.args)

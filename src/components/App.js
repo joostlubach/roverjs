@@ -5,7 +5,7 @@ import {observer} from 'mobx-react'
 import {jss, colors, layout, shadows} from '../styles'
 import {Panels, Grid, Inventory, ItemSprite, Robot, Goal, CodeEditor, CodeToolbar, SimulatorToolbar, MessageBox} from '.'
 import {levelStore, viewStateStore, programStore, simulatorStore} from '../stores'
-import type {Item} from '../program'
+import type {Item, ProgramResult} from '../program'
 
 export type Props = {}
 
@@ -14,7 +14,7 @@ export default class App extends React.Component<*, Props, *> {
 
 	props: Props
 
-	async levelComplete() {
+	async levelFinished() {
 		levelStore.completeLevel(3)
 
 		const nextLevelAvailable = levelStore.levels.length > programStore.level.id
@@ -38,13 +38,14 @@ export default class App extends React.Component<*, Props, *> {
 		}
 	}
 
-	async levelIncomplete(reason: string) {
-		if (reason !== 'not-enough-apples' && window.localStorage.levelIncompleteBoxShown) { return }
+	async levelUnfinished(result: ProgramResult) {
+		// Only show the 'Rover did not make it to the flag' box once.
+		if (!result.atGoal && window.localStorage.levelUnfinishedBoxShown) { return }
+		window.localStorage.levelUnfinishedBoxShown = 'true'
 
-		window.localStorage.levelIncompleteBoxShown = 'true'
 		await MessageBox.show({
 			title:   "Level incomplete",
-			message: reason === 'not-enough-apples'
+			message: result.atGoal
 				? "Rover did make it to the flag, but he did not eat enough apples!"
 				: "Rover did not make it to the flag!",
 			buttons: [
@@ -129,9 +130,9 @@ export default class App extends React.Component<*, Props, *> {
 		const direction = state == null
 			? level.startDirection
 			: state.direction
-		const transitionDuration = simulatorStore.simulator == null
-			? 0
-			: simulatorStore.simulator.frameDuration
+		const transitionDuration = simulatorStore.running
+			? simulatorStore.simulator.frameDuration
+			: 0
 
 		const goal = level.goalPosition
 
@@ -168,11 +169,11 @@ export default class App extends React.Component<*, Props, *> {
 		programStore.runProgram(e.metaKey)
 	}
 
-	onSimulatorDone = (finished: boolean, reason: string) => {
-		if (finished) {
-			this.levelComplete()
+	onSimulatorDone = (result: ProgramResult) => {
+		if (result.finished) {
+			this.levelFinished()
 		} else {
-			this.levelIncomplete(reason)
+			this.levelUnfinished(result)
 		}
 	}
 

@@ -47,6 +47,8 @@ export default class Function {
 				rest.push(arg)
 			} else {
 				const param = params.shift()
+				if (param == null) { break }
+
 				if (param.type === 'Identifier') {
 					scope.define(param.name, arg, false)
 				} else if (param.type === 'RestElement') {

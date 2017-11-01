@@ -1,0 +1,27 @@
+rows: 8
+columns: 8
+
+start: [0, 7, 'up']
+goal:  [7, 0]
+
+initialCode: |-
+  // Remember chess? The knight in chess moves two places
+  // ahead, and then one to the left or right.
+  //
+  // Write a function called "knightMove" below which has
+  // a parameter called "direction". If you do it right,
+  // the program will bring Rover to the flag.
+
+  // ---- You cannot modify these lines
+
+  knightMove('right')
+  knightMove('left')
+  turn('right')
+  knightMove('right')
+  turn('left')
+  knightMove('left')
+  knightMove('left')
+  turn('right')
+  knightMove('right')
+
+  // ++++

@@ -46,6 +46,7 @@ export default class ProgramStore extends EventEmitter {
 		if (this.code == null) {
 			this.code = this.level.initialCode
 		}
+
 		simulatorStore.reset()
 	}
 
@@ -66,7 +67,7 @@ export default class ProgramStore extends EventEmitter {
 	@action
 	runProgram() {
 		if (this.level == null) { return }
-		if (simulatorStore.inProgress) { return }
+		if (simulatorStore.active) { return }
 
 		// Create a new program.
 		const program = this.program = new Program(this.level)

@@ -3,7 +3,7 @@
 import EventEmitter from 'events'
 import {observable, action} from 'mobx'
 import {Simulator} from '../program'
-import type {Program, ProgramState} from '../program'
+import type {Program, ProgramState, ProgramResult} from '../program'
 
 export default class SimulatorStore extends EventEmitter {
 
@@ -23,37 +23,36 @@ export default class SimulatorStore extends EventEmitter {
 	running: boolean = false
 
 	@observable
+	active: boolean = false
+
+	@observable
 	done: boolean = false
 
 	@observable
 	finished: boolean = false
 
-	get inProgress(): boolean {
-		return this.state != null
-	}
-
 	@action
 	reset() {
-		if (this.simulator != null) {
-			this.simulator.reset()
-		}
+		if (this.simulator == null) { return }
+		this.simulator.reset()
 
+		this.simulator.removeAllListeners()
+		this.simulator = null
 		this.state = null
-		this.running = false
-		this.done = false
-		this.finished = false
 	}
 
 	@action
 	simulate(program: Program) {
 		this.reset()
 
-		this.running = true
 		this.simulator = new Simulator(program)
 		this.simulator.on('reset', this.onSimulatorReset)
 		this.simulator.on('step', this.onSimulatorStep)
 		this.simulator.on('done', this.onSimulatorDone)
 		this.simulator.run()
+
+		this.active = true
+		this.running = true
 	}
 
 	@action
@@ -76,7 +75,9 @@ export default class SimulatorStore extends EventEmitter {
 	onSimulatorReset = (state: ProgramState) => {
 		this.currentLine = null
 		this.state = state
+		this.running = false
 		this.done = false
+		this.active = false
 		this.finished = false
 	}
 
@@ -88,16 +89,14 @@ export default class SimulatorStore extends EventEmitter {
 	}
 
 	@action
-	onSimulatorDone = (finished: boolean, reason: ?string) => {
-		this.simulator.removeAllListeners()
-		this.simulator = null
-
+	onSimulatorDone = (result: ProgramResult) => {
 		this.currentLine = null
 		this.running = false
 		this.done = true
-		this.finished = finished
+		this.active = false
+		this.finished = result.finished
 
-		this.emit('done', finished, reason)
+		this.emit('done', result)
 	}
 
 }

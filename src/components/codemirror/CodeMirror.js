@@ -15,6 +15,9 @@ export type Props = {
 	value:      string,
 	onChange:   (value: string) => void,
 
+	onCodeMirrorSetUp?: (codeMirror: CodeMirrorEl) => void,
+	onValueSet?: (value: string, codeMirror: CodeMirrorEl) => void,
+
 	children?:  any,
 	className?: ClassNameProp
 }
@@ -53,6 +56,10 @@ export default class CodeMirror extends React.Component<*, Props, *> {
 
 	static childContextTypes = {
 		codeMirror: PropTypes.instanceOf(CodeMirrorEl)
+	}
+
+	getCodeMirror() {
+		return this.state.codeMirror
 	}
 
 	getChildContext() {
@@ -99,6 +106,10 @@ export default class CodeMirror extends React.Component<*, Props, *> {
 		const codeMirror = CodeMirrorEl.fromTextArea(this.textArea, this.options)
 		codeMirror.on('change', this.onChange.bind(this))
 		this.setState({codeMirror: codeMirror})
+
+		if (this.props.onCodeMirrorSetUp) {
+			this.props.onCodeMirrorSetUp(codeMirror)
+		}
 		return codeMirror
 	}
 
@@ -110,12 +121,18 @@ export default class CodeMirror extends React.Component<*, Props, *> {
 
 	updateValue(value: string) {
 		if (value === this.currentValue) { return }
+		this.setValue(value)
+	}
 
-		const {codeMirror} = this.state
+	setValue(value: string, codeMirror: ?CodeMirrorEl = this.state.codeMirror) {
 		if (codeMirror == null) { return }
 
 		codeMirror.setValue(value)
 		this.currentValue = value
+
+		if (this.props.onValueSet) {
+			this.props.onValueSet(value, codeMirror)
+		}
 	}
 
 	//------
@@ -123,9 +140,7 @@ export default class CodeMirror extends React.Component<*, Props, *> {
 
 	componentDidMount() {
 		const codeMirror = this.setupCodeMirror()
-
-		codeMirror.setValue(this.props.value)
-		this.currentValue = this.props.value
+		this.setValue(this.props.value, codeMirror)
 	}
 
 	componentWillUnmount() {

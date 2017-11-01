@@ -5,12 +5,8 @@ import {jss, jssKeyframes, colors, layout} from '../styles'
 import {Sprite, SVG} from '.'
 import type {Props as SpriteProps} from './Sprite'
 import type {Direction} from '../program'
-import type Color from 'color'
 
 export type Props = SpriteProps & {
-	triedX: number,
-	triedY: number,
-
 	direction:          Direction,
 	transitionDuration: number,
 	jumpForJoy:         boolean,
@@ -24,57 +20,34 @@ export const defaultProps = {
 }
 
 type State = {
-	tryX:    ?number,
-	tryY:    ?number,
-	animate: boolean
+	degrees: number
 }
 
 export default class Robot extends React.Component<*, Props, *> {
 
-	props: Props
-	static defaultProps = defaultProps
+	constructor(props: Props) {
+		super(props)
 
-	state: State = {
-		tryX:    null,
-		tryY:    null,
-		animate: true
-	}
-
-	tryTimeout: ?number = null
-
-	get directionDegrees(): string {
-		switch (this.props.direction) {
-		case 'up':    return 0
-		case 'down':  return 180
-		case 'left':  return -90
-		case 'right': return 90
+		this.state = {
+			degrees: degreesForDirection(props.direction)
 		}
 	}
 
+	props: Props
+	static defaultProps = defaultProps
+
 	componentWillReceiveProps(props: Props) {
-		const {tryX, tryY} = props
-		if (tryX != null && tryY != null) {
-			this.setState({tryX, tryY, animate: true})
-			this.tryTimeout = setTimeout(() => {
-				this.setState({tryX: null, tryY: null, animate: false})
-			}, this.props.transitionDuration * 0.4)
-		} else {
-			this.setState({tryX, tryY, animate: true})
-			clearTimeout(this.tryTimeout)
+		if (props.direction !== this.props.direction) {
+			this.setState({degrees: degreesForDirection(props.direction, this.props.direction, this.state.degrees)})
 		}
 	}
 
 	render() {
-		const {transitionDuration, jumpForJoy, shame} = this.props
-		const {animate} = this.state
+		const {x, y, transitionDuration, jumpForJoy, shame} = this.props
 		const style = {
-			transform:          `rotateZ(${this.directionDegrees}deg)`,
-			transitionDuration: animate ? `${transitionDuration}ms` : 0
+			transform:          `rotateZ(${this.state.degrees}deg)`,
+			transitionDuration: `${transitionDuration}ms`
 		}
-
-		const {tryX, tryY} = this.state
-		const x = tryX == null ? this.props.x : tryX
-		const y = tryY == null ? this.props.y : tryY
 
 		return (
 			<Sprite className={[$.robot]} {...{x, y}} style={style}>
@@ -85,6 +58,19 @@ export default class Robot extends React.Component<*, Props, *> {
 		)
 	}
 
+}
+
+function degreesForDirection(direction: Direction, existing: Direction = 'up', existingDegrees: number = 0): string {
+	return existingDegrees + directionDiff(existing, direction)
+}
+
+function directionDiff(from: Direction, to: Direction) {
+	switch (`${from}-${to}`) {
+	case 'up-up': case 'right-right': case 'down-down': case 'left-left': return 0
+	case 'up-right': case 'right-down': case 'down-left': case 'left-up': return 90
+	case 'up-down': case 'right-left': case 'down-up': case 'left-right': return 180
+	case 'up-left': case 'right-up': case 'down-right': case 'left-down': return -90
+	}
 }
 
 const rotateAnim = jssKeyframes('rotate', {

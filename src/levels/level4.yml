@@ -1,0 +1,38 @@
+rows:    5
+columns: 5
+
+start:      [0, 2, 'right']
+goal:       [4, 2]
+goalApples: 3
+
+items:
+  - [2, 2, 'apple']
+  - [2, 2, 'apple']
+  - [2, 2, 'apple']
+  - [2, 2, 'apple']
+
+initialCode: |-
+  // This time, there are four apples, but they're all
+  // in the same place.
+  //
+  // Rover only eats one apple at a time when he moves to
+  // a square with an apple. So to eat them all, he has to
+  // move away, turn around, and come back.
+  //
+  // That's a bit annoying to type over and over again. Can
+  // you create a *function* that does this, and use it
+  // to eat all the apples?
+
+  function moveAwayAndComeBack() {
+    // Fill in your function here.
+  }
+
+  // ---- You cannot modify these lines
+
+  move(); move()
+  for (let i = 0; i < 3; i++) {
+    moveAwayAndComeBack()
+  }
+  move(); move()
+
+  // ++++

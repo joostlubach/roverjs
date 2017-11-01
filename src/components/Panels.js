@@ -62,22 +62,23 @@ export default class Panels extends React.Component<*, Props, *> {
 	}
 
 	renderMain(element: ?any) {
-		const {splitterSize} = this.props
 		const {left, right} = this.state.sizes
 
 		return (
-			<div className={$.main} style={{left: left + splitterSize, right: right + splitterSize}}>
+			<div className={$.main} style={{left: left, right: right}}>
 				{element}
 			</div>
 		)
 	}
 
 	renderPanel(side: string, element: any) {
+		const {splitterSize} = this.props
+
 		return (
 			<div
 				ref={el => { this.panels.set(side, el) }}
 				className={[$.panel, $[`panel_${side}`]]}
-				style={{width: this.state.sizes[side]}}
+				style={{width: this.state.sizes[side] - splitterSize}}
 			>
 				{element}
 				{this.renderHandle(side)}

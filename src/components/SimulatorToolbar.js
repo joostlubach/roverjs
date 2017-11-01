@@ -67,7 +67,7 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 	// Event handlers
 
 	onPlayTap = () => {
-		if (!simulatorStore.inProgress) {
+		if (!simulatorStore.active) {
 			programStore.runProgram()
 		} else {
 			simulatorStore.resume()
