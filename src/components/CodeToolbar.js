@@ -3,7 +3,7 @@
 import React from 'react'
 import {observer} from 'mobx-react'
 import {jss, layout, colors, fonts, shadows} from '../styles'
-import {SVG, Markdown, ToolbarButton, Button, MessageBox} from '.'
+import {SVG, Markdown, ToolbarButton, Button, MessageBox, ScoreStars} from '.'
 import {levelStore, programStore} from '../stores'
 
 export type Props = {}
@@ -58,6 +58,8 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
 	}
 
 	renderLevelButton(level: Level) {
+		const score = levelStore.levelScores.get(level.id)
+
 		return (
 			<Button
 				key={level.id}
@@ -66,7 +68,9 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
 				color={programStore.isActiveLevel(level) ? colors.green : colors.purple.lighten(0.2)}
 				disabled={!levelStore.isLevelSelectable(level)}
 				onTap={this.onLevelTap.bind(this, level)}
-			/>
+			>
+				{score && <ScoreStars score={score} starSize={10} padding={4} animated={false}/>}
+			</Button>
 		)
 	}
 

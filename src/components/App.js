@@ -3,7 +3,7 @@
 import React from 'react'
 import {observer} from 'mobx-react'
 import {jss, colors, layout, shadows} from '../styles'
-import {Panels, Grid, Inventory, ItemSprite, Robot, Goal, CodeEditor, CodeToolbar, SimulatorToolbar, MessageBox} from '.'
+import {Panels, Grid, Inventory, ItemSprite, Robot, Goal, CodeEditor, CodeToolbar, SimulatorToolbar, Scoring, MessageBox} from '.'
 import {levelStore, viewStateStore, programStore, simulatorStore} from '../stores'
 import type {Item, ProgramResult} from '../program'
 
@@ -14,15 +14,16 @@ export default class App extends React.Component<*, Props, *> {
 
 	props: Props
 
-	async levelFinished() {
-		levelStore.completeLevel(3)
+	async levelFinished(score: number, message: ?string) {
+		levelStore.completeLevel(score)
 
 		const nextLevelAvailable = levelStore.levels.length > programStore.level.id
 		const nextLevel = await MessageBox.show({
 			title:   "Level completed",
 			message: nextLevelAvailable
-				? "You completed the level!"
+				? null
 				: "You finished all the levels, well done!",
+			body:    <Scoring className={$.scoring} score={score} message={message}/>,
 			buttons: nextLevelAvailable ? [
 				{label: "Try again", result: false},
 				{label: "Next level", result: true},
@@ -172,7 +173,7 @@ export default class App extends React.Component<*, Props, *> {
 
 	onSimulatorDone = (result: ProgramResult) => {
 		if (result.finished) {
-			this.levelFinished()
+			this.levelFinished(result.score, result.message)
 		} else {
 			this.levelUnfinished(result)
 		}
@@ -222,6 +223,6 @@ const $ = jss({
 		backgroundColor: colors.purple,
 		backgroundImage: colors.bevelGradient('left'),
 		boxShadow:       shadows.horizontal(2)
-	},
+	}
 
 })

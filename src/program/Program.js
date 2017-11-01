@@ -20,7 +20,11 @@ export type ProgramResult =  {
 	finished:        boolean,
 	atGoal:          boolean,
 	hasEnoughApples: boolean,
-	state:           ProgramState,
+
+	score:   number,
+	message: ?string,
+
+	state: ProgramState,
 }
 
 export type TurnDirection = 'left' | 'right'
@@ -30,13 +34,23 @@ export default class Program {
 	//------
 	// Constructor
 
-	constructor(level: Level) {
+	constructor(level: Level, code: string) {
 		this.level = level
+		this.code  = code
 		this.state = this.defaultState()
 	}
 
 	level: Level
+	code:  string
 	state: ProgramState
+
+	get linesOfCode(): number {
+		const lines = this.code
+			.split('\n')
+			.filter(line => !/^\s*(\/\/.*)?$/.test(line))
+
+		return lines.length
+	}
 
 	defaultState() {
 		return {
@@ -135,8 +149,20 @@ export default class Program {
 			finished:        this.isFinished(),
 			atGoal:          this.isAtGoal(),
 			hasEnoughApples: this.hasEnoughApples(),
-			state:           this.state
+			state:           this.state,
+
+			...this.applyScoring()
 		}
+	}
+
+	applyScoring() {
+		for (const {score, message, condition} of this.level.scoring) {
+			if (condition(this)) {
+				return {score, message}
+			}
+		}
+
+		return {score: 3, message: null}
 	}
 
 	//------

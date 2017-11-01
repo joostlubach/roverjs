@@ -23,13 +23,8 @@ export default class Simulator extends EventEmitter {
 		return 1000 / this.fps
 	}
 
-	reset() {
-		this.program.reset()
-		this.emitReset(this.program.state)
-	}
-
 	run() {
-		this.reset()
+		this.program.reset()
 		this.next()
 	}
 
@@ -55,10 +50,6 @@ export default class Simulator extends EventEmitter {
 		} else {
 			this.emitDone()
 		}
-	}
-
-	emitReset() {
-		this.emit('reset', this.program.state)
 	}
 
 	emitStep(step: Step<*>, success: boolean) {

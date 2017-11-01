@@ -20,6 +20,11 @@ jss({
 			...layout.flex.column,
 
 			font: fonts.normal
+		},
+		'h1, h2, h3': {
+			fontSize: '100%',
+			padding:  0,
+			margin:   0
 		}
 	}
 })

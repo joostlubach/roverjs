@@ -30,3 +30,16 @@ initialCode: |-
   //
   // Can you find a way using a *for loop* to get Rover to the
   // flag in only three lines of code?
+
+scoring:
+  - score: 2
+    regexp:   for\s*\(.*;.*;.*\)
+    message: |-
+      You haven't used a `for` loop in your code.
+      
+      To get three stars, use a `for` loop...
+
+  - score:    2
+    maxLines: 3
+    message: |-
+      Try to use only three lines of code for your program...    

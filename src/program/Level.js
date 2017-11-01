@@ -1,6 +1,12 @@
 // @flow
 
-import type {Position, Direction} from '.'
+import type {Program, Position, Direction} from '.'
+
+export type Scoring = {
+	score:     number,
+	message:   ?string,
+	condition: (program: Program) => number
+}
 
 export default class Level {
 
@@ -31,6 +37,10 @@ export default class Level {
 		}
 		level.originalItems = level.items
 
+		if (raw.scoring != null) {
+			level.scoring = parseScoring(raw.scoring)
+		}
+
 		level.initialCode = raw.initialCode
 		return level
 	}
@@ -45,9 +55,10 @@ export default class Level {
 	goalPosition:   ?Position = null
 	goalApples: ?number = null
 
-	initialCode:    string = ''
-	originalItems:  Item[] = []
-	items:          Item[] = []
+	initialCode:    string    = ''
+	originalItems:  Item[]    = []
+	items:          Item[]    = []
+	scoring:        Scoring[] = []
 
 	itemAt(x: number, y: number): ?Item {
 		return this.items.find(({position}) => position.x === x && position.y === y)
@@ -65,6 +76,25 @@ export default class Level {
 		this.items = this.originalItems
 	}
 
+}
+
+function parseScoring(raw: any[]): Scoring[] {
+	return raw.map(({score, message = null, ...condition}) => {
+		return {score, message, condition: buildScoringCondition(condition)}
+	})
+}
+
+function buildScoringCondition(condition: Object) {
+	return program => {
+		if ('regexp' in condition && new RegExp(condition.regexp).test(program.code)) {
+			return false
+		}
+		if ('maxLines' in condition && program.linesOfCode <= condition.maxLines) {
+			return false
+		}
+
+		return true
+	}
 }
 
 export class Item {

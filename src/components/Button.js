@@ -7,11 +7,14 @@ import type {TappableState} from './Tappable'
 import type Color from 'color'
 
 export type Props = {
-	icon:     string,
-	label:    string,
+	icon:      string,
+	label:     string,
+	children?: any,
+
 	color:    Color,
 	disabled: boolean,
 	small?:   boolean,
+
 	onTap:    () => void
 }
 export const defaultProps = {
@@ -32,7 +35,7 @@ export default class Button extends React.Component<*, Props, *> {
 	}
 
 	render() {
-		const {icon, label, small, disabled, color, onTap} = this.props
+		const {icon, label, children, small, disabled, color, onTap} = this.props
 
 		const {tappableState} = this.state
 		const style = {
@@ -54,8 +57,11 @@ export default class Button extends React.Component<*, Props, *> {
 				onTap={disabled ? null : onTap}
 				onStateChange={state => { this.setState({tappableState: state}) }}
 			>
-				{icon && <SVG className={[$.icon, small && $.iconSmall]} name={icon}/>}
-				<div className={[$.label, small && $.labelSmall]}>{label}</div>
+				<div className={[$.content, small && $.contentSmall]}>
+					{icon && <SVG className={[$.icon, small && $.iconSmall]} name={icon}/>}
+					<div className={[$.label, small && $.labelSmall]}>{label}</div>
+				</div>
+				{children && <div className={$.body}>{children}</div>}
 			</Tappable>
 		)
 	}
@@ -83,8 +89,10 @@ const $ = jss({
 		cursor: 'pointer'
 	},
 
-	buttonSmall: {
-		padding: layout.padding.xs,
+	content: {
+		...layout.flex.column,
+		alignItems:     'center',
+		justifyContent: 'space-around',
 	},
 
 	buttonDisabled: {
@@ -105,6 +113,10 @@ const $ = jss({
 		font:          fonts.smallCaps,
 		textTransform: 'uppercase',
 		fontWeight:    500
+	},
+
+	buttonSmall: {
+		padding: layout.padding.xs,
 	},
 
 	iconSmall: {

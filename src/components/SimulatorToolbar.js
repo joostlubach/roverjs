@@ -33,7 +33,6 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 			<ToolbarButton
 				icon='play'
 				label="PLAY"
-				disabled={simulatorStore.done}
 				onTap={this.onPlayTap}
 			/>
 		)
@@ -67,10 +66,16 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 	// Event handlers
 
 	onPlayTap = () => {
-		if (!simulatorStore.active) {
-			programStore.runProgram()
-		} else {
+		if (simulatorStore.active) {
 			simulatorStore.resume()
+		} else if (simulatorStore.done) {
+			// Reset everything, and wait a while to run, to allow everything to reset
+			// without animation.
+			simulatorStore.reset()
+			setTimeout(() => { programStore.runProgram() }, 200)
+		} else {
+			// Run immediately.
+			programStore.runProgram()
 		}
 	}
 

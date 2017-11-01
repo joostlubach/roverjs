@@ -70,7 +70,7 @@ export default class ProgramStore extends EventEmitter {
 		if (simulatorStore.active) { return }
 
 		// Create a new program.
-		const program = this.program = new Program(this.level)
+		const program = this.program = new Program(this.level, this.code)
 
 		// Use the students code to build the program.
 		const builder = new ProgramBuilder(program)

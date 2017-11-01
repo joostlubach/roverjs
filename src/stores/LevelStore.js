@@ -8,10 +8,6 @@ import URL from 'url'
 
 export default class LevelStore {
 
-	constructor() {
-		reaction(() => [this.levelScores, programStore && programStore.level], () => { this.save() })
-	}
-
 	@observable
 	levels: Level[] = levels
 
@@ -23,7 +19,11 @@ export default class LevelStore {
 		const currentLevel = programStore.level
 		if (currentLevel == null) { return }
 
-		this.levelScores.set(currentLevel.id, score)
+		const existingScore = this.levelScores.get(currentLevel.id)
+		if (existingScore == null || existingScore < score) {
+			this.levelScores.set(currentLevel.id, score)
+			this.save()
+		}
 	}
 
 	@action
@@ -40,6 +40,7 @@ export default class LevelStore {
 		if (level == null) { return }
 
 		programStore.loadLevel(level)
+		this.save()
 	}
 
 	isLevelSelectable(level: Level) {

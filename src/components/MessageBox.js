@@ -16,9 +16,10 @@ export type MessageBoxButton<T> = {
 }
 
 export type Props<T> = {
-	title:    string,
-	message:  string,
-	buttons:  MessageBoxButton<T>[],
+	title:     string,
+	message?:  string,
+	body?:     any,
+	buttons:   MessageBoxButton<T>[],
 
 	className?: ClassNameProp
 }
@@ -66,11 +67,12 @@ export default class MessageBox<T> extends React.Component<void, Props<T>, void>
 	}
 
 	renderBody() {
-		const {message} = this.props
+		const {body, message} = this.props
 
 		return (
 			<div className={$.body}>
-				<Markdown className={$.message}>{message}</Markdown>
+				{message && <Markdown className={$.message}>{message}</Markdown>}
+				{body && <div>{body}</div>}
 			</div>
 		)
 	}
@@ -207,18 +209,21 @@ const $ = jss({
 	messageBox: {
 		flex:       [0, 1, 'auto'],
 		overflow:   'auto',
-		maxWidth:   '80%',
+		maxWidth:   480,
+
+		border: [4, 'solid', colors.amber],
 
 		pointerEvents: 'auto',
 
 		background:    colors.bg.light,
-		borderRadius:  layout.radius.s,
+		borderRadius:  layout.radius.m,
 	},
 
 	header: {
 		...layout.flex.center,
 		borderRadius: [layout.radius.m, layout.radius.m, 0, 0],
-		padding:      [layout.padding.s, layout.padding.s]
+		padding:      [layout.padding.m, layout.padding.m, 0],
+		color:        colors.blue
 	},
 
 	title: {
@@ -229,6 +234,10 @@ const $ = jss({
 		minWidth:   360,
 		padding:    layout.padding.m,
 		...layout.flex.center,
+
+		'& > :not(:last-child)': {
+			marginBottom: layout.padding.m
+		}
 	},
 
 	message: {
