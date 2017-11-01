@@ -85,7 +85,7 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
 	}
 
 	onLevelTap = (level: Level) => {
-		programStore.loadLevel(level)
+		levelStore.goTo(level.id)
 	}
 
 	onResetTap = () => {

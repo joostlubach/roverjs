@@ -25,3 +25,35 @@ initialCode: |-
   knightMove('right')
 
   // ++++
+
+scoring:
+  tests:
+    hasFunction:
+      regexp: function\s+knightMove
+    hasArg:
+      regexp: function\s+knightMove\(.*[a-z].*\)
+    short:
+      maxLines: 16
+
+  scores:
+    - score: 1
+      hasFunction: false
+      short:       false
+      message: |-
+        It seems you finished without implementing the `knightMove` function.
+
+        To get three stars, make sure you've implemented this function.
+
+    - score: 2
+      hasFunction: true
+      hasArg:      false
+      message: |-
+        Your function does not accept an argument.
+
+        To get three stars, make sure your `knightMove` function accepts an argument.
+
+    - score: 2
+      hasFunction: true
+      short:       false
+      message: |-
+        It seems your code is too long. You can do it in less lines of code!

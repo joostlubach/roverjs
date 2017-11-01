@@ -69,7 +69,7 @@ export default class Level {
 	}
 
 	get hasApples(): boolean {
-		return this.items.filter(item => item instanceof Apple).length > 0
+		return this.originalItems.filter(item => item instanceof Apple).length > 0
 	}
 
 	reset() {

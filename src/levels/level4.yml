@@ -36,3 +36,25 @@ initialCode: |-
   move(); move()
 
   // ++++
+
+scoring:
+  tests:
+    hasFunction:
+      regexp: function\s+moveAwayAndComeBack
+    short:
+      maxLines: 14
+
+  scores:
+    - score: 1
+      hasFunction: false
+      short:       false
+      message: |-
+        It seems you finished without implementing the `knightMove` function.
+
+        To get three stars, make sure you've implemented this function.
+
+    - score: 2
+      hasFunction: true
+      short:       false
+      message: |-
+        It seems your code is too long. You can do it in less lines of code!
