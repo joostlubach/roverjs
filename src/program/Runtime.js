@@ -4,21 +4,29 @@
 import {Scope, Context, Function} from '.'
 import type {ASTNode} from '.'
 
+export type Options = {
+	context?:   Context,
+	callbacks?: Callbacks
+}
+export type Callbacks = {
+	node?:      (node: ASTNode) => void,
+	statement?: (node: ASTNode) => void
+}
+
 export default class Runtime {
 
-	constructor(context: Context = new Context()) {
-		this.context = context
-		this.currentScope = context
+	constructor(options: Options = {}) {
+		this.context      = options.context || new Context()
+		this.callbacks    = options.callbacks || {}
+		this.currentScope = this.context
 	}
 
-	contet:       Scope
+	context:      Context
 	currentScope: Scope
+	callbacks:    Callbacks
 
 	/** Set when a return or break has been called. */
 	interruptType: ?('return' | 'break' | 'continue')
-
-	/** The current node being evaluated. Used to record line numbers of steps. */
-	currentNode:     ?ASTNode = null
 
 	/** The current receiver. Used for method calls. */
 	currentReceiver: ?Object = null
@@ -29,7 +37,7 @@ export default class Runtime {
 	evaluatedNodes: number = 0
 
 	evaluate(node: ASTNode) {
-		this.currentNode = node
+		this.runCallbacks(node)
 
 		if (this.evaluatedNodes++ > 10000) {
 			throw new InfiniteLoopException()
@@ -37,6 +45,18 @@ export default class Runtime {
 
 		const {type} = node
 		return this[`evaluate_${type}`](node)
+	}
+
+	runCallbacks(node: ASTNode) {
+		const {callbacks} = this
+		if (callbacks == null) { return }
+
+		if (callbacks.node) {
+			callbacks.node(node)
+		}
+		if (callbacks.statement && isStatement(node)) {
+			callbacks.statement(node)
+		}
 	}
 
 	//------
@@ -180,12 +200,12 @@ export default class Runtime {
 		this.interruptType = 'continue'
 	}
 
-	//------
-	// Expressions
-
 	evaluate_ExpressionStatement(node: ASTNode) {
 		return this.evaluate(node.expression)
 	}
+
+	//------
+	// Expressions
 
 	evaluate_AssignmentExpression(node: ASTNode) {
 		if (node.operator === '=') {
@@ -410,6 +430,25 @@ export default class Runtime {
 		throw error
 	}
 
+}
+
+function isStatement(node: ASTNode) {
+	return /(Declaration|Statement)$/.test(node.type)
+}
+
+function isSimpleStatement(node: ASTNode) {
+	return isStatement(node) && !isCompoundStatement(node)
+}
+
+function isCompoundStatement(node: ASTNode) {
+	return [
+		'BlockStatement',
+		'IfStatement',
+		'ForStatement',
+		'ForOfStatement',
+		'ForInStatement',
+		'WhileStatement'
+	].includes(node.type)
 }
 
 function templateDefault(strings: string[], ...values: any[]): string {

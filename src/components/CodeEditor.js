@@ -105,7 +105,7 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 					cursorScrollMargin: 50
 				}}
 			>
-				{this.renderCurrentLineClass()}
+				{this.renderCurrentStepMarker()}
 				{this.renderErrorMarkers()}
 				{this.renderFocusedErrorLineWidgets()}
 				{this.renderReadOnlyMarkers()}
@@ -121,14 +121,15 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 	//------
 	// Current line
 
-	renderCurrentLineClass() {
+	renderCurrentStepMarker() {
 		const {currentStep, stepSuccess} = simulatorStore
 		if (currentStep == null) { return null }
 
 		return (
-			<LineClass
-				line={currentStep.line}
-				className={stepSuccess ? $.currentLineSuccess : $.currentLineFailure}
+			<Marker
+				from={{line: currentStep.start.line, ch: currentStep.start.column}}
+				to={{line: currentStep.end.line, ch: currentStep.end.column}}
+				className={stepSuccess ? $.currentStepSuccess : $.currentStepFailure}
 			/>
 		)
 	}
@@ -284,11 +285,11 @@ const $ = jss({
 		}
 	},
 
-	currentLineSuccess: {
+	currentStepSuccess: {
 		background: colors.green
 	},
 
-	currentLineFailure: {
+	currentStepFailure: {
 		background: colors.red
 	},
 

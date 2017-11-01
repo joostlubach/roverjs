@@ -1,6 +1,7 @@
 // @flow
 
 import {parse} from 'acorn'
+import * as walk from 'acorn/dist/walk'
 import {Runtime, Program} from '.'
 
 export type ASTNode = {
@@ -37,10 +38,12 @@ export default class ProgramBuilder {
 
 	compile(code: string) {
 		try {
-			return parse(code, {
+			const ast = parse(code, {
 				sourceType: 'script',
 				locations:  true
 			})
+			markRecordableNodes(ast)
+			return ast
 		} catch (error) {
 			if (error.name !== 'SyntaxError') {
 				throw error
@@ -55,18 +58,28 @@ export default class ProgramBuilder {
 		const iface = {}
 		for (const method of this.program.interfaceMethods) {
 			iface[method] = (...args: any[]) => {
-				const {runtime, program} = this
-				const fn   = program[method]
-				const line = runtime == null ? null : runtime.currentNode.loc.start.line
-
-				return this.program.record(fn, args, line - 1)
+				return this.program.recordAction(this.program[method], args)
 			}
 		}
 		return iface
 	}
 
 	run(ast: ASTNode) {
-		this.runtime = new Runtime()
+		this.runtime = new Runtime({
+			callbacks: {
+				node: node => {
+					if (!node.recordable) { return }
+
+					this.program.recordStep({
+						line:   node.loc.start.line - 1,
+						column: node.loc.start.column
+					}, {
+						line:   node.loc.end.line - 1,
+						column: node.loc.end.column
+					})
+				}
+			}
+		})
 
 		try {
 			this.runtime.context.assign(this.programInterface, true)
@@ -85,4 +98,44 @@ export default class ProgramBuilder {
 		}
 	}
 
+}
+
+function markRecordableNodes(ast: ASTNode) {
+	walk.ancestor(ast, {
+		VariableDeclaration(node) {
+			node.recordable = true
+		},
+		FunctionDeclaration(node) {
+			node.recordable = true
+		},
+		IfStatement(node) {
+			node.test.recordable = true
+		},
+		WhileStatement(node) {
+			node.test.recordable = true
+		},
+		ForStatement(node) {
+			node.init.recordable = true
+			node.test.recordable = true
+			node.update.recordable = true
+		},
+		ForOfStatement(node) {
+			node.left.recordable = true
+		},
+		ForInStatement(node) {
+			node.left.recordable = true
+		},
+		ReturnStatement(node) {
+			node.recordable = true
+		},
+		BreakStatement(node) {
+			node.recordable = true
+		},
+		ContinueStatement(node) {
+			node.recordable = true
+		},
+		ExpressionStatement(node) {
+			node.recordable = true
+		}
+	})
 }

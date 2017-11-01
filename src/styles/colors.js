@@ -24,7 +24,7 @@ export const search    = blue
 export const bg = {
 	light:         white,
 	medium:        new Color('#F9F9F9'),
-	dark:          new Color('#EDEDED'),
+	dark:          new Color('#CCCCCC'),
 
 	toolbar:       new Color('#444').alpha(0.9),
 	grid:          purple.darken(0.4),
@@ -44,6 +44,7 @@ export const placeholder = fg.normal.alpha(0.3)
 export const border = {
 	light:    new Color('#eee'),
 	medium:   new Color('#ccc'),
+	darl:     new Color('#aaa'),
 	grid:     amber
 }
 

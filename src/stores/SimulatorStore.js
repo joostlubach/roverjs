@@ -1,11 +1,29 @@
 // @flow
 
 import EventEmitter from 'events'
-import {observable, computed, action} from 'mobx'
+import {observable, computed, action, autorun} from 'mobx'
 import {Simulator} from '../program'
 import type {Program, ProgramState, ProgramResult} from '../program'
 
 export default class SimulatorStore extends EventEmitter {
+
+	constructor() {
+		super()
+
+		autorun(() => {
+			localStorage.verbose = JSON.stringify(this.verbose)
+			if (this.simulator != null) {
+				this.simulator.verbose = this.verbose
+			}
+		})
+
+		autorun(() => {
+			localStorage.fps = JSON.stringify(this.fps)
+			if (this.simulator != null) {
+				this.simulator.fps = this.fps
+			}
+		})
+	}
 
 	/** The currently active simulator. */
 	@observable
@@ -13,7 +31,7 @@ export default class SimulatorStore extends EventEmitter {
 
 	/** The most recently (or currently) executed step. */
 	@observable
-	currentStep: ?Step<*> = null
+	currentStep: ?Step = null
 
 	/** Whether the current step was successful. */
 	@observable
@@ -40,6 +58,12 @@ export default class SimulatorStore extends EventEmitter {
 	/** Whether the player has finished the level. */
 	@observable
 	finished: boolean = false
+
+	@observable
+	verbose: boolean = JSON.parse(localStorage.verbose || 'false')
+
+	@observable
+	fps: boolean = JSON.parse(localStorage.fps || '2')
 
 	/** Resets everything to default values. */
 	@action
@@ -69,6 +93,9 @@ export default class SimulatorStore extends EventEmitter {
 		this.reset()
 
 		this.simulator = new Simulator(program)
+		this.simulator.fps = this.fps
+		this.simulator.verbose = this.verbose
+
 		this.simulator.on('step', this.onSimulatorStep)
 		this.simulator.on('done', this.onSimulatorDone)
 
@@ -95,7 +122,7 @@ export default class SimulatorStore extends EventEmitter {
 	}
 
 	@action
-	onSimulatorStep = (step: Step<*>, success: boolean, state: ProgramState) => {
+	onSimulatorStep = (step: Step, success: boolean, state: ProgramState) => {
 		this.currentStep = step
 		this.stepSuccess = success
 		this.state = state

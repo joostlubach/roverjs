@@ -2,8 +2,8 @@
 
 import React from 'react'
 import {observer} from 'mobx-react'
-import {jss, layout, colors, shadows} from '../styles'
-import {ToolbarButton} from '.'
+import {jss, layout, colors, fonts, shadows} from '../styles'
+import {ToolbarButton, Switch, Slider} from '.'
 import {programStore, simulatorStore} from '../stores'
 
 export type Props = {}
@@ -18,12 +18,12 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 
 		return (
 			<div className={$.toolbar}>
-				{!running && this.renderPlayButton()}
-				{running && this.renderPauseButton()}
-
-				{this.renderFPSSlider()}
-
-				{!running && state != null && this.renderRestartButton()}
+				<div className={$.buttons}>
+					{!running && this.renderPlayButton()}
+					{running && this.renderPauseButton()}
+					{!running && state != null && this.renderRestartButton()}
+				</div>
+				{this.renderControls()}
 			</div>
 		)
 	}
@@ -58,8 +58,41 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 		)
 	}
 
+	renderControls() {
+		return (
+			<div className={$.controls}>
+				{this.renderFPSSlider()}
+				{this.renderVerboseSwitch()}
+			</div>
+		)
+	}
+
 	renderFPSSlider() {
-		return null
+		return (
+			<div className={$.fpsSliderContainer}>
+				<Slider
+					className={$.fpsSlider}
+					values={[1, 2, 3, 5, 8, 13]}
+					value={simulatorStore.fps}
+					onChange={value => { simulatorStore.fps = value }}
+					showValues={false}
+				/>
+				<div>Speed</div>
+			</div>
+		)
+	}
+
+	renderVerboseSwitch() {
+		return (
+			<div className={$.verboseSwitchContainer}>
+				<Switch
+					className={$.verboseSwitch}
+					isOn={simulatorStore.verbose}
+					onChange={on => { simulatorStore.verbose = on }}
+				/>
+				<div>Verbose</div>
+			</div>
+		)
 	}
 
 	//------
@@ -93,7 +126,7 @@ const $ = jss({
 	toolbar: {
 		position: 'relative',
 		height:   96,
-		
+
 		...layout.row(),
 		justifyContent: 'space-between',
 		padding:        layout.padding.s,
@@ -104,5 +137,38 @@ const $ = jss({
 		background: colors.bg.toolbar,
 		color:      colors.fg.inverted,
 		'& svg':    {fill: colors.fg.inverted}
-	}
+	},
+
+	buttons: {
+		...layout.row()
+	},
+
+	controls: {
+		...layout.row()
+	},
+
+	fpsSliderContainer: {
+		...layout.flex.column,
+		alignItems: 'center',
+
+		font:           fonts.tiny,
+		textTransform: 'uppercase'
+	},
+
+	fpsSlider: {
+		marginBottom: layout.padding.xs,
+		width:        120
+	},
+
+	verboseSwitchContainer: {
+		...layout.flex.column,
+		alignItems: 'center',
+
+		font:           fonts.tiny,
+		textTransform: 'uppercase'
+	},
+
+	verboseSwitch: {
+		marginBottom: layout.padding.xs
+	},
 })

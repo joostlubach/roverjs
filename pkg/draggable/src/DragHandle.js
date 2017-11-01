@@ -124,7 +124,9 @@ export default class DragHandle extends React.Component {
 		if (Math.abs(this.dragState.mouseDelta.x) > this.draggableProps.threshold || Math.abs(this.dragState.mouseDelta.y) > this.draggableProps.threshold) {
 			if (!this.dragActive) {
 				this.dragActive = true
-				this.draggableProps.onStart(this.dragState)
+				if (this.draggableProps.onStart) {
+					this.draggableProps.onStart(this.dragState)
+				}
 			}
 
 			this.draggableProps.onDrag(this.dragState)
@@ -136,7 +138,7 @@ export default class DragHandle extends React.Component {
 			return
 		}
 
-		if (this.dragActive) {
+		if (this.dragActive && this.draggableProps.onEnd) {
 			this.draggableProps.onEnd(this.dragState)
 		}
 

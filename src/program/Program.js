@@ -1,12 +1,17 @@
 // @flow
 
 import {Level} from '.'
-import type {Position, Direction} from '.'
+import type {Position, Direction, ASTNodeLocation} from '.'
 
-export type Step<T: any[]> = {
-	action: (...args: T) => void,
+export type Step = {
+	start:   ASTNodeLocation,
+	end:     ASTNodeLocation,
+	actions: Action<*>[]
+}
+
+export type Action<T: any[]> = {
+	method: ?((...args: T) => void),
 	args:   T,
-	line:   ?number
 }
 
 export type ProgramState = {
@@ -173,10 +178,11 @@ export default class Program {
 	}
 
 	//------
-	// Replay
+	// Record && replay
 
-	steps: Step<*>[]    = []
-	currentStepIndex = 0
+	steps: Step[]        = []
+	recordingStep:? Step = null
+	currentStepIndex     = 0
 
 	reset() {
 		this.state = this.defaultState()
@@ -184,35 +190,49 @@ export default class Program {
 		this.currentStepIndex = 0
 	}
 
-	prepState() {
-		this.state.failedPosition = null
+	recordStep(start: ASTNodeLocation, end: ASTNodeLocation) {
+		const step = {start, end, actions: []}
+		this.steps.push(step)
+		this.recordingStep = step
+		this.currentStepIndex = this.steps.length
 	}
 
-	perform<T: any[]>(action: (...args: T) => void, args: T) {
-		this.prepState()
-		return action.apply(this, args)
+	recordAction<T: any[]>(method: (...args: T) => void, args: T, line: ?number) {
+		const {recordingStep} = this
+		if (recordingStep == null || !method.recordable) { return }
+
+		recordingStep.actions.push({method, args})
+		return this.performAction(method, args)
 	}
 
-	record<T: any[]>(action: (...args: T) => void, args: T, line: ?number) {
-		if (action.recordable) {
-			this.steps.push({action, args, line})
-			this.currentStepIndex = this.steps.length
-		}
-
-		return this.perform(action, args)
-	}
-
-	step(): [?Step<*>, boolean] {
+	step(): [?Step, boolean] {
 		if (this.done || this.isFinished()) {
 			this.prepState()
 			return [null, this.isFinished()]
 		}
 
 		const step = this.steps[this.currentStepIndex]
-		const result = this.perform(step.action, step.args)
+		const result = this.performStep(step)
 		this.currentStepIndex++
 
 		return [step, result]
+	}
+
+	performStep(step: Step) {
+		let retval = true
+		for (const {method, args} of step.actions) {
+			retval = this.performAction(method, args)
+		}
+		return retval
+	}
+
+	performAction<T: any[]>(method: (...args: T) => void, args: T, line: ?number) {
+		this.prepState()
+		return method.apply(this, args)
+	}
+
+	prepState() {
+		this.state.failedPosition = null
 	}
 
 	get done(): boolean {

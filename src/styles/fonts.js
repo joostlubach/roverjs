@@ -5,6 +5,10 @@ export const smallCaps = {
 	family: defaultFamily,
 	size:   12
 }
+export const reallyTiny = {
+	family: defaultFamily,
+	size:   10
+}
 export const tiny = {
 	family: defaultFamily,
 	size:   12

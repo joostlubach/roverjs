@@ -4,7 +4,8 @@ import EventEmitter from 'events'
 import type {Program, Step} from '.'
 
 export type Options = {
-	fps?: number
+	fps?:                      number,
+	verbose?: boolean
 }
 
 export default class Simulator extends EventEmitter {
@@ -17,6 +18,8 @@ export default class Simulator extends EventEmitter {
 	}
 
 	program: Program
+
+	verbose: boolean = false
 	fps:     number = 2
 
 	get frameDuration(): number {
@@ -44,15 +47,21 @@ export default class Simulator extends EventEmitter {
 
 	next() {
 		const [step, success] = this.program.step()
-		if (step != null) {
+		if (step == null) {
+			this.emitDone()
+			return
+		}
+
+		if (!this.verbose && step.actions.length === 0) {
+			// We're skipping steps that have no actions. Immediately execute the next step.
+			this.next()
+		} else {
 			this.emitStep(step, success)
 			this.resume()
-		} else {
-			this.emitDone()
 		}
 	}
 
-	emitStep(step: Step<*>, success: boolean) {
+	emitStep(step: Step, success: boolean) {
 		this.emit('step', step, success, this.program.state)
 	}
 
