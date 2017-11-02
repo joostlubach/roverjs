@@ -3,9 +3,10 @@
 import React from 'react'
 import {jss, colors, layout, fonts} from '../styles'
 import {SVG, Markdown, Button} from '.'
+import type {Level} from '../program'
 
 export type Props = {
-	instructions: string
+	level: Level
 }
 
 type State = {
@@ -53,8 +54,9 @@ export default class Instructions extends React.Component<*, Props, *> {
 	}
 	
 	render() {
-		const {instructions} = this.props
+		const {level} = this.props
 		const {collapsed, collapsible} = this.state
+		if (level.instructions == null) { return null }
 
 		return (
 			<div className={$.instructions}>
@@ -80,7 +82,7 @@ export default class Instructions extends React.Component<*, Props, *> {
 					}
 				</div>
 				<div ref={el => { this.bubble = el }} className={[$.instructionsBubble, collapsed && $.collapsedBubble]}>
-					<Markdown>{instructions}</Markdown>
+					<Markdown key={level.id}>{level.instructions}</Markdown>
 				</div>
 			</div>
 		)

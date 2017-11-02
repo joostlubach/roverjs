@@ -15,6 +15,8 @@ instructions: |-
   Can you modify the arrays so that I will arrive at the flag? Note, you cannot change the *variables*
   as they're const, so you have to modify the arrays themselves.
 
+  Read about arrays in [this MDN article](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array).
+
 rows:    5
 columns: 5
 start:   [0, 4, 'up']

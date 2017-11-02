@@ -124,7 +124,7 @@ export default class App extends React.Component<*, Props, *> {
 		return (
 			<div className={$.codePanel}>
 				<CodeToolbar/>
-				{level.instructions != null && <Instructions instructions={level.instructions}/>}
+				<Instructions level={level}/>
 				<CodeEditor className={$.codeEditor}/>
 			</div>
 		)
