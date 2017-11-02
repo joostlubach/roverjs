@@ -66,8 +66,10 @@ export default class SimulatorStore extends EventEmitter {
 	done: boolean = false
 
 	/** Whether the player has finished the level. */
-	@observable
-	finished: boolean = false
+	@computed
+	get finished(): boolean {
+		return this.state != null && this.state.finished
+	}
 
 	@observable
 	verbose: boolean = JSON.parse(localStorage.verbose || 'false')
@@ -92,7 +94,6 @@ export default class SimulatorStore extends EventEmitter {
 
 		this.simulator   = null
 		this.running     = false
-		this.finished    = false
 	}
 
 	/** Starts simulating a program. If a current simulation was in progress, it is terminated. */
