@@ -97,9 +97,10 @@ export default class DragHandle extends React.Component {
 		if (!this.draggableProps.enabled) { return }
 		if (this.dragState != null) { return }
 
+		const {pageX, pageY} = e.changedTouches ? e.changedTouches[0] : e
 		this.dragState = {
-			mouseStart:   {x: e.pageX, y: e.pageY},
-			mouseCurrent: {x: e.pageX, y: e.pageY},
+			mouseStart:   {x: pageX, y: pageY},
+			mouseCurrent: {x: pageX, y: pageY},
 			mouseDelta:   {x: 0, y: 0}
 		}
 
@@ -108,7 +109,9 @@ export default class DragHandle extends React.Component {
 		window.addEventListener('touchmove', this.onMouseMove)
 		window.addEventListener('touchend', this.onMouseUp)
 
-		e.preventDefault()
+		if (e.type !== 'touchstart') {
+			e.preventDefault()
+		}
 	}
 
 	onMouseMove = (e: MouseEvent) => {
@@ -116,10 +119,11 @@ export default class DragHandle extends React.Component {
 			return
 		}
 
-		this.dragState.mouseCurrent.x = e.pageX
-		this.dragState.mouseCurrent.y = e.pageY
-		this.dragState.mouseDelta.x = e.pageX - this.dragState.mouseStart.x
-		this.dragState.mouseDelta.y = e.pageY - this.dragState.mouseStart.y
+		const {pageX, pageY} = e.changedTouches ? e.changedTouches[0] : e
+		this.dragState.mouseCurrent.x = pageX
+		this.dragState.mouseCurrent.y = pageY
+		this.dragState.mouseDelta.x = pageX - this.dragState.mouseStart.x
+		this.dragState.mouseDelta.y = pageY - this.dragState.mouseStart.y
 
 		if (Math.abs(this.dragState.mouseDelta.x) > this.draggableProps.threshold || Math.abs(this.dragState.mouseDelta.y) > this.draggableProps.threshold) {
 			if (!this.dragActive) {
