@@ -20,6 +20,9 @@ export default class Level {
 
 	static deserialize(id: number, raw: Object) {
 		const level = new Level(id)
+
+		level.name = raw.name
+		level.instructions = raw.instructions
 		level.rows = raw.rows
 		level.columns = raw.columns
 		level.startPosition  = {x: raw.start[0], y: raw.start[1]}
@@ -45,7 +48,10 @@ export default class Level {
 		return level
 	}
 
-	id:      number
+	id:           number
+	name:         string
+	instructions: ?string
+
 	rows:    number
 	columns: number
 
@@ -58,10 +64,6 @@ export default class Level {
 	initialCode:    string    = ''
 	items:          Item[]    = []
 	scoring:        Scoring[] = []
-
-	itemAt(x: number, y: number): ?Item {
-		return this.items.find(({position}) => position.x === x && position.y === y)
-	}
 
 	get hasApples(): boolean {
 		return this.items.filter(item => item instanceof Apple).length > 0

@@ -6,7 +6,7 @@ import * as layout from './layout'
 
 export const base = {
 	'& > :not(:last-child)': {
-		paddingBottom: '0.5em'
+		marginBottom: '1.2em'
 	},
 
 	'& h1': {
@@ -40,12 +40,29 @@ export const base = {
 	'& strong': {
 		fontWeight: 600
 	},
+	'& ul, & ol': {
+		paddingLeft: '1.6em',
+		margin: 0
+	},
 	'& li': {
 		listStyle:  'disc',
-		marginLeft: '1.4em'
 	},
 	'& a[href]': {
 		color: colors.secondary
+	},
+
+	'& blockquote': {
+		...layout.flex.column,
+		alignItems: 'center',
+
+		'& > div': {
+			background: colors.black.alpha(0.2),
+			fontWeight:  500,
+			color:      colors.blue,
+			font:       fonts.large,
+			textAlign:  'center',
+			padding:    layout.padding.m
+		}
 	}
 }
 

@@ -33,7 +33,7 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
 			<div className={$.toolbar}>
 				<SVG name='logo' className={$.logo}/>
 				<div className={$.main}>
-					{this.renderIntro()}
+					{this.renderLevelName()}
 					{this.renderLevelSelector()}
 				</div>
 				{this.renderResetButton()}
@@ -41,11 +41,13 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
 		)
 	}
 
-	renderIntro() {
+	renderLevelName() {
+		const {level} = programStore
+
 		return (
-			<Markdown className={$.intro}>
-				Learn JavaScript by navigating Rover the Robot through mazes.
-			</Markdown>
+			<div className={$.levelName}>
+				{level.name}
+			</div>
 		)
 	}
 
@@ -124,9 +126,9 @@ const $ = jss({
 		marginLeft:     layout.padding.m
 	},
 
-	intro: {
+	levelName: {
 		color: colors.fg.inverted.alpha(0.6),
-		font:  fonts.small
+		font:  fonts.large
 	},
 
 	levelSelector: {

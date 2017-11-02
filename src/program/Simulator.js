@@ -36,26 +36,22 @@ export default class Simulator extends EventEmitter {
 		return this.currentStepIndex === this.program.steps.length - 1
 	}
 
-	run() {
-		this.displayStep(0, 1, true)
-	}
-
 	pause() {
 		clearTimeout(this.timeout)
 		this.timeout = null
 	}
 
 	resume() {
-		this.displayStep(this.currentStepIndex + 1, 1, true)
+		this.displayStep(this.currentStepIndex + 1, 1, this.resumePlayback.bind(this))
 	}
 
-	forward() {
-		this.displayStep(this.currentStepIndex + 1, 1, false)
+	forward(callback?: () => void) {
+		this.displayStep(this.currentStepIndex + 1, 1, callback)
 	}
 
-	backward() {
+	backward(callback?: () => void) {
 		if (this.currentStepIndex === -1) { return }
-		this.displayStep(this.currentStepIndex - 1, -1, false)
+		this.displayStep(this.currentStepIndex - 1, -1, callback)
 	}
 
 	goTo(index: number) {
@@ -63,35 +59,31 @@ export default class Simulator extends EventEmitter {
 		this.displayStep(index, 0, false)
 	}
 
-	displayStep(index: number, direction: number, playback: boolean) {
+	displayStep(index: number, direction: number, callback: ?(() => void)) {
 		const step = this.program.steps[index]
-		if (step == null) { return }
+		if (index >= this.program.steps.length) {
+			this.emitDone()
+			return
+		}
 
 		this.currentStepIndex = index
 										
-		if (!this.verbose && direction !== 0 && emptyStep(step)) {
-			// We're skipping steps that incur no state change.
-			this.displayStep(index + direction, direction, playback)
+		if (!this.verbose && direction !== 0 && step && !step.actionPerformed) {
+			// We're skipping steps that have not executed any program actions.
+			this.displayStep(index + direction, direction, callback)
 		} else {
 			this.emitStep(step)
 
-			const done = index === this.program.steps.length - 1 || step.endState.finished
-			if (done) {
+			if (step.endState.finished) {
 				this.emitDoneSoon()
-			} else if (playback) {
-				this.resumePlayback()
+			} else if (callback) {
+				setTimeout(callback, this.frameDuration)
 			}
 		}
 	}
 
 	resumePlayback() {
-		if (this.timeout != null) { return }
-
-		const nextIndex = this.currentStepIndex + 1
-		this.timeout = setTimeout(() => {
-			this.timeout = null
-			this.displayStep(nextIndex, 1, true)
-		}, this.frameDuration)
+		this.displayStep(this.currentStepIndex + 1, 1, this.resumePlayback.bind(this))
 	}
 
 	emitDoneSoon() {
@@ -100,7 +92,7 @@ export default class Simulator extends EventEmitter {
 		}, this.frameDuration)
 	}
 
-	emitStep(step: Step) {
+	emitStep(step: ?Step) {
 		this.emit('step', step)
 	}
 
@@ -108,9 +100,4 @@ export default class Simulator extends EventEmitter {
 		this.emit('done')
 	}
 
-}
-
-function emptyStep(step: Step) {
-	const {startState, endState} = step
-	return isEqual(startState, endState)
 }

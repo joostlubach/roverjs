@@ -1,17 +1,67 @@
-rows:    5
-columns: 5
+name: Variables
+instructions: |-
+  Let's try something new. A part of the code has already been
+  written, and you have to help out to make it work.
 
-start:      [0, 2, 'right']
-goal:       [4, 2]
-goalApples: 3
+  In the code, two *variables* are used: `stepsUp` and `stepsRight`. It's your job
+  to declare these variables.
+
+  Read up on variables on [this MDN article](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/First_steps/Variables).
+
+rows:    4
+columns: 4
+
+start:      [0, 3, 'up']
+goal:       [3, 0]
 
 items:
-  - [1, 3, 'apple']
-  - [2, 3, 'apple']
-  - [3, 3, 'apple']
+  - [1, 1, 'tree']
+  - [1, 2, 'tree']
+  - [1, 3, 'tree']
+  - [2, 1, 'tree']
+  - [2, 2, 'apple']
+  - [2, 3, 'tree']
+  - [3, 1, 'tree']
+  - [3, 2, 'tree']
+  - [3, 3, 'tree']
 
 initialCode: |-
-  // Rover really likes apples. It makes no sense for a robot
-  // to like apples, but Rover just does.
-  //
-  // Make Rover eat all the apples before going to the flag!
+  // Declare your variables here:
+
+  // ---- You cannot modify these lines
+
+  for (let i = 0; i < stepsUp; i++) {
+    move();
+  }
+  turn('right');
+  for (let i = 0; i < stepsRight; i++) {
+    move();
+  }
+
+  // ++++
+
+scoring:
+  tests:
+    usedVar:
+      regexp: var stepsUp|var stepsRight
+    usedLet:
+      regexp: let stepsUp|let stepsRight
+    usedConst:
+      regexp: const stepsUp|const stepsRight
+
+  scores:
+    - score: 1
+      usedConst: false
+      usedLet:   false
+      message: |-
+        You have used `var` to declare your variables. Nowadays, we encourage programmers to use
+        `let` or `const`.
+        
+        Do you know which of the two to use?
+
+    - score: 2
+      usedConst: false
+      usedLet:   true
+      message: |-
+        Great, but think about whether you should use `let` or `const`. Are the values of your
+        variables ever going to change after you've initialized them?

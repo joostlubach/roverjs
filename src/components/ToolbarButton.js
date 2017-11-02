@@ -34,6 +34,7 @@ const $ = jss({
 		alignItems:     'center',
 		justifyContent: 'space-around',
 		padding:        layout.padding.xs,
+		minWidth:       56,
 
 		border:       [1, 'solid', colors.transparent],
 		borderRadius: layout.radius.m,

@@ -46,17 +46,19 @@ export default class Robot extends React.Component<*, Props, *> {
 
 	failedTimeout: ?number = null
 
-	simulateFailed(failedPosition: Position) {
+	simulateFailed(props: Props) {
 		if (this.failedTimeout != null) { return }
+
+		const {failedPosition, transitionDuration} = props
 
 		// Simulate a move that fails.
 		this.setState({failedPosition})
 		this.failedTimeout = setTimeout(() => {
 			this.setState({failedPosition: null})
-		}, this.props.transitionDuration * 0.2)
+		}, transitionDuration * 0.2)
 		setTimeout(() => {
 			this.stopFailedSimulation()
-		}, this.props.transitionDuration)
+		}, transitionDuration)
 	}
 
 	stopFailedSimulation() {
@@ -74,7 +76,7 @@ export default class Robot extends React.Component<*, Props, *> {
 		}
 
 		if (props.failedPosition != null) {
-			this.simulateFailed(props.failedPosition)
+			this.simulateFailed(props)
 		} else {
 			this.stopFailedSimulation()
 		}

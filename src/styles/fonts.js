@@ -1,4 +1,4 @@
-export const defaultFamily = 'Avenir, Helvetica, sans-serif'
+export const defaultFamily = 'Helvetica, sans-serif'
 export const monospaceFamily = 'Roboto Mono, Courier New, monospace'
 
 export const smallCaps = {

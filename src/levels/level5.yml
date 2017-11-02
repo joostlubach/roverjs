@@ -1,39 +1,49 @@
-rows: 8
-columns: 8
+name: Functions
+instructions: |-
+  This time, there are four apples, but they're all in the same place.
 
-start: [0, 7, 'up']
-goal:  [7, 0]
+  I can only eat one apple a time when I move to a square with an apple.
+  So, to eat them all, I have to move away, turn around and come back.
+
+  Can you help me by writing a `function` that does exactly this?
+
+  Read about functions in [this MDN article](https://developer.mozilla.org/nl/docs/Web/JavaScript/Guide/Functions).
+
+rows:    5
+columns: 5
+
+start:      [0, 2, 'right']
+goal:       [4, 2]
+goalApples: 3
+
+items:
+  - [2, 2, 'apple']
+  - [2, 2, 'apple']
+  - [2, 2, 'apple']
+  - [2, 2, 'apple']
+
 
 initialCode: |-
-  // Remember chess? The knight in chess moves two places
-  // ahead, and then one to the left or right.
-  //
-  // Write a function called "knightMove" below which has
-  // a parameter called "direction". If you do it right,
-  // the program will bring Rover to the flag.
+  function moveAwayAndComeBack() {
+    // Fill in your function here.
+  }
 
   // ---- You cannot modify these lines
 
-  knightMove('right')
-  knightMove('left')
-  turn('right')
-  knightMove('right')
-  turn('left')
-  knightMove('left')
-  knightMove('left')
-  turn('right')
-  knightMove('right')
+  move(); move()
+  for (let i = 0; i < 3; i++) {
+    moveAwayAndComeBack()
+  }
+  move(); move()
 
   // ++++
 
 scoring:
   tests:
     hasFunction:
-      regexp: function\s+knightMove
-    hasArg:
-      regexp: function\s+knightMove\(.*[a-z].*\)
+      regexp: function\s+moveAwayAndComeBack
     short:
-      maxLines: 16
+      maxLines: 14
 
   scores:
     - score: 1
@@ -43,14 +53,6 @@ scoring:
         It seems you finished without implementing the `knightMove` function.
 
         To get three stars, make sure you've implemented this function.
-
-    - score: 2
-      hasFunction: true
-      hasArg:      false
-      message: |-
-        Your function does not accept an argument.
-
-        To get three stars, make sure your `knightMove` function accepts an argument.
 
     - score: 2
       hasFunction: true

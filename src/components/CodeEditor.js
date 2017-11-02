@@ -147,13 +147,23 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 	}
 
 	renderReadOnlyLineClasses() {
-		return this.readOnlyLines.map(line => (
+		const classes = []
+		classes.push(...this.readOnlyLines.map(line => (
 			<LineClass
 				key={`readonly-${line}`}
 				line={line}
 				className={$.readOnlyLine}
 			/>
-		))
+		)))
+		classes.push(...this.readOnlyLines.map(line => (
+			<LineClass
+				key={`readonly-gutter-${line}`}
+				line={line}
+				where='gutter'
+				className={$.readOnlyLine}
+			/>
+		)))
+		return classes
 	}
 
 	//------
@@ -299,7 +309,7 @@ const $ = jss({
 	},
 
 	readOnlyLine: {
-		backgroundColor: colors.black.alpha(0.2)
+		backgroundColor: colors.blue.alpha(0.2)
 	},
 
 	errorGutterMarker: {

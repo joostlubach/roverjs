@@ -2,8 +2,22 @@
 
 import React from 'react'
 import {observer} from 'mobx-react'
-import {jss, colors, layout, shadows} from '../styles'
-import {Panels, Grid, Inventory, ItemSprite, Robot, Goal, CodeEditor, CodeToolbar, SimulatorToolbar, Scoring, MessageBox} from '.'
+import {jss, colors, layout, fonts, shadows} from '../styles'
+import {
+	Panels,
+	Grid,
+	Inventory,
+	ItemSprite,
+	Robot,
+	Goal,
+	SVG,
+	Markdown,
+	CodeEditor,
+	CodeToolbar,
+	SimulatorToolbar,
+	Scoring,
+	MessageBox
+} from '.'
 import {levelStore, viewStateStore, programStore, simulatorStore} from '../stores'
 import type {Item, ProgramState, ProgramScoring} from '../program'
 
@@ -105,9 +119,20 @@ export default class App extends React.Component<*, Props, *> {
 	}
 
 	renderCodePanel() {
+		const {level} = programStore
+		if (level == null) { return }
+
 		return (
 			<div className={$.codePanel}>
 				<CodeToolbar/>
+				{level.instructions != null &&
+					<div className={$.instructions}>
+						<SVG name='rover-instructions' size={{width: 60, height: 42}}/>
+						<Markdown className={$.instructionsBubble}>
+							{level.instructions}
+						</Markdown>
+					</div>
+				}
 				<CodeEditor className={$.codeEditor}/>
 			</div>
 		)
@@ -133,10 +158,13 @@ export default class App extends React.Component<*, Props, *> {
 		if (level == null) { return null }
 
 		const {state, done} = simulatorStore
+		const items = state == null
+			? level.items
+			: state.items
 		const position = state == null
 			? level.startPosition
 			: state.position
-		const failedPosition = state == null
+		const failedPosition = (state == null || simulatorStore.done)
 			? null
 			: state.failedPosition
 		const direction = state == null
@@ -145,10 +173,10 @@ export default class App extends React.Component<*, Props, *> {
 		const transitionDuration = simulatorStore.running
 			? simulatorStore.simulator.frameDuration
 			: 0
-
+		
 		return (
 			<Grid rows={level.rows} columns={level.columns}>
-				{level.items.map((item, index) => this.renderSprite(item, index))}
+				{items.map((item, index) => this.renderSprite(item, index))}
 
 				{level.goalPosition != null && <Goal position={level.goalPosition} type='goal'/>}
 				<Robot
@@ -201,7 +229,7 @@ const $ = jss({
 		height: '100vh',
 
 		...layout.flex.row,
-		backgroundColor:  colors.bg.grid,
+		backgroundColor:  colors.bg.app,
 		backgroundImage:  'url(/images/bg.png)',
 		backgroundRepeat: 'repeat'
 	},
@@ -223,6 +251,23 @@ const $ = jss({
 	codePanel: {
 		...layout.overlay,
 		...layout.flex.column
+	},
+
+	instructions: {
+		...layout.flex.row,
+		alignItems: 'flex-start',
+		padding:    layout.padding.m,
+	},
+
+	instructionsBubble: {
+		flex: [1, 0, 0],
+
+		borderRadius: layout.radius.l,
+		padding:      layout.padding.m,
+		
+		background: colors.bg.instructions,
+		color:      colors.fg.instructions,
+		font:       fonts.small
 	},
 
 	codeEditor: {

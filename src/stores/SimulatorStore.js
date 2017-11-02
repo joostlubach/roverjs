@@ -34,15 +34,15 @@ export default class SimulatorStore extends EventEmitter {
 	currentStep: ?Step = null
 
 	@computed
-	get atFirstStep(): boolean {
+	get atStart(): boolean {
 		if (this.simulator == null) { return false }
-		return this.simulator.atFirstStep
+		return this.simulator.atStart
 	}
 
 	@computed
-	get atLastStep(): boolean {
+	get atEnd(): boolean {
 		if (this.simulator == null) { return false }
-		return this.simulator.atLastStep
+		return this.simulator.atEnd
 	}
 
 	@computed
@@ -58,7 +58,7 @@ export default class SimulatorStore extends EventEmitter {
 	/** Whether there is currently a simulation active (albeit paused). */
 	@computed
 	get active(): boolean {
-		return this.simulator != null
+		return this.currentStep != null
 	}
 
 	/** Whether the current simulation is done. */
@@ -108,52 +108,56 @@ export default class SimulatorStore extends EventEmitter {
 		this.simulator.on('done', this.onSimulatorDone)
 
 		if (firstStepOnly) {
-			this.running = false
-			this.simulator.forward()
+			this.forward()
 		} else {
-			this.running = true
-			this.simulator.run()
+			this.resume()
 		}
 	}
 
 	/** Pauses the current simulation. */
 	@action
 	pause() {
-		if (this.simulator == null) { return }
+		if (!this.running || this.simulator == null) { return }
 
-		this.simulator.pause()
 		this.running = false
+		this.simulator.pause()
 	}
 
 	/** Resumes the current simulation. */
 	@action
 	resume() {
-		if (this.simulator == null) { return }
+		if (this.running || this.simulator == null) { return }
 
-		this.simulator.resume()
 		this.running = true
+		this.simulator.resume()
 	}
 
 	@action
 	forward() {
 		if (this.running || this.simulator == null) { return }
 		
-		this.simulator.forward()
+		console.log('A')
+		this.running = true
+		console.log('B')
+		this.simulator.forward(() => {
+			console.log('C')
+			this.running = false
+			console.log('D')
+		})
 	}
 
 	@action
 	backward() {
 		if (this.running || this.simulator == null) { return }
 		
-		if (this.simulator.currentStepIndex === 0) {
-			this.reset()
-		} else {
-			this.simulator.backward()
-		}
+		this.running = true
+		this.simulator.backward(() => {
+			this.running = false
+		})
 	}
 
 	@action
-	onSimulatorStep = (step: Step) => {
+	onSimulatorStep = (step: ?Step) => {
 		this.currentStep = step
 	}
 

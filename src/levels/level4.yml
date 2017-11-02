@@ -1,3 +1,8 @@
+name: Apples
+instructions: |-
+  In case I haven't mentioned it before, I really like apples. Let's take a small
+  break and eat some. No `for` loops, just make me eat the apples and get to the flag.
+
 rows:    5
 columns: 5
 
@@ -6,55 +11,6 @@ goal:       [4, 2]
 goalApples: 3
 
 items:
-  - [2, 2, 'apple']
-  - [2, 2, 'apple']
-  - [2, 2, 'apple']
-  - [2, 2, 'apple']
-
-initialCode: |-
-  // This time, there are four apples, but they're all
-  // in the same place.
-  //
-  // Rover only eats one apple at a time when he moves to
-  // a square with an apple. So to eat them all, he has to
-  // move away, turn around, and come back.
-  //
-  // That's a bit annoying to type over and over again. Can
-  // you create a *function* that does this, and use it
-  // to eat all the apples?
-
-  function moveAwayAndComeBack() {
-    // Fill in your function here.
-  }
-
-  // ---- You cannot modify these lines
-
-  move(); move()
-  for (let i = 0; i < 3; i++) {
-    moveAwayAndComeBack()
-  }
-  move(); move()
-
-  // ++++
-
-scoring:
-  tests:
-    hasFunction:
-      regexp: function\s+moveAwayAndComeBack
-    short:
-      maxLines: 14
-
-  scores:
-    - score: 1
-      hasFunction: false
-      short:       false
-      message: |-
-        It seems you finished without implementing the `knightMove` function.
-
-        To get three stars, make sure you've implemented this function.
-
-    - score: 2
-      hasFunction: true
-      short:       false
-      message: |-
-        It seems your code is too long. You can do it in less lines of code!
+  - [1, 3, 'apple']
+  - [2, 3, 'apple']
+  - [3, 3, 'apple']

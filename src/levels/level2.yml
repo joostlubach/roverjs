@@ -1,3 +1,14 @@
+name: For loops
+instructions: |-
+  Alright, that was easy. Now I seem to be lost in an apple orchard (because I love apples).
+  Of course, you can type out `move()` seven times, but the point of writing code is to
+  not repeat yourself too often.
+
+  Can you find a way using a `for` loop to get me to the flag *in only three lines of code*?
+
+  Read [this MDN page](https://developer.mozilla.org/nl/docs/Web/JavaScript/Reference/Statements/for)
+  for more information about `for` loops!
+
 rows:    8
 columns: 3
 
@@ -21,15 +32,6 @@ items:
   - [2, 5, 'tree']
   - [2, 6, 'tree']
   - [2, 7, 'tree']
-
-initialCode: |-
-  // Alright, that was easy. Now Rover has lost himself in an
-  // apple orchard. Of course, you can type out `move()` seven
-  // times, but the point of writing code is to not repeat
-  // yourself too often.
-  //
-  // Can you find a way using a *for loop* to get Rover to the
-  // flag in only three lines of code?
 
 scoring:
   tests:

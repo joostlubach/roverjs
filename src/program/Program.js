@@ -9,8 +9,9 @@ export type Step = {
 		start: ASTNodeLocation,
 		end:   ASTNodeLocation,
 	},
-	startState: ProgramState,
-	endState:   ProgramState
+	startState:      ProgramState,
+	endState:        ProgramState,
+	actionPerformed: boolean
 }
 
 export type Action<T: any[]> = {
@@ -118,10 +119,10 @@ export default class Program {
 
 		this.state.position = {x, y}
 
-		const item = this.level.itemAt(x, y)
+		const item = this.itemAt(x, y)
 		if (item != null && item.type === 'apple') {
 			this.state.apples += 1
-			this.level.removeItem(item)
+			this.state.items = this.state.items.filter(i => i !== item)
 		}
 
 		return true
@@ -141,12 +142,17 @@ export default class Program {
 		return true
 	}
 
-	beforeAction() {
+	prepareState() {
 		this.state.failedPosition = null
 	}
 
 	afterAction() {
-		this.state.finished = this.isFinished()
+		if (this.recordingStep != null) {
+			this.recordingStep.actionPerformed = true
+		}
+
+		this.state.finished        = this.isFinished()
+		this.state.atGoal          = this.isAtGoal()
 		this.state.hasEnoughApples = this.hasEnoughApples()
 		
 		if (this.isFinished()) {
@@ -164,12 +170,12 @@ export default class Program {
 		if (x < 0 || x >= this.level.columns) { return false }
 		if (y < 0 || y >= this.level.rows) { return false }
 
-		const item = this.level.itemAt(x, y)
+		const item = this.itemAt(x, y)
 		return item == null || !item.blocking
 	}
 
-	itemAt(x: number, y: number) {
-		return this.level.itemAt(x, y)
+	itemAt(x: number, y: number): ?Item {
+		return this.state.items.find(({position}) => position.x === x && position.y === y)
 	}
 
 	position(): Position {
@@ -220,7 +226,7 @@ export default class Program {
 			this.recordingStep.endState = state
 		}
 
-		const step = {codeLocation, startState: state, endState: state}
+		const step = {codeLocation, startState: state, endState: state, actionPerformed: false}
 		this.steps.push(step)
 		this.recordingStep = step
 	}
@@ -243,7 +249,7 @@ function action(target: Class<Program>, key: string, descriptor: Object) {
 
 function wrapAction(fn: Function) {
 	return function wrapped() {
-		this.beforeAction()
+		this.prepareState()
 		fn.apply(this, arguments)
 		this.afterAction()
 	}

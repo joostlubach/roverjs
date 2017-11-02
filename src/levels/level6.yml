@@ -1,0 +1,65 @@
+name: Function arguments
+instructions: |-
+  Let's play some chess. The knight in chess [moves](http://www.chesscorner.com/tutorial/basic/knight/knight.htm)
+  two places ahead, and then one to the left or right.
+  
+  Write a function called `knightMove` below which has a parameter called `direction`. If you do it right,
+  the program will bring me to the flag.
+
+  If you're lost, here's that [MDN article](https://developer.mozilla.org/nl/docs/Web/JavaScript/Guide/Functions)
+  about functions.
+
+rows: 8
+columns: 8
+
+start: [0, 7, 'up']
+goal:  [7, 0]
+
+initialCode: |-
+  // Write your function here:
+
+  // ---- You cannot modify these lines
+
+  knightMove('right')
+  knightMove('left')
+  turn('right')
+  knightMove('right')
+  turn('left')
+  knightMove('left')
+  knightMove('left')
+  turn('right')
+  knightMove('right')
+
+  // ++++
+
+scoring:
+  tests:
+    hasFunction:
+      regexp: function\s+knightMove
+    hasArg:
+      regexp: function\s+knightMove\(.*[a-z].*\)
+    short:
+      maxLines: 16
+
+  scores:
+    - score: 1
+      hasFunction: false
+      short:       false
+      message: |-
+        It seems you finished without implementing the `knightMove` function.
+
+        To get three stars, make sure you've implemented this function.
+
+    - score: 2
+      hasFunction: true
+      hasArg:      false
+      message: |-
+        Your function does not accept an argument.
+
+        To get three stars, make sure your `knightMove` function accepts an argument.
+
+    - score: 2
+      hasFunction: true
+      short:       false
+      message: |-
+        It seems your code is too long. You can do it in less lines of code!

@@ -98,7 +98,7 @@ const $ = jss({
 		...layout.flex.column,
 
 		boxSizing:  'content-box',
-		background: colors.bg.medium,
+		background: colors.bg.grid,
 		border:     [5, 'solid', colors.border.grid],
 		boxShadow:  shadows.float(5)
 	},

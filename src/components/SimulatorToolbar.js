@@ -20,9 +20,9 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 			<div className={$.toolbar}>
 				<div className={$.buttons}>
 					{!running && this.renderPlayButton()}
-					{!running && this.renderBackwardButton()}
-					{!running && this.renderForwardButton()}
 					{running && this.renderPauseButton()}
+					{!simulatorStore.done && this.renderBackwardButton()}
+					{!simulatorStore.done && this.renderForwardButton()}
 					{!running && active && this.renderRestartButton()}
 				</div>
 				{this.renderControls()}
@@ -45,7 +45,7 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 			<ToolbarButton
 				icon='backward'
 				label="BACK"
-				disabled={!simulatorStore.active || simulatorStore.atStart}
+				disabled={!simulatorStore.active || simulatorStore.running || simulatorStore.atStart}
 				onTap={this.onBackwardTap}
 			/>
 		)
@@ -56,7 +56,7 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 			<ToolbarButton
 				icon='forward'
 				label="FWD"
-				disabled={simulatorStore.atEnd}
+				disabled={simulatorStore.running || simulatorStore.atEnd}
 				onTap={this.onForwardTap}
 			/>
 		)
@@ -123,7 +123,7 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 	// Event handlers
 
 	onPlayTap = () => {
-		if (simulatorStore.active) {
+		if (!simulatorStore.done && simulatorStore.active) {
 			simulatorStore.resume()
 		} else if (simulatorStore.done) {
 			// Reset everything, and wait a while to run, to allow everything to reset
@@ -137,7 +137,7 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 	}
 
 	onForwardTap = () => {
-		if (simulatorStore.active) {
+		if (!simulatorStore.done && simulatorStore.active) {
 			simulatorStore.forward()
 		} else if (simulatorStore.done) {
 			// Reset everything, and wait a while to run, to allow everything to reset

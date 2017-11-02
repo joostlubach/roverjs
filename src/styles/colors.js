@@ -3,6 +3,7 @@
 import Color from 'color'
 
 export const black = new Color('black')
+export const gray  = new Color('#F9F9F9')
 export const white = new Color('white')
 export const transparent = new Color('transparent')
 
@@ -23,11 +24,12 @@ export const search    = blue
 
 export const bg = {
 	light:         white,
-	medium:        new Color('#F9F9F9'),
 	dark:          new Color('#CCCCCC'),
 
 	toolbar:       new Color('#444').alpha(0.9),
-	grid:          purple.darken(0.4),
+	instructions:  new Color('#E7E5D3'),
+	app:           purple.darken(0.4),
+	grid:          gray,
 
 	overlay:       black.alpha(0.4)
 }
@@ -36,6 +38,7 @@ export const fg = {
 	normal:       new Color('#333'),
 	dim:          new Color('#777'),
 	dashboard:    new Color('#B1CCDB'),
+	instructions: new Color('#444'),
 	inverted:     white
 }
 

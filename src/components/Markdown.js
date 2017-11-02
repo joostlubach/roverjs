@@ -13,8 +13,23 @@ export default function Markdown({className, children, ...props}) {
 	)
 }
 
+let linkID = 0
+
 const rules = {
 	...SimpleMarkdown.defaultRules,
+
+	link: {
+		...SimpleMarkdown.defaultRules.link,
+
+		react(node, output, state) {
+			const content = output(node.content)
+			const href    = node.target
+			const target  = /^https?:\/\//.test(href) ? '_blank' : null
+
+			return <a key={linkID++} href={href} target={target}>{content}</a>
+		},
+		
+	}
 }
 
 const $ = jss({
@@ -29,7 +44,7 @@ const $ = jss({
 	icon: {
 		display:       'inline-block',
 		verticalAlign: 'middle'
-	}
+	},
 })
 
 const parser = SimpleMarkdown.parserFor(rules)
