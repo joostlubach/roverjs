@@ -136,13 +136,9 @@ export default class SimulatorStore extends EventEmitter {
 	forward() {
 		if (this.running || this.simulator == null) { return }
 		
-		console.log('A')
 		this.running = true
-		console.log('B')
 		this.simulator.forward(() => {
-			console.log('C')
 			this.running = false
-			console.log('D')
 		})
 	}
 

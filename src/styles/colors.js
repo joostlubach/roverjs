@@ -2,9 +2,10 @@
 
 import Color from 'color'
 
-export const black = new Color('black')
-export const gray  = new Color('#F9F9F9')
-export const white = new Color('white')
+export const black       = new Color('black')
+export const gray        = new Color('#F9F9F9')
+export const darkGray    = new Color('#AAAAAA')
+export const white       = new Color('white')
 export const transparent = new Color('transparent')
 
 export const green  = new Color('#8ABB55')
@@ -24,13 +25,14 @@ export const search    = blue
 
 export const bg = {
 	light:         white,
-	dark:          new Color('#CCCCCC'),
+	dark:          darkGray,
 
 	toolbar:       new Color('#444').alpha(0.9),
 	instructions:  new Color('#E7E5D3'),
 	app:           purple.darken(0.4),
 	grid:          gray,
-
+	gridDark:      darkGray,
+	
 	overlay:       black.alpha(0.4)
 }
 
@@ -48,7 +50,8 @@ export const border = {
 	light:    new Color('#eee'),
 	medium:   new Color('#ccc'),
 	dark:     new Color('#aaa'),
-	grid:     amber
+	grid:     amber,
+	gridDark: amber.darken(0.6)
 }
 
 export const leftnav = {

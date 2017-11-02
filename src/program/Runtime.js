@@ -44,7 +44,11 @@ export default class Runtime {
 		}
 
 		const {type} = node
-		return this[`evaluate_${type}`](node)
+		if (this[`evaluate_${type}`] == null) {
+			throw new Error(`Unsupported node: ${node.type}`)
+		} else {
+			return this[`evaluate_${type}`](node)
+		}
 	}
 
 	runCallbacks(node: ASTNode) {
@@ -123,6 +127,39 @@ export default class Runtime {
 		}
 	}
 
+	evaluate_SwitchStatement(node: ASTNode) {
+		const discriminant = this.evaluate(node.discriminant)
+
+		const defaultIndex = node.cases.findIndex(cs => cs.test == null)
+
+		let caseIndex = node.cases.findIndex(cs => {
+			if (cs.test == null) { return false } // Default case
+			return this.binary('===', discriminant, this.evaluate(cs.test))
+		})
+		if (caseIndex === -1) {
+			caseIndex = defaultIndex
+		}
+		if (caseIndex === -1) {
+			return
+		}
+
+		for (let index = caseIndex; index < node.cases.length; index++) {
+			const cs = node.cases[index]
+			let broken = false
+
+			for (const stmt of cs.consequent) {
+				this.evaluate(stmt)
+				if (this.interruptType === 'break') {
+					this.interruptType = null
+					broken = true
+					break
+				}
+			}
+
+			if (broken) { break }
+		}
+	}
+
 	evaluate_WhileStatement(node: ASTNode) {
 		const {test, body} = node
 
@@ -137,7 +174,9 @@ export default class Runtime {
 		this.scoped(() => {
 			this.evaluate(init)
 			while (this.evaluate(test)) {
-				this.evaluate(body)
+				this.scoped(() => {
+					this.evaluate(body)
+				})
 				this.evaluate(update)
 
 				if (this.interruptType === 'break') {
@@ -155,7 +194,9 @@ export default class Runtime {
 			for (const key in iteratee) {
 				this.scoped(() => {
 					this.currentScope.define(name, key, kind === 'const')
-					this.evaluate(node.body)
+					this.scoped(() => {
+						this.evaluate(node.body)
+					})
 				})
 
 				if (this.interruptType === 'break') {
@@ -175,7 +216,9 @@ export default class Runtime {
 			for (const item of iteratee) {
 				this.scoped(scope => {
 					scope.define(name, item, kind === 'const')
-					this.evaluate(node.body)
+					this.scoped(() => {
+						this.evaluate(node.body)
+					})
 				})
 
 				if (this.interruptType === 'break') {

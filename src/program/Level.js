@@ -10,12 +10,8 @@ export type Scoring = {
 
 export default class Level {
 
-	constructor(id: number, rows: number, columns: number, startPosition: Position, startDirection: Direction) {
+	constructor(id: number) {
 		this.id = id
-		this.rows = rows
-		this.columns = columns
-		this.startPosition = startPosition
-		this.startDirection = startDirection
 	}
 
 	static deserialize(id: number, raw: Object) {
@@ -33,18 +29,18 @@ export default class Level {
 		}
 		level.goalApples = raw.goalApples
 
+		level.dark = raw.dark
 		if (raw.items != null) {
 			level.items = raw.items.map(([x, y, type]) => {
 				return Item.create(type, {x, y})
 			})
 		}
-		level.originalItems = level.items
 
+		level.initialCode = raw.initialCode
 		if (raw.scoring != null) {
 			level.scoring = parseScoring(raw.scoring)
 		}
 
-		level.initialCode = raw.initialCode
 		return level
 	}
 
@@ -61,8 +57,10 @@ export default class Level {
 	goalPosition:   ?Position = null
 	goalApples: ?number = null
 
+	dark:  boolean
+	items: Item[]    = []
+
 	initialCode:    string    = ''
-	items:          Item[]    = []
 	scoring:        Scoring[] = []
 
 	get hasApples(): boolean {

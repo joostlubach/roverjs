@@ -16,8 +16,14 @@ export type Props = {
 
 type State = {
 	focusedErrorLine: ?number,
-	readOnlyRanges:   Array<{start: number, end: number}>,
+	readOnlyRanges:   Array<{fromLine: number, toLine: number}>,
+	hiddenRanges:     Array<Range>,
 	codeMirror:       ?CodeMirrorEl,
+}
+
+type Range = {
+	from: {line: number, ch: number},
+	to:   {line: number, ch: number}
 }
 
 @observer
@@ -28,6 +34,7 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 	state: State = {
 		focusedErrorLine: null,
 		readOnlyRanges:   [],
+		hiddenRanges:     [],
 		codeMirror:       null
 	}
 
@@ -59,9 +66,9 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 			let end = code.indexOf('++++', start)
 			if (end === -1) { end = code.length }
 
-			const startLine = codeMirror.posFromIndex(start).line
-			const endLine   = codeMirror.posFromIndex(end).line
-			ranges.push({start: startLine, end: endLine})
+			const fromLine = codeMirror.posFromIndex(start).line
+			const toLine   = codeMirror.posFromIndex(end).line
+			ranges.push({fromLine, toLine})
 
 			start = end + 1
 		}
@@ -71,8 +78,8 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 
 	get readOnlyLines(): number[] {
 		const lines = new Set()
-		for (const {start, end} of this.state.readOnlyRanges) {
-			for (let line = start; line <= end; line++) {
+		for (const {fromLine, toLine} of this.state.readOnlyRanges) {
+			for (let line = fromLine; line <= toLine; line++) {
 				lines.add(line)
 			}
 		}
@@ -80,11 +87,33 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 	}
 
 	//------
-	// Rendering
+	// Read only
 
-	componentWillReact() {
-		// this.setState({readOnlyRanges: this.calculateReadOnlyRanges()})
+	updateHiddenRanges(code: string, codeMirror: CodeMirrorEl) {
+		this.setState({hiddenRanges: this.calculateHiddenRanges(code, codeMirror)})
 	}
+
+	calculateHiddenRanges(code: string, codeMirror: CodeMirrorEl): Array<Range> {
+		const ranges = []
+
+		let start = 0
+		while ((start = code.indexOf('/*<*/', start)) !== -1) {
+			let end = code.indexOf('/*>*/', start)
+			if (end === -1) { end = code.length }
+
+			ranges.push({
+				from: codeMirror.posFromIndex(start),
+				to:   codeMirror.posFromIndex(end + 5)
+			})
+
+			start = end + 1
+		}
+
+		return ranges
+	}
+
+	//------
+	// Rendering
 
 	render() {
 		const {className} = this.props
@@ -108,6 +137,7 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 				{this.renderCurrentStepMarker()}
 				{this.renderErrorMarkers()}
 				{this.renderFocusedErrorLineWidgets()}
+				{this.renderHiddenMarkers()}
 				{this.renderReadOnlyMarkers()}
 				{this.renderReadOnlyLineClasses()}
 
@@ -135,12 +165,15 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 		)
 	}
 
+	//------
+	// Read only
+
 	renderReadOnlyMarkers() {
-		return this.state.readOnlyRanges.map(({start, end}) => (
+		return this.state.readOnlyRanges.map(({fromLine, toLine}, index) => (
 			<Marker
-				key={`readonly-${start}-${end}`}
-				from={{line: start, ch: 0}}
-				to={{line: end + 1, ch: 0}}
+				key={`readonly-${index}`}
+				from={{line: fromLine, ch: 0}}
+				to={{line: toLine + 1, ch: 0}}
 				options={{readOnly: true}}
 			/>
 		))
@@ -164,6 +197,20 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 			/>
 		)))
 		return classes
+	}
+
+	//------
+	// Hidden
+
+	renderHiddenMarkers() {
+		return this.state.hiddenRanges.map(({from, to}, index) => (
+			<Marker
+				key={`hidden-${index}`}
+				from={from}
+				to={to}
+				options={{replacedWith: createHiddenEl()}}
+			/>
+		))
 	}
 
 	//------
@@ -240,11 +287,15 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 
 		if (this.state.codeMirror != null) {
 			this.updateReadOnlyRanges(value, this.state.codeMirror)
+			this.updateHiddenRanges(value, this.state.codeMirror)
 		}
+
+		simulatorStore.reset()
 	}
 
 	onValueSet = (value: string, codeMirror: ?CodeMirrorEl) => {
 		this.updateReadOnlyRanges(value, codeMirror)
+		this.updateHiddenRanges(value, codeMirror)
 	}
 
 	onErrorGutterMarkerTap = (line: number) => {
@@ -285,6 +336,13 @@ const errorAnim = jssKeyframes('error', {
 	'100%': {},
 })
 
+function createHiddenEl() {
+	const div = document.createElement('div')
+	div.classList.add($.hidden)
+	div.innerHTML = '(...)'
+	return div
+}
+
 const $ = jss({
 	codeEditor: {
 		...layout.flex.column,
@@ -310,6 +368,15 @@ const $ = jss({
 
 	readOnlyLine: {
 		backgroundColor: colors.blue.alpha(0.2)
+	},
+
+	hidden: {
+		display: 'inline-block',
+		font:    fonts.monospaceTiny,
+		opacity: 0.6,
+
+		border:  [1, 'solid', colors.fg.normal],
+		borderRadius: layout.radius.s,
 	},
 
 	errorGutterMarker: {

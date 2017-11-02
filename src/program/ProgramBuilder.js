@@ -97,6 +97,9 @@ function markRecordableNodes(ast: ASTNode) {
 		IfStatement(node) {
 			node.test.recordable = true
 		},
+		SwitchStatement(node) {
+			node.discriminant.recordable = true
+		},
 		WhileStatement(node) {
 			node.test.recordable = true
 		},

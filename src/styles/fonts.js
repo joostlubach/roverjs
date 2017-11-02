@@ -55,3 +55,9 @@ export const monospaceSmall = {
 	fontWeight: 200,
 	size:       12
 }
+
+export const monospaceTiny = {
+	family:     monospaceFamily,
+	fontWeight: 200,
+	size:       10
+}

@@ -24,6 +24,8 @@ export default class Simulator extends EventEmitter {
 	verbose: boolean = false
 	fps:     number = 2
 
+	callbackTimeout: ?number = null
+
 	get frameDuration(): number {
 		return 1000 / this.fps
 	}
@@ -37,8 +39,8 @@ export default class Simulator extends EventEmitter {
 	}
 
 	pause() {
-		clearTimeout(this.timeout)
-		this.timeout = null
+		clearTimeout(this.callbackTimeout)
+		this.callbackTimeout = null
 	}
 
 	resume() {
@@ -74,10 +76,13 @@ export default class Simulator extends EventEmitter {
 		} else {
 			this.emitStep(step)
 
-			if (step.endState.finished) {
+			if (step != null && step.endState.finished) {
 				this.emitDoneSoon()
 			} else if (callback) {
-				setTimeout(callback, this.frameDuration)
+				if (this.callbackTimeout != null) {
+					clearTimeout(this.callbackTimeout)
+				}
+				this.callbackTimeout = setTimeout(callback, this.frameDuration)
 			}
 		}
 	}

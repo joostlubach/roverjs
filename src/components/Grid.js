@@ -8,14 +8,19 @@ import times from 'lodash/times'
 export type Props = {
 	rows:    number,
 	columns: number,
+	dark:    boolean,
 
 	className?: ClassNameProp,
 	children?:  any
+}
+export const defaultProps = {
+	dark: false
 }
 
 export default class Grid extends React.Component<*, Props, *> {
 
 	props: Props
+	static defaultProps = defaultProps
 
 	static childContextTypes = {
 		spriteBounds: PropTypes.func
@@ -39,14 +44,14 @@ export default class Grid extends React.Component<*, Props, *> {
 	}
 
 	render() {
-		const {rows, columns, className} = this.props
+		const {rows, columns, dark, className} = this.props
 		const size = {
 			width:  columns * layout.gridCell.width,
 			height: rows * layout.gridCell.height
 		}
 
 		return (
-			<div className={[$.grid, className]} style={size}>
+			<div className={[$.grid, dark && $.gridDark, className]} style={size}>
 				{this.renderCells()}
 				{this.renderContents()}
 			</div>
@@ -101,6 +106,11 @@ const $ = jss({
 		background: colors.bg.grid,
 		border:     [5, 'solid', colors.border.grid],
 		boxShadow:  shadows.float(5)
+	},
+
+	gridDark: {
+		background:  colors.bg.gridDark,
+		borderColor: colors.border.gridDark
 	},
 
 	cells: {

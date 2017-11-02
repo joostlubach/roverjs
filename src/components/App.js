@@ -158,7 +158,8 @@ export default class App extends React.Component<*, Props, *> {
 		if (level == null) { return null }
 
 		const {state, done} = simulatorStore
-		const items = state == null
+		const showItems = !level.dark || simulatorStore.done
+		const items = state == null || level.dark
 			? level.items
 			: state.items
 		const position = state == null
@@ -175,8 +176,8 @@ export default class App extends React.Component<*, Props, *> {
 			: 0
 		
 		return (
-			<Grid rows={level.rows} columns={level.columns}>
-				{items.map((item, index) => this.renderSprite(item, index))}
+			<Grid rows={level.rows} dark={level.dark} columns={level.columns}>
+				{showItems && items.map((item, index) => this.renderSprite(item, index))}
 
 				{level.goalPosition != null && <Goal position={level.goalPosition} type='goal'/>}
 				<Robot

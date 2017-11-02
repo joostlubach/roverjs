@@ -21,15 +21,15 @@ initialCode: |-
 
   // ---- You cannot modify these lines
 
-  knightMove('right')
-  knightMove('left')
-  turn('right')
-  knightMove('right')
-  turn('left')
-  knightMove('left')
-  knightMove('left')
-  turn('right')
-  knightMove('right')
+  knightMove('right');
+  knightMove('left');
+  turn('right');
+  knightMove('right');
+  turn('left');
+  knightMove('left');
+  knightMove('left');
+  turn('right');
+  knightMove('right');
 
   // ++++
 
