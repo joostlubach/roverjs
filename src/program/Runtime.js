@@ -91,7 +91,7 @@ export default class Runtime {
 	// Program & statements
 
 	evaluate_Program(node: ASTNode) {
-		for (const bodyNode of node.body) {
+		for (const bodyNode of hoist(node.body)) {
 			this.evaluate(bodyNode)
 		}
 	}
@@ -99,7 +99,7 @@ export default class Runtime {
 	evaluate_BlockStatement(node: ASTNode) {
 		this.interruptType = null
 
-		for (const bodyNode of node.body) {
+		for (const bodyNode of hoist(node.body)) {
 			this.evaluate(bodyNode)
 			if (this.interruptType != null) { break }
 		}
@@ -164,7 +164,9 @@ export default class Runtime {
 		const {test, body} = node
 
 		while (this.evaluate(test)) {
-			this.evaluate(body)
+			this.scoped(() => {
+				this.evaluate(body)
+			})
 		}
 	}
 
@@ -268,6 +270,15 @@ export default class Runtime {
 
 	evaluate_ArrowFunctionExpression(node: ASTNode) {
 		return this.createFunction(node, true)
+	}
+
+	evaluate_LogicalExpression(node: ASTNode) {
+		const left = this.evaluate(node.left)
+		if (!left && node.operator === '&&') { return left }
+		if (left && node.operator === '||') { return left }
+
+		const right = this.evaluate(node.right)
+		return this.binary(node.operator, left, right)
 	}
 
 	evaluate_UnaryExpression(node: ASTNode) {
@@ -492,6 +503,21 @@ function isCompoundStatement(node: ASTNode) {
 		'ForInStatement',
 		'WhileStatement'
 	].includes(node.type)
+}
+
+function hoist(nodes: ASTNode[]) {
+	const hoisted = []
+	const rest = []
+
+	for (const node of nodes) {
+		if (node.type === 'FunctionDeclaration') {
+			hoisted.push(node)
+		} else {
+			rest.push(node)
+		}
+	}
+
+	return hoisted.concat(rest)
 }
 
 function templateDefault(strings: string[], ...values: any[]): string {

@@ -6,7 +6,7 @@ instructions: |-
   In the code, two *variables* are used: `stepsUp` and `stepsRight`. It's your job
   to declare these variables.
 
-  Read up on variables on [this MDN article](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/First_steps/Variables).
+  Read up on variables on [this MDN article](https://developer.mozilla.org/docs/Learn/JavaScript/First_steps/Variables).
 
 rows:    4
 columns: 4

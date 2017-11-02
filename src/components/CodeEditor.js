@@ -155,7 +155,7 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 		const {currentStep, done} = simulatorStore
 		if (currentStep == null || done) { return null }
 
-		const {codeLocation, failedPosition} = currentStep
+		const {codeLocation, endState: {failedPosition}} = currentStep
 		return (
 			<Marker
 				from={locationToCodeMirrorLocation(codeLocation.start)}

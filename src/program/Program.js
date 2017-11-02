@@ -66,18 +66,31 @@ export default class Program {
 	}
 
 	get meaningfulCode(): string {
-		return this.code
-			.split('\n')
+		const lines = this.code.split('\n')
+
+		let start = null
+		const ranges = []
+		for (const [i, line] of lines.entries()) {
+			if (line.indexOf('----') !== -1) {
+				start = i
+			}
+			if (start != null && line.indexOf('++++') !== -1) {
+				ranges.push({start, end: i + 1})
+				start = null
+			}
+		}
+
+		for (const {start, end} of ranges.reverse()) {
+			lines.splice(start, end - start)
+		}
+
+		return lines
 			.filter(line => !/^\s*(\/\/.*)?$/.test(line))
 			.join('\n')
 	}
 
 	get linesOfCode(): number {
-		const lines = this.code
-			.split('\n')
-			.filter(line => !/^\s*(\/\/.*)?$/.test(line))
-
-		return lines.length
+		return this.meaningfulCode.split('\n').length
 	}
 
 	cloneState() {

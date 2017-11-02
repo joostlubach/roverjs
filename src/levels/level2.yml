@@ -6,7 +6,7 @@ instructions: |-
 
   Can you find a way using a `for` loop to get me to the flag *in only three lines of code*?
 
-  Read [this MDN page](https://developer.mozilla.org/nl/docs/Web/JavaScript/Reference/Statements/for)
+  Read [this MDN page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/for)
   for more information about `for` loops!
 
 rows:    8

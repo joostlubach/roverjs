@@ -7,7 +7,7 @@ instructions: |-
 
   Can you help me by writing a `function` that does exactly this?
 
-  Read about functions in [this MDN article](https://developer.mozilla.org/nl/docs/Web/JavaScript/Guide/Functions).
+  Read about functions in [this MDN article](https://developer.mozilla.org/docs/Web/JavaScript/Guide/Functions).
 
 rows:    5
 columns: 5
@@ -43,14 +43,13 @@ scoring:
     hasFunction:
       regexp: function\s+moveAwayAndComeBack
     short:
-      maxLines: 14
+      maxLines: 8
 
   scores:
     - score: 1
       hasFunction: false
-      short:       false
       message: |-
-        It seems you finished without implementing the `knightMove` function.
+        It seems you finished without implementing the `moveAwayAndComeBack` function.
 
         To get three stars, make sure you've implemented this function.
 
@@ -58,4 +57,4 @@ scoring:
       hasFunction: true
       short:       false
       message: |-
-        It seems your code is too long. You can do it in less lines of code!
+        You can do it in less lines of code!

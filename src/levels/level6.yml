@@ -7,7 +7,7 @@ instructions: |-
   make me do a knight's move in the specified direction. If you do it right, the program will bring me to
   the flag.
 
-  If you're lost, here's that [MDN article](https://developer.mozilla.org/nl/docs/Web/JavaScript/Guide/Functions)
+  If you're lost, here's that [MDN article](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)
   about functions.
 
 rows: 8
@@ -40,7 +40,7 @@ scoring:
     hasArg:
       regexp: function\s+knightMove\(.*[a-z].*\)
     short:
-      maxLines: 16
+      maxLines: 6
 
   scores:
     - score: 1

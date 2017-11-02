@@ -127,7 +127,6 @@ const $ = jss({
 	},
 
 	levelName: {
-		color: colors.fg.inverted.alpha(0.6),
 		font:  fonts.large
 	},
 
