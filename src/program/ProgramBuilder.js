@@ -54,36 +54,22 @@ export default class ProgramBuilder {
 		}
 	}
 
-	get programInterface(): Object {
-		const iface = {}
-		for (const method of this.program.interfaceMethods) {
-			iface[method] = (...args: any[]) => {
-				return this.program.recordAction(this.program[method], args)
-			}
-		}
-		return iface
-	}
-
 	run(ast: ASTNode) {
 		this.runtime = new Runtime({
 			callbacks: {
 				node: node => {
 					if (!node.recordable) { return }
-
-					this.program.recordStep({
-						line:   node.loc.start.line - 1,
-						column: node.loc.start.column
-					}, {
-						line:   node.loc.end.line - 1,
-						column: node.loc.end.column
-					})
+					this.program.recordStep(node.loc)
 				}
 			}
 		})
 
 		try {
-			this.runtime.context.assign(this.programInterface, true)
+			this.runtime.context.assign(this.program.interface, true)
+
+			this.program.startRecording()
 			this.runtime.evaluate(ast)
+			this.program.stopRecording()
 			return true
 		} catch (error) {
 			if (error.node != null) {

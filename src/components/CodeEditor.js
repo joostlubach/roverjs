@@ -122,14 +122,15 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 	// Current line
 
 	renderCurrentStepMarker() {
-		const {currentStep, stepSuccess} = simulatorStore
-		if (currentStep == null) { return null }
+		const {currentStep, done} = simulatorStore
+		if (currentStep == null || done) { return null }
 
+		const {codeLocation, failedPosition} = currentStep
 		return (
 			<Marker
-				from={{line: currentStep.start.line, ch: currentStep.start.column}}
-				to={{line: currentStep.end.line, ch: currentStep.end.column}}
-				className={stepSuccess ? $.currentStepSuccess : $.currentStepFailure}
+				from={locationToCodeMirrorLocation(codeLocation.start)}
+				to={locationToCodeMirrorLocation(codeLocation.end)}
+				className={failedPosition == null ? $.currentStepSuccess : $.currentStepFailure}
 			/>
 		)
 	}
@@ -165,14 +166,14 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 	}
 
 	renderErrorMarker(error: CodeError, index: number) {
-		const {start, end, empty} = getErrorLocation(error)
-		if (start == null) { return null }
+		const {from, to, empty} = getErrorLocation(error)
+		if (from == null) { return null }
 
 		return (
 			<Marker
 				key={index}
-				from={{line: start.line, ch: start.column}}
-				to={{line: end.line, ch: empty ? end.column + 1 : end.column}}
+				from={from}
+				to={to}
 				className={[$.errorMarker, empty && $.emptyErrorMarker]}
 			/>
 		)
@@ -181,10 +182,10 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 	renderErrorGutterMarkers() {
 		const lines = new Set()
 		for (const error of programStore.errors) {
-			const {start, end} = getErrorLocation(error)
-			if (start == null) { continue }
+			const {from, to} = getErrorLocation(error)
+			if (from == null) { continue }
 
-			for (let ln = start.line; ln <= end.line; ln++) {
+			for (let ln = from.line; ln <= to.line; ln++) {
 				lines.add(ln)
 			}
 		}
@@ -206,10 +207,10 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 		if (line == null) { return null }
 
 		const errors = programStore.errors.filter(err => {
-			const {start, end} = getErrorLocation(err)
-			if (start == null) { return false }
+			const {from, to} = getErrorLocation(err)
+			if (from == null) { return false }
 
-			return start.line <= line && end.line >= line
+			return from.line <= line && to.line >= line
 		})
 		return errors.map((error, index) => {
 			return (
@@ -242,7 +243,11 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 
 }
 
-function getErrorLocation(error: CodeError): {start: ASTNodeLocation, end: ASTNodeLocation} {
+function locationToCodeMirrorLocation(location: ASTNodeLocation) {
+	return {line: location.line - 1, ch: location.column}
+}
+
+function getErrorLocation(error: CodeError): {from: ASTNodeLocation, to: ASTNodeLocation, empty: boolean} {
 	const {loc} = error
 	if (loc == null) { return {start: null, end: null} }
 
@@ -258,10 +263,10 @@ function getErrorLocation(error: CodeError): {start: ASTNodeLocation, end: ASTNo
 
 	const empty = start.line === end.line && start.column === end.column
 
-	start = {line: start.line - 1, column: start.column}
-	end = {line: end.line - 1, column: end.column}
+	const from = {line: start.line - 1, column: start.column}
+	const to = {line: end.line - 1, column: empty ? end.column : end.column + 1}
 
-	return {start, end, empty}
+	return {from, to, empty}
 }
 
 const errorAnim = jssKeyframes('error', {

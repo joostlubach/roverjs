@@ -2,11 +2,15 @@
 
 import {Level} from '.'
 import type {Position, Direction, ASTNodeLocation} from '.'
+import cloneDeep from 'lodash/cloneDeep'
 
 export type Step = {
-	start:   ASTNodeLocation,
-	end:     ASTNodeLocation,
-	actions: Action<*>[]
+	codeLocation: {
+		start: ASTNodeLocation,
+		end:   ASTNodeLocation,
+	},
+	startState: ProgramState,
+	endState:   ProgramState
 }
 
 export type Action<T: any[]> = {
@@ -18,18 +22,19 @@ export type ProgramState = {
 	position:       Position,
 	direction:      Direction,
 	failedPosition: ?Position,
-	apples:         number
-}
 
-export type ProgramResult =  {
+	apples:          number,
+
 	finished:        boolean,
 	atGoal:          boolean,
 	hasEnoughApples: boolean,
 
-	score:   number,
-	message: ?string,
+	scoring: ProgramScoring
+}
 
-	state: ProgramState,
+export type ProgramScoring = {
+	score:   number,
+	message: ?string
 }
 
 export type TurnDirection = 'left' | 'right'
@@ -49,6 +54,16 @@ export default class Program {
 	code:  string
 	state: ProgramState
 
+	defaultState() {
+		return {
+			position:       this.level.startPosition,
+			direction:      this.level.startDirection,
+			items:          [...this.level.items],
+			failedPosition: null,
+			apples:         0
+		}
+	}
+
 	get meaningfulCode(): string {
 		return this.code
 			.split('\n')
@@ -64,13 +79,12 @@ export default class Program {
 		return lines.length
 	}
 
-	defaultState() {
-		return {
-			position:       this.level.startPosition,
-			direction:      this.level.startDirection,
-			failedPosition: null,
-			apples:         0
-		}
+	cloneState() {
+		return cloneDeep(this.state)
+	}
+
+	reset() {
+		this.state = this.defaultState()
 	}
 
 	//------
@@ -78,7 +92,15 @@ export default class Program {
 
 	interfaceMethods = ['move', 'turn', 'isFinished', 'robotAt', 'position', 'itemAt']
 
-	@recordable
+	get interface(): Object {
+		const iface = {}
+		for (const method of this.interfaceMethods) {
+			iface[method] = this[method].bind(this)
+		}
+		return iface
+	}
+
+	@action
 	move(): boolean {
 		let {x, y} = this.state.position
 
@@ -105,7 +127,7 @@ export default class Program {
 		return true
 	}
 
-	@recordable
+	@action
 	turn(direction: TurnDirection): boolean {
 		let newDir
 		switch (this.state.direction) {
@@ -117,6 +139,21 @@ export default class Program {
 
 		this.state.direction = newDir
 		return true
+	}
+
+	beforeAction() {
+		this.state.failedPosition = null
+	}
+
+	afterAction() {
+		this.state.finished = this.isFinished()
+		this.state.hasEnoughApples = this.hasEnoughApples()
+		
+		if (this.isFinished()) {
+			this.state.scoring = this.calculateScoring()
+		} else {
+			this.state.scoring = null
+		}
 	}
 
 	robotAt(x: number, y: number) {
@@ -156,18 +193,7 @@ export default class Program {
 		return this.isAtGoal() && this.hasEnoughApples()
 	}
 
-	get result(): ProgramResult {
-		return {
-			finished:        this.isFinished(),
-			atGoal:          this.isAtGoal(),
-			hasEnoughApples: this.hasEnoughApples(),
-			state:           this.state,
-
-			...this.applyScoring()
-		}
-	}
-
-	applyScoring() {
+	calculateScoring() {
 		for (const {score, message, condition} of this.level.scoring) {
 			if (condition(this)) {
 				return {score, message}
@@ -178,70 +204,47 @@ export default class Program {
 	}
 
 	//------
-	// Record && replay
+	// Recording
 
-	steps: Step[]        = []
-	recordingStep:? Step = null
-	currentStepIndex     = 0
+	steps: Step[] = []
+	recordingStep: ?Step = null
 
-	reset() {
-		this.state = this.defaultState()
-		this.level.reset()
-		this.currentStepIndex = 0
+	startRecording() {
+		this.steps = []
+		this.recordingStep = null
 	}
 
-	recordStep(start: ASTNodeLocation, end: ASTNodeLocation) {
-		const step = {start, end, actions: []}
+	recordStep(codeLocation: {start: ASTNodeLocation, end: ASTNodeLocation}) {
+		const state = this.cloneState()
+		if (this.recordingStep != null) {
+			this.recordingStep.endState = state
+		}
+
+		const step = {codeLocation, startState: state, endState: state}
 		this.steps.push(step)
 		this.recordingStep = step
-		this.currentStepIndex = this.steps.length
 	}
 
-	recordAction<T: any[]>(method: (...args: T) => void, args: T, line: ?number) {
-		const {recordingStep} = this
-		if (recordingStep == null || !method.recordable) { return }
-
-		recordingStep.actions.push({method, args})
-		return this.performAction(method, args)
-	}
-
-	step(): [?Step, boolean] {
-		if (this.done || this.isFinished()) {
-			this.prepState()
-			return [null, this.isFinished()]
-		}
-
-		const step = this.steps[this.currentStepIndex]
-		const result = this.performStep(step)
-		this.currentStepIndex++
-
-		return [step, result]
-	}
-
-	performStep(step: Step) {
-		let retval = true
-		for (const {method, args} of step.actions) {
-			retval = this.performAction(method, args)
-		}
-		return retval
-	}
-
-	performAction<T: any[]>(method: (...args: T) => void, args: T, line: ?number) {
-		this.prepState()
-		return method.apply(this, args)
-	}
-
-	prepState() {
-		this.state.failedPosition = null
-	}
-
-	get done(): boolean {
-		return this.currentStepIndex >= this.steps.length
+	stopRecording() {
+		if (this.recordingStep == null) { return }
+		
+		this.recordingStep.endState = this.cloneState()
+		this.recordingStep = null
 	}
 
 }
 
-function recordable(target: Class<Program>, key: string, descriptor: Object) {
-	const {value} = descriptor
-	value.recordable = true
+function action(target: Class<Program>, key: string, descriptor: Object) {
+	return {
+		...descriptor,
+		value: wrapAction(descriptor.value)
+	}
+}
+
+function wrapAction(fn: Function) {
+	return function wrapped() {
+		this.beforeAction()
+		fn.apply(this, arguments)
+		this.afterAction()
+	}
 }

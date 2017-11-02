@@ -33,13 +33,11 @@ export default class SimulatorStore extends EventEmitter {
 	@observable
 	currentStep: ?Step = null
 
-	/** Whether the current step was successful. */
-	@observable
-	stepSuccess: boolean = true
-
-	/** The current (simulated) program state. */
-	@observable
-	state: ?ProgramState = null
+	@computed
+	get state(): ProgramState {
+		if (this.currentStep == null) { return null }
+		return this.currentStep.endState
+	}
 
 	/** Whether the simulator is currently running (and not paused). */
 	@observable
@@ -69,7 +67,6 @@ export default class SimulatorStore extends EventEmitter {
 	@action
 	reset() {
 		this.currentStep = null
-		this.stepSuccess = false
 		this.done        = false
 		this.cleanUp()
 	}
@@ -84,7 +81,6 @@ export default class SimulatorStore extends EventEmitter {
 		this.simulator   = null
 		this.running     = false
 		this.finished    = false
-		this.state       = null
 	}
 
 	/** Starts simulating a program. If a current simulation was in progress, it is terminated. */
@@ -122,21 +118,15 @@ export default class SimulatorStore extends EventEmitter {
 	}
 
 	@action
-	onSimulatorStep = (step: Step, success: boolean, state: ProgramState) => {
+	onSimulatorStep = (step: Step) => {
 		this.currentStep = step
-		this.stepSuccess = success
-		this.state = state
 	}
 
 	@action
-	onSimulatorDone = (result: ProgramResult) => {
+	onSimulatorDone = () => {
+		this.done = true
 		this.cleanUp()
-
-		this.state    = result.state
-		this.done     = true
-		this.finished = result.finished
-
-		this.emit('done', result)
+		this.emit('done')
 	}
 
 }

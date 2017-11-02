@@ -56,7 +56,6 @@ export default class Level {
 	goalApples: ?number = null
 
 	initialCode:    string    = ''
-	originalItems:  Item[]    = []
 	items:          Item[]    = []
 	scoring:        Scoring[] = []
 
@@ -64,16 +63,8 @@ export default class Level {
 		return this.items.find(({position}) => position.x === x && position.y === y)
 	}
 
-	removeItem(item: Item) {
-		this.items = this.items.filter(i => i !== item)
-	}
-
 	get hasApples(): boolean {
-		return this.originalItems.filter(item => item instanceof Apple).length > 0
-	}
-
-	reset() {
-		this.items = this.originalItems
+		return this.items.filter(item => item instanceof Apple).length > 0
 	}
 
 }

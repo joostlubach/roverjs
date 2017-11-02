@@ -5,7 +5,7 @@ import {observer} from 'mobx-react'
 import {jss, colors, layout, shadows} from '../styles'
 import {Panels, Grid, Inventory, ItemSprite, Robot, Goal, CodeEditor, CodeToolbar, SimulatorToolbar, Scoring, MessageBox} from '.'
 import {levelStore, viewStateStore, programStore, simulatorStore} from '../stores'
-import type {Item, ProgramResult} from '../program'
+import type {Item, ProgramState, ProgramScoring} from '../program'
 
 export type Props = {}
 
@@ -14,22 +14,24 @@ export default class App extends React.Component<*, Props, *> {
 
 	props: Props
 
-	async levelFinished(score: number, scoreMessage: ?string) {
+	async levelFinished(state: ProgramState) {
+		const {score, message} = state.scoring
 		levelStore.completeLevel(score)
 
 		const title = "Level completed"
-		const scoring = (
+		const body = (
 			<Scoring
 				className={$.scoring}
 				score={score}
-				message={scoreMessage || "**Excellent!**"}
+				message={message || "**Excellent!**"}
 			/>
 		)
 
 		const nextLevelAvailable = levelStore.levels.length > programStore.level.id
 		const nextLevel = await MessageBox.show({
 			title,
-			body:    scoring,
+			body,
+
 			buttons: nextLevelAvailable ? [
 				{label: "Try again", result: false},
 				{label: "Next level", result: true},
@@ -45,14 +47,14 @@ export default class App extends React.Component<*, Props, *> {
 		}
 	}
 
-	async levelUnfinished(result: ProgramResult) {
+	async levelUnfinished(state: ProgramState) {
 		// Only show the 'Rover did not make it to the flag' box once.
-		if (!result.atGoal && window.localStorage.levelUnfinishedBoxShown) { return }
+		if (!state.atGoal && window.localStorage.levelUnfinishedBoxShown) { return }
 		window.localStorage.levelUnfinishedBoxShown = 'true'
 
 		await MessageBox.show({
 			title:   "Level incomplete",
-			message: result.atGoal
+			message: state.atGoal
 				? "Rover did make it to the flag, but he did not eat enough apples!"
 				: "Rover did not make it to the flag!",
 			buttons: [
@@ -130,7 +132,7 @@ export default class App extends React.Component<*, Props, *> {
 		const {level} = programStore
 		if (level == null) { return null }
 
-		const {state} = simulatorStore
+		const {state, done} = simulatorStore
 		const position = state == null
 			? level.startPosition
 			: state.position
@@ -154,8 +156,8 @@ export default class App extends React.Component<*, Props, *> {
 					failedPosition={failedPosition}
 					direction={direction}
 					transitionDuration={transitionDuration}
-					jumpForJoy={simulatorStore.finished}
-					shame={simulatorStore.done && !simulatorStore.finished}
+					jumpForJoy={done && (state && state.finished)}
+					shame={done && (state && !state.finished)}
 				/>
 			</Grid>
 		)
@@ -177,11 +179,14 @@ export default class App extends React.Component<*, Props, *> {
 		programStore.runProgram(e.metaKey)
 	}
 
-	onSimulatorDone = (result: ProgramResult) => {
-		if (result.finished) {
-			this.levelFinished(result.score, result.message)
+	onSimulatorDone = () => {
+		const {state} = simulatorStore
+		if (state == null) { return }
+
+		if (state.finished) {
+			this.levelFinished(state)
 		} else {
-			this.levelUnfinished(result)
+			this.levelUnfinished(state)
 		}
 	}
 

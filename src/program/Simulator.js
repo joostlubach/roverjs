@@ -2,6 +2,7 @@
 
 import EventEmitter from 'events'
 import type {Program, Step} from '.'
+import isEqual from 'lodash/isEqual'
 
 export type Options = {
 	fps?:                      number,
@@ -18,6 +19,8 @@ export default class Simulator extends EventEmitter {
 	}
 
 	program: Program
+	currentStepIndex: number = 0
+	doneOnNextStep: boolean = false
 
 	verbose: boolean = false
 	fps:     number = 2
@@ -27,7 +30,6 @@ export default class Simulator extends EventEmitter {
 	}
 
 	run() {
-		this.program.reset()
 		this.next()
 	}
 
@@ -46,27 +48,33 @@ export default class Simulator extends EventEmitter {
 	}
 
 	next() {
-		const [step, success] = this.program.step()
-		if (step == null) {
+		const step = this.program.steps[this.currentStepIndex++]
+		if (this.doneOnNextStep || step == null) {
 			this.emitDone()
-			return
-		}
-
-		if (!this.verbose && step.actions.length === 0) {
-			// We're skipping steps that have no actions. Immediately execute the next step.
+		} else if (!this.verbose && emptyStep(step)) {
+			// We're skipping steps that incur no state change.
 			this.next()
 		} else {
-			this.emitStep(step, success)
+			this.emitStep(step)
+
+			// If the program has finished after this step. Emit done on the next round.
+			this.doneOnNextStep = step.endState.finished
+
 			this.resume()
 		}
 	}
 
-	emitStep(step: Step, success: boolean) {
-		this.emit('step', step, success, this.program.state)
+	emitStep(step: Step) {
+		this.emit('step', step)
 	}
 
 	emitDone() {
-		this.emit('done', this.program.result)
+		this.emit('done')
 	}
 
+}
+
+function emptyStep(step: Step) {
+	const {startState, endState} = step
+	return isEqual(startState, endState)
 }
