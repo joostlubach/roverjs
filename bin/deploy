@@ -1,0 +1,5 @@
+NODE_ENV=production gulp build
+cd dist && \
+	git add . && git commit -m "Distribution $(date)" && \
+	git push && \
+	cd ..

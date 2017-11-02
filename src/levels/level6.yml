@@ -3,8 +3,9 @@ instructions: |-
   Let's play some chess. The knight in chess [moves](http://www.chesscorner.com/tutorial/basic/knight/knight.htm)
   two places ahead, and then one to the left or right.
   
-  Write a function called `knightMove` below which has a parameter called `direction`. If you do it right,
-  the program will bring me to the flag.
+  Write a function called `knightMove` below which has a parameter called `direction`. The function should
+  make me do a knight's move in the specified direction. If you do it right, the program will bring me to
+  the flag.
 
   If you're lost, here's that [MDN article](https://developer.mozilla.org/nl/docs/Web/JavaScript/Guide/Functions)
   about functions.

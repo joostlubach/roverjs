@@ -16,7 +16,7 @@ export default {
 		preamble:    production ? 'src/init/prod.js' : 'src/init/dev.js',
 		watch:       ['src/**/*.js', 'pkg/**/*.js', 'locales/**'],
 		destination: '/',
-		uglify:      false,
+		uglify:      production,
 
 		appFilename:    'main.js',
 		vendorFilename: 'vendor.js',

@@ -51,7 +51,6 @@ function createBundle(bundler, filename, modifyStream, callback) {
 		.on('end', callback)
 		.on('error', GulpNotify.onError({title: 'Syntax error'}))
 		.pipe(source(filename))
-		.pipe(gulpIf(config.uglify, streamify(uglify())))
 		.pipe(Gulp.dest(`${config.buildDir}/${config.scripts.destination}`))
 
 	if (modifyStream != null) {
@@ -66,10 +65,14 @@ function createBundler(watch, modifyStream) {
 		config.scripts.preamble,
 		config.scripts.source
 	]
+	const transforms = ['babelify', 'yamlify']
+	if (config.scripts.uglify) {
+		transforms.push('uglifyify')
+	}
 
 	const appBundler = browserify({
 		entries:   appEntries,
-		transform: ['babelify', 'yamlify'],
+		transform: transforms,
 		paths:     config.scripts.paths,
 		debug:     !config.production,
 

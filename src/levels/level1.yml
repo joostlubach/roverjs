@@ -14,11 +14,11 @@ instructions: |-
 
   *Tips:*
 
-  - Press ▶︎ PLAY to see me move forward and turn to the right.
+  - Press ▶PLAY to see me move forward and turn to the right.
   - If you want to restart, use the RESTART button.
   - If your code contains an error, red circles will indicate where
     the error is. Click on it to get details.
-  - To reset the code to the original code shown below, use the ♺ RESET
+  - To reset the code to the original code shown below, use the RESET
     button above.
 
 rows:    4
