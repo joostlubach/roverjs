@@ -44,6 +44,8 @@ export default class LineWidget extends React.Component<*, Props, *> {
 		const {element, lineWidget} = this
 		if (element == null || lineWidget == null) { return }
 
+		console.log('destroy')
+
 		lineWidget.clear()
 		unmountComponentAtNode(this.element)
 	}
@@ -83,7 +85,12 @@ export default class LineWidget extends React.Component<*, Props, *> {
 		if (element == null || lineWidget == null) { return }
 
 		renderSubtreeIntoContainer(this, this.renderWidget(props), element)
-		lineWidget.changed()
+		try {
+			lineWidget.changed()
+		} catch (_) {
+			// If the line does not exist anymore, an error is thrown. This is ok as the line widget is
+			// destroyed soon anyway.
+		}
 	}
 
 	//------

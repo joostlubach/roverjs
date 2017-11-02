@@ -96,8 +96,8 @@ export default class App extends React.Component<*, Props, *> {
 	}
 
 	componentWillUnmount() {
-		simulatorStore.removeListeners()
-		programStore.removeListeners()
+		simulatorStore.removeAllListeners()
+		programStore.removeAllListeners()
 	}
 
 	render() {
