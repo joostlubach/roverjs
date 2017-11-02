@@ -65,7 +65,7 @@ export default class ProgramStore extends EventEmitter {
 	}
 
 	@action
-	runProgram() {
+	runProgram(firstStepOnly: boolean = false) {
 		if (this.level == null) { return }
 		if (simulatorStore.active) { return }
 
@@ -82,7 +82,7 @@ export default class ProgramStore extends EventEmitter {
 		// If successful, run a simulation of the created program.
 		simulatorStore.reset()
 		if (success) {
-			simulatorStore.simulate(program)
+			simulatorStore.simulate(program, firstStepOnly)
 		} else {
 			this.emit('error')
 		}

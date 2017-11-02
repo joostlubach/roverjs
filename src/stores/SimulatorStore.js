@@ -34,6 +34,18 @@ export default class SimulatorStore extends EventEmitter {
 	currentStep: ?Step = null
 
 	@computed
+	get atFirstStep(): boolean {
+		if (this.simulator == null) { return false }
+		return this.simulator.atFirstStep
+	}
+
+	@computed
+	get atLastStep(): boolean {
+		if (this.simulator == null) { return false }
+		return this.simulator.atLastStep
+	}
+
+	@computed
 	get state(): ProgramState {
 		if (this.currentStep == null) { return null }
 		return this.currentStep.endState
@@ -85,7 +97,7 @@ export default class SimulatorStore extends EventEmitter {
 
 	/** Starts simulating a program. If a current simulation was in progress, it is terminated. */
 	@action
-	simulate(program: Program) {
+	simulate(program: Program, firstStepOnly: boolean = false) {
 		this.reset()
 
 		this.simulator = new Simulator(program)
@@ -95,8 +107,13 @@ export default class SimulatorStore extends EventEmitter {
 		this.simulator.on('step', this.onSimulatorStep)
 		this.simulator.on('done', this.onSimulatorDone)
 
-		this.running = true
-		this.simulator.run()
+		if (firstStepOnly) {
+			this.running = false
+			this.simulator.forward()
+		} else {
+			this.running = true
+			this.simulator.run()
+		}
 	}
 
 	/** Pauses the current simulation. */
@@ -115,6 +132,24 @@ export default class SimulatorStore extends EventEmitter {
 
 		this.simulator.resume()
 		this.running = true
+	}
+
+	@action
+	forward() {
+		if (this.running || this.simulator == null) { return }
+		
+		this.simulator.forward()
+	}
+
+	@action
+	backward() {
+		if (this.running || this.simulator == null) { return }
+		
+		if (this.simulator.currentStepIndex === 0) {
+			this.reset()
+		} else {
+			this.simulator.backward()
+		}
 	}
 
 	@action

@@ -14,14 +14,16 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 	props: Props
 
 	render() {
-		const {running, state} = simulatorStore
+		const {running, active} = simulatorStore
 
 		return (
 			<div className={$.toolbar}>
 				<div className={$.buttons}>
 					{!running && this.renderPlayButton()}
+					{!running && this.renderBackwardButton()}
+					{!running && this.renderForwardButton()}
 					{running && this.renderPauseButton()}
-					{!running && state != null && this.renderRestartButton()}
+					{!running && active && this.renderRestartButton()}
 				</div>
 				{this.renderControls()}
 			</div>
@@ -34,6 +36,28 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 				icon='play'
 				label="PLAY"
 				onTap={this.onPlayTap}
+			/>
+		)
+	}
+
+	renderBackwardButton() {
+		return (
+			<ToolbarButton
+				icon='backward'
+				label="BACK"
+				disabled={!simulatorStore.active || simulatorStore.atStart}
+				onTap={this.onBackwardTap}
+			/>
+		)
+	}
+
+	renderForwardButton() {
+		return (
+			<ToolbarButton
+				icon='forward'
+				label="FWD"
+				disabled={simulatorStore.atEnd}
+				onTap={this.onForwardTap}
 			/>
 		)
 	}
@@ -110,6 +134,24 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 			// Run immediately.
 			programStore.runProgram()
 		}
+	}
+
+	onForwardTap = () => {
+		if (simulatorStore.active) {
+			simulatorStore.forward()
+		} else if (simulatorStore.done) {
+			// Reset everything, and wait a while to run, to allow everything to reset
+			// without animation.
+			simulatorStore.reset()
+			setTimeout(() => { programStore.runProgram(true) }, 200)
+		} else {
+			// Run immediately.
+			programStore.runProgram(true)
+		}
+	}
+
+	onBackwardTap = () => {
+		simulatorStore.backward()
 	}
 
 	onPauseTap = () => {
