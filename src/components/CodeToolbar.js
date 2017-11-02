@@ -31,7 +31,15 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
 	render() {
 		return (
 			<div className={$.toolbar}>
-				<SVG name='logo' className={$.logo}/>
+				<div className={$.left}>
+					<SVG name='logo' className={$.logo}/>
+					<Button
+						className={$.aboutButton}
+						label="about"
+						tiny
+						onTap={this.onAboutTap}
+					/>
+				</div>
 				<div className={$.main}>
 					{this.renderLevelName()}
 					{this.renderLevelSelector()}
@@ -87,6 +95,12 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
 		)
 	}
 
+	renderAboutBody() {
+		return (
+			<Markdown className={$.about}>{about}</Markdown>
+		)
+	}
+
 	onLevelTap = (level: Level) => {
 		levelStore.goTo(level.id)
 	}
@@ -95,7 +109,27 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
 		this.confirmAndReset()
 	}
 
+	onAboutTap = () => {
+		MessageBox.show({
+			title: "Rover the Robot",
+			body:  this.renderAboutBody(),
+			buttons: [{
+				label: "Whatever"
+			}]
+		})
+	}
+
 }
+
+const about = `Rover the Robot was created by [Joost Lubach](https://github.com/joostlubach) as a learning
+tool for JavaScript.
+
+Thanks to [Simon Child](https://thenounproject.com/Simon%20Child/) for the Robot icon, and
+to [Freepik](https://www.flaticon.com/authors/freepik) for the tree icon. All the ugly other
+ones I have made myself 🙌.
+
+This project is open source. You can find the source here:
+[joostlubach/robot-client](https://github.com/joostlubach/robot-client).`
 
 const $ = jss({
 	toolbar: {
@@ -103,7 +137,6 @@ const $ = jss({
 		minHeight: 96,
 
 		...layout.flex.row,
-		alignItems:     'flex-start',
 		justifyContent: 'space-between',
 		padding:        layout.padding.s,
 
@@ -112,6 +145,15 @@ const $ = jss({
 
 		background: colors.bg.toolbar,
 		color:      colors.fg.inverted
+	},
+
+	left: {
+		...layout.flex.column,
+		alignItems: 'stretch'
+	},
+
+	about: {
+		textAlign: 'center'
 	},
 
 	logo: {

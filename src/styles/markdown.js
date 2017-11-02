@@ -5,6 +5,8 @@ import * as colors from './colors'
 import * as layout from './layout'
 
 export const base = {
+	lineHeight: '1.4em',
+
 	'& > :not(:last-child)': {
 		marginBottom: '1.2em'
 	},
