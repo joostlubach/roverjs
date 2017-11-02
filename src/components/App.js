@@ -10,10 +10,9 @@ import {
 	ItemSprite,
 	Robot,
 	Goal,
-	SVG,
-	Markdown,
-	CodeEditor,
 	CodeToolbar,
+	Instructions,
+	CodeEditor,
 	SimulatorToolbar,
 	Scoring,
 	MessageBox
@@ -125,14 +124,7 @@ export default class App extends React.Component<*, Props, *> {
 		return (
 			<div className={$.codePanel}>
 				<CodeToolbar/>
-				{level.instructions != null &&
-					<div className={$.instructions}>
-						<SVG name='rover-instructions' size={{width: 60, height: 42}}/>
-						<Markdown className={$.instructionsBubble}>
-							{level.instructions}
-						</Markdown>
-					</div>
-				}
+				{level.instructions != null && <Instructions instructions={level.instructions}/>}
 				<CodeEditor className={$.codeEditor}/>
 			</div>
 		)
@@ -252,23 +244,6 @@ const $ = jss({
 	codePanel: {
 		...layout.overlay,
 		...layout.flex.column
-	},
-
-	instructions: {
-		...layout.flex.row,
-		alignItems: 'flex-start',
-		padding:    layout.padding.m,
-	},
-
-	instructionsBubble: {
-		flex: [1, 0, 0],
-
-		borderRadius: layout.radius.l,
-		padding:      layout.padding.m,
-		
-		background: colors.bg.instructions,
-		color:      colors.fg.instructions,
-		font:       fonts.small
 	},
 
 	codeEditor: {

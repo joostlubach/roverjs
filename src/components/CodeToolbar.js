@@ -79,6 +79,7 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
 	renderResetButton() {
 		return (
 			<ToolbarButton
+				className={$.resetButton}
 				icon='reset'
 				label="RESET"
 				onTap={this.onResetTap}
@@ -98,10 +99,11 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
 
 const $ = jss({
 	toolbar: {
-		position: 'relative',
-		height:   96,
+		position:  'relative',
+		minHeight: 96,
 
 		...layout.flex.row,
+		alignItems:     'flex-start',
 		justifyContent: 'space-between',
 		padding:        layout.padding.s,
 
@@ -131,7 +133,18 @@ const $ = jss({
 	},
 
 	levelSelector: {
-		...layout.row(layout.padding.s),
-		flexWrap: 'wrap'
+		...layout.row(layout.padding.xs),
+		flexWrap: 'wrap',
+
+		paddingTop:   layout.padding.xs,
+		marginBottom: layout.padding.xs - layout.padding.s,
+
+		'& > *': {
+			marginBottom: layout.padding.xs
+		}
+	},
+
+	resetButton: {
+		alignSelf: 'center'
 	}
 })

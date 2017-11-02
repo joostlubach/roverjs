@@ -324,8 +324,8 @@ function getErrorLocation(error: CodeError): {from: ASTNodeLocation, to: ASTNode
 
 	const empty = start.line === end.line && start.column === end.column
 
-	const from = {line: start.line - 1, column: start.column}
-	const to = {line: end.line - 1, column: empty ? end.column : end.column + 1}
+	const from = {line: start.line - 1, ch: start.column}
+	const to = {line: end.line - 1, ch: empty ? end.column + 1 : end.column}
 
 	return {from, to, empty}
 }

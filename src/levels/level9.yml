@@ -11,6 +11,11 @@ instructions: |-
   The instructions array contains strings, any of `'move'`, `'turn-left'` or `'turn-right'`. An
   *example* of an instructions array is `const instructions = ['move', 'left', 'move']`.
 
+  *Tips:*
+
+  - Use a `for ... of` loop to iterate through the instructions
+  - Use `console.log` to inspect each instruction when implementing your algorithm
+
 rows:    6
 columns: 6
 start:   [0, 5, 'up']

@@ -1,0 +1,83 @@
+name: Algorithms 2
+instructions: |-
+  This time, the instructions look a bit different. The array contains elements which are any
+  of the following:
+
+  - The string `'move'`
+  - The string `'turnAround'`, which should make me turn 180 degrees
+  - An object `{turn: 'left'}` or `{turn: 'right'}`
+  - An object `{move: N}` where N is the number of steps to move.
+
+  Modify your algorithm from level 9 to understand these new instructions.
+
+  *Tips:*
+
+  - Use `function`s to implement the `'turnAround'` and the `{move: N}` instructions
+  - Check the type of each instruction
+
+rows:    6
+columns: 6
+start:   [0, 0, 'right']
+goal:    [4, 3]
+
+dark: true
+items:
+  - [3, 0, 'water']
+  - [4, 0, 'water']
+  - [5, 0, 'water']
+  - [2, 1, 'water']
+  - [3, 1, 'water']
+  - [4, 1, 'water']
+  - [5, 1, 'water']
+  - [0, 1, 'tree']
+  - [0, 2, 'tree']
+  - [0, 3, 'tree']
+  - [0, 4, 'tree']
+  - [0, 5, 'tree']
+  - [2, 2, 'tree']
+  - [2, 3, 'tree']
+  - [2, 5, 'tree']
+  - [3, 2, 'tree']
+  - [3, 3, 'tree']
+  - [3, 5, 'tree']
+  - [5, 2, 'tree']
+
+initialCode: |-
+  // ---- You cannot modify these lines
+  const instructions = [/*<*/{move: 2}, 'turnAround', 'move', {turn: 'left'}, {move: 4}, {turn: 'left'}, {move: 3}, {turn: 'left'}, 'move'/*>*/];
+  // ++++
+
+  // Write your code here:
+
+scoring:
+  tests:
+    usedFor:
+      regexp: for\s+\(let.*instructions
+    usedForOf:
+      regexp: for\s+\(.*of\sinstructions
+    usedIf:
+      regexp: if\s+\(
+    usedSwitch:
+      regexp: switch\s+\(
+
+  scores:
+    - score: 1
+      usedFor:   false
+      usedForOf: false
+      message: |-
+        For some reason, you managed to reach the flag without iterating through the instructions.
+
+        To get more stars, try to follow the assignment.
+
+    - score: 2
+      usedFor:   true
+      usedForOf: false
+      message: |-
+        Well done! Now, can you try to see if you can make it work with a `for ... of` loop?
+
+    - score: 2
+      usedIf: true
+      usedSwitch: false
+      message: |-
+        Great! You've used an `if` statement to check the instructions. Can you think of another
+        control structure used to compare a value against multiple possibilities?

@@ -429,6 +429,12 @@ export default class Runtime {
 	// Values & operators
 
 	unary(operator: string, value: ?any, node: ASTNode): ?any {
+		if (operator === 'typeof') {
+			// For some inexplicable reason, adding a typeof entry in the unaryOperators object below
+			// causes an infinite loop when checking objects. So we check this one like this.
+			return typeof value
+		}
+
 		const fn = unaryOperators[operator]
 		if (fn == null) {
 			this.throw(ReferenceError, `Invalid operator: ${operator}`, node)
@@ -471,16 +477,20 @@ export default class Runtime {
 	// Errors
 
 	throw(ErrorType: Class<Error>, message: string, node: ASTNode) {
+		console.log('throw', message, node)
 		this.rethrow(new ErrorType(message), node)
 	}
 
 	rethrow(error: Error, node: ASTNode) {
+		console.log('rethrow', error, node)
 		if (typeof node !== 'object' || node.type == null || node.loc == null) {
 			throw error
 		}
 
-		error.node = node
-		error.loc  = node.loc
+		if (error.node == null) {
+			error.node = node
+			error.loc  = node.loc
+		}
 		throw error
 	}
 

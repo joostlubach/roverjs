@@ -1,0 +1,88 @@
+name: Arrays 2
+instructions: |-
+  Can you modify the arrays again to make me reach the flag?
+
+rows:    6
+columns: 6
+start:   [0, 5, 'up']
+goal:    [4, 0]
+
+items:
+  - [0, 0, 'water']
+  - [0, 1, 'water']
+  - [0, 2, 'water']
+  - [1, 0, 'water']
+  - [1, 1, 'water']
+  - [3, 0, 'water']
+  - [5, 0, 'water']
+  - [3, 2, 'water']
+  - [4, 2, 'water']
+  - [5, 2, 'water']
+  - [3, 3, 'water']
+  - [1, 2, 'tree']
+  - [2, 5, 'tree']
+  - [3, 5, 'tree']
+  - [0, 3, 'tree']
+  - [1, 3, 'tree']
+  - [1, 5, 'tree']
+  - [4, 3, 'tree']
+  - [4, 5, 'tree']
+  - [5, 3, 'tree']
+  - [5, 4, 'tree']
+  - [5, 5, 'tree']
+
+initialCode: |-
+  // ---- You cannot modify this code
+  const stepsUp = [1, 4, 5, 3, 1];
+  const stepsRight = [3, 2, 5, 2];
+  // ++++
+ 
+  // Modify the arrays here.
+ 
+  // ---- You cannot modify this code
+ 
+  while (stepsUp.length > 0 || stepsRight.length > 0) {
+    const up = stepsUp.shift();
+    if (up != null) { moveN(up); }
+    turn('right');
+
+    const right = stepsRight.shift();
+    if (right != null) { moveN(right); }
+    turn('left');
+  }
+
+  function moveN(n) {
+    for (let i = 0; i < n; i++) {
+      move();
+    }
+  }
+ 
+  // ++++
+
+scoring:
+  tests:
+    usedShift:
+      regexp: \.shift\(
+    usedSplice:
+      regexp: \.splice\(
+    short:
+      maxLines: 3
+
+  scores:
+    - score: 1
+      usedShift: false
+      message: |-
+        Try to see if you can use the array methods `shift` and `splice`.
+
+    - score: 1
+      usedSplice: false
+      message: |-
+        Try to see if you can use the array methods `shift` and `splice`.
+
+    - score: 2
+      short: false
+      message: |-
+        You can solve this level in only three lines of code!
+
+        
+  

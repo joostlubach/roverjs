@@ -1,10 +1,16 @@
-name: Arrays
+name: Arrays 1
 instructions: |-
   Just like before, part of the program has been written. This time, you should modify some arrays
   to get me to the flag.
 
   There are two arrays. I will use `stepsUp` to go up a few steps, and then `stepsRight` to go right
   a few steps, until both arrays are empty.
+
+  So, the way it's set up now, I will:
+
+  - Go up 1 step
+  - Go right 1 step
+  - Go up 4 steps
 
   Can you modify the arrays so that I will arrive at the flag? Note, you cannot change the *variables*
   as they're const, so you have to modify the arrays themselves.
@@ -34,8 +40,8 @@ items:
 
 initialCode: |-
   // ---- You cannot modify this code
-  const stepsUp = [1, 4]
-  const stepsRight = [1]
+  const stepsUp = [1, 4];
+  const stepsRight = [1];
   // ++++
  
   // Modify the arrays here.
@@ -73,12 +79,12 @@ scoring:
     - score: 1
       usedUnshift: false
       message: |-
-        Try to see if you can use the array methods `unshift` and `push` to make your code shorter.
+        Try to see if you can use the array methods `unshift` and `push`.
 
     - score: 1
       usedPush: false
       message: |-
-        Try to see if you can use the array methods `unshift` and `push` to make your code shorter.
+        Try to see if you can use the array methods `unshift` and `push`.
 
     - score: 2
       short: false

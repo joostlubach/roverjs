@@ -7,13 +7,15 @@ import type {TappableState} from './Tappable'
 import type Color from 'color'
 
 export type Props = {
-	icon:      string,
-	label:     string,
-	children?: any,
+	icon:       string,
+	label:      string,
+	children?:  any,
+	className?: ClassNameProp,
 
 	color:    Color,
 	disabled: boolean,
 	small?:   boolean,
+	tiny?:    boolean,
 
 	onTap:    () => void
 }
@@ -35,7 +37,7 @@ export default class Button extends React.Component<*, Props, *> {
 	}
 
 	render() {
-		const {icon, label, children, small, disabled, color, onTap} = this.props
+		const {icon, label, children, className, small, tiny, disabled, color, onTap} = this.props
 
 		const {tappableState} = this.state
 		const style = {
@@ -50,16 +52,16 @@ export default class Button extends React.Component<*, Props, *> {
 
 		return (
 			<Tappable
-				className={[$.button, disabled && $.buttonDisabled, small && $.buttonSmall]}
+				className={[$.button, disabled && $.buttonDisabled, small && $.buttonSmall, tiny && $.buttonTiny, className]}
 				style={style}
 
 				focusable={!disabled}
 				onTap={disabled ? null : onTap}
 				onStateChange={state => { this.setState({tappableState: state}) }}
 			>
-				<div className={[$.content, small && $.contentSmall]}>
-					{icon && <SVG className={[$.icon, small && $.iconSmall]} name={icon}/>}
-					<div className={[$.label, small && $.labelSmall]}>{label}</div>
+				<div className={[$.content, small && $.contentSmall, tiny && $.contentTiny]}>
+					{icon && <SVG className={[$.icon, small && $.iconSmall, tiny && $.iconTiny]} name={icon}/>}
+					<div className={[$.label, small && $.labelSmall, tiny && $.labelTiny]}>{label}</div>
 				</div>
 				{children && <div className={$.body}>{children}</div>}
 			</Tappable>
@@ -125,5 +127,19 @@ const $ = jss({
 	},
 
 	labelSmall: {
+	},
+
+	buttonTiny: {
+		padding: 2,
+	},
+
+	iconTiny: {
+		width:  16,
+		height: 16
+	},
+
+	labelTiny: {
+		font:     fonts.tiny,
+		fontSize: 10
 	}
 })

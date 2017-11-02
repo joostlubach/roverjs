@@ -8,7 +8,9 @@ export type Props = {
 	icon:     string,
 	label:    string,
 	disabled: boolean,
-	onTap:    () => void
+	onTap:    () => void,
+
+	className?: ClassNameProp
 }
 
 export default class ToolbarButton extends React.Component<*, Props, *> {
@@ -16,10 +18,10 @@ export default class ToolbarButton extends React.Component<*, Props, *> {
 	props: Props
 
 	render() {
-		const {icon, label, disabled, onTap} = this.props
+		const {icon, label, className, disabled, onTap} = this.props
 
 		return (
-			<Tappable className={[$.button, disabled && $.buttonDisabled]} onTap={disabled ? null : onTap}>
+			<Tappable className={[$.button, disabled && $.buttonDisabled, className]} onTap={disabled ? null : onTap}>
 				<SVG className={$.icon} name={icon}/>
 				<div className={$.label}>{label}</div>
 			</Tappable>
