@@ -4,7 +4,7 @@ instructions: |-
   of the following:
 
   - The string `'move'`
-  - The string `'turnAround'`, which should make me turn 180 degrees
+  - The string `'turn-around'`, which should make me turn 180 degrees
   - An object `{turn: 'left'}` or `{turn: 'right'}`
   - An object `{move: N}` where N is the number of steps to move.
 
@@ -12,7 +12,7 @@ instructions: |-
 
   *Tips:*
 
-  - Use `function`s to implement the `'turnAround'` and the `{move: N}` instructions
+  - Use `function`s to implement the `'turn-around'` and the `{move: N}` instructions
   - Check the type of each instruction
 
 rows:    6
@@ -44,23 +44,28 @@ items:
 
 initialCode: |-
   // ---- You cannot modify these lines
-  const instructions = [/*<*/{move: 2}, 'turnAround', 'move', {turn: 'left'}, {move: 4}, {turn: 'left'}, {move: 3}, {turn: 'left'}, 'move'/*>*/];
+  const instructions = [/*<*/{move: 2}, 'turn-around', 'move', {turn: 'left'}, {move: 4}, {turn: 'left'}, {move: 3}, {turn: 'left'}, 'move'/*>*/];
   // ++++
 
   // Write your code here:
 
 scoring:
   tests:
+    usedDoubleEquals:
+      regexp: \s==\s
     usedFor:
       regexp: for\s+\(let.*instructions
     usedForOf:
       regexp: for\s+\(.*of\sinstructions
-    usedIf:
-      regexp: if\s+\(
-    usedSwitch:
-      regexp: switch\s+\(
+    usedFunction:
+      regexp: function\s+\w
 
   scores:
+    - score: 1
+      usedDoubleEquals: true
+      message: |-
+        When comparing things in JavaScript, always use `===`, unless you are comparing to `null`.
+
     - score: 1
       usedFor:   false
       usedForOf: false
@@ -76,8 +81,7 @@ scoring:
         Well done! Now, can you try to see if you can make it work with a `for ... of` loop?
 
     - score: 2
-      usedIf: true
-      usedSwitch: false
+      usedFunction: false
       message: |-
-        Great! You've used an `if` statement to check the instructions. Can you think of another
-        control structure used to compare a value against multiple possibilities?
+        As your algorithms grow more complex, use `function`s to separate your code. Why not
+        write a `function` to perform the `turn-around` move, or to move `n` places ahead?

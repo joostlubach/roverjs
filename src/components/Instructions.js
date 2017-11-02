@@ -48,7 +48,7 @@ export default class Instructions extends React.Component<*, Props, *> {
 	}
 
 	componentWillReceiveProps(props: Props) {
-		if (props.instructions !== this.props.instructions) {
+		if (props.level.id !== this.props.level.id) {
 			this.shouldUpdateCollapsible = true
 		}
 	}

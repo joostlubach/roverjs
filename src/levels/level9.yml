@@ -9,7 +9,7 @@ instructions: |-
   Use your knowledge so far to iterate through this array and execute the instructions inside.
 
   The instructions array contains strings, any of `'move'`, `'turn-left'` or `'turn-right'`. An
-  *example* of an instructions array is `const instructions = ['move', 'left', 'move']`.
+  *example* of an instructions array is `const instructions = ['move', 'turn-left', 'move']`.
 
   *Tips:*
 
@@ -54,6 +54,8 @@ initialCode: |-
 
 scoring:
   tests:
+    usedDoubleEquals:
+      regexp: \s==\s
     usedFor:
       regexp: for\s+\(let.*instructions
     usedForOf:
@@ -64,6 +66,11 @@ scoring:
       regexp: switch\s+\(
 
   scores:
+    - score: 1
+      usedDoubleEquals: true
+      message: |-
+        When comparing things in JavaScript, always use `===`, unless you are comparing to `null`.
+
     - score: 1
       usedFor:   false
       usedForOf: false

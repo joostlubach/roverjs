@@ -477,12 +477,10 @@ export default class Runtime {
 	// Errors
 
 	throw(ErrorType: Class<Error>, message: string, node: ASTNode) {
-		console.log('throw', message, node)
 		this.rethrow(new ErrorType(message), node)
 	}
 
 	rethrow(error: Error, node: ASTNode) {
-		console.log('rethrow', error, node)
 		if (typeof node !== 'object' || node.type == null || node.loc == null) {
 			throw error
 		}
