@@ -8,6 +8,11 @@ instructions: |-
 
   Read up on variables on [this MDN article](https://developer.mozilla.org/docs/Learn/JavaScript/First_steps/Variables).
 
+  *Tip:*
+
+  - If you want to see *all* JavaScripts steps that are executed, not only the ones that move the robot,
+    activate the VERBOSE switch at the top right of the screen.
+
 rows:    4
 columns: 4
 
