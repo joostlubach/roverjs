@@ -16,15 +16,11 @@ export default class Function {
 	expression: boolean
 	boundReceiver: ?Object
 
-	call(receiver: Object, ...args: any[]) {
-		return this.apply(receiver, args)
-	}
-
 	apply(receiver: Object, args: any[]) {
 		return this.runtime.scoped(scope => {
 			this.assignArguments(scope, args)
 			if (this.boundReceiver) {
-				scope.receiver = boundReceiver
+				scope.receiver = this.boundReceiver
 			} else {
 				scope.receiver = receiver
 			}

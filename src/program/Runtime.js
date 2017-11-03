@@ -3,14 +3,15 @@
 
 import {Scope, Context, Function} from '.'
 import type {ASTNode} from '.'
+import isFunction from 'lodash/isFunction'
 
 export type Options = {
 	context?:   Context,
-	callbacks?: Callbacks
+	callbacks?: Callbacks,
+	code?:      string
 }
 export type Callbacks = {
-	node?:      (node: ASTNode) => void,
-	statement?: (node: ASTNode) => void
+	node?: (node: ASTNode) => void,
 }
 
 export default class Runtime {
@@ -19,20 +20,16 @@ export default class Runtime {
 		this.context      = options.context || new Context()
 		this.callbacks    = options.callbacks || {}
 		this.currentScope = this.context
+		this.source       = options.source
 	}
 
 	context:      Context
 	currentScope: Scope
 	callbacks:    Callbacks
+	source:         ?string = null
 
 	/** Set when a return or break has been called. */
 	interruptType: ?('return' | 'break' | 'continue')
-
-	/** The current receiver. Used for method calls. */
-	currentReceiver: ?Object = null
-
-	/** The current property. Used for mutating property assignments. */
-	currentProperty: ?(string | number) = null
 
 	evaluatedNodes: number = 0
 
@@ -57,9 +54,6 @@ export default class Runtime {
 
 		if (callbacks.node) {
 			callbacks.node(node)
-		}
-		if (callbacks.statement && isStatement(node)) {
-			callbacks.statement(node)
 		}
 	}
 
@@ -315,29 +309,23 @@ export default class Runtime {
 	}
 
 	evaluate_CallExpression(node: ASTNode) {
-		const callee   = this.evaluate(node.callee)
+		const {object: receiver, value: callee} = this.evaluateMemberExpression(node.callee)
 		const args     = node.arguments.map(arg => this.evaluate(arg))
-		const receiver = this.currentReceiver
 
-		this.currentReceiver = null
-
-		return callee.apply(receiver, args)
-	}
-
-	evaluate_MemberExpression(node: ASTNode) {
-		const object   = this.evaluate(node.object)
-		const property = node.computed
-			? this.evaluate(node.property)
-			: node.property.name
-
-		this.currentReceiver = object
-		this.currentProperty = property
+		if (!isFunction(callee.apply)) {
+			this.throw(TypeError, `${this.nodeSource(node.callee, 'this')} is not a function`)
+		}
 
 		try {
-			return object[property]
+			return callee.apply(receiver, args)
 		} catch (error) {
 			this.rethrow(error, node)
 		}
+	}
+
+	evaluate_MemberExpression(node: ASTNode) {
+		const {value} = this.evaluateMemberExpression(node)
+		return value
 	}
 
 	evaluate_ObjectExpression(node: ASTNode) {
@@ -419,10 +407,14 @@ export default class Runtime {
 			bound ? this.currentScope.receiver : null
 		)
 
+		// Wrap this function into a native JS function.
+		const createNative = new window.Function('fn', `return function ${fn.name || ''}() { return fn.apply(this, arguments) }`)
+		const native = createNative(fn)
+
 		if (name != null) {
-			this.currentScope.define(name, fn, false)
+			this.currentScope.define(name, native, false)
 		}
-		return fn
+		return native
 	}
 
 	//------
@@ -464,17 +456,37 @@ export default class Runtime {
 				}
 			}
 		} else if (left.type === 'MemberExpression') {
-			this.evaluate_MemberExpression(left)
-			this.currentReceiver[this.currentProperty] = value
-			this.currentReceiver = null
-			this.currentProperty = null
+			const {object: receiver, property} = this.evaluateMemberExpression(left)
+			receiver[property] = value
 		} else {
 			this.throw(TypeError, `Invalid assignment left hand side`, left)
 		}
 	}
 
+	evaluateMemberExpression(node: ASTNode): {object?: ?Object, value: ?any} {
+		if (node.type !== 'MemberExpression') {
+			return {value: this.evaluate(node)}
+		}
+
+		const object   = this.evaluate(node.object)
+		const property = node.computed
+			? this.evaluate(node.property)
+			: node.property.name
+
+		try {
+			return {object, property, value: object[property]}
+		} catch (error) {
+			this.rethrow(error, node)
+		}
+	}
+
 	//------
-	// Errors
+	// Errors & utility
+
+	nodeSource(node: ASTNode, defaultText: string) {
+		if (this.source == null) { return defaultText }
+		return '`' + this.source.slice(node.start, node.end) + '`'
+	}
 
 	throw(ErrorType: Class<Error>, message: string, node: ASTNode) {
 		this.rethrow(new ErrorType(message), node)
@@ -492,25 +504,6 @@ export default class Runtime {
 		throw error
 	}
 
-}
-
-function isStatement(node: ASTNode) {
-	return /(Declaration|Statement)$/.test(node.type)
-}
-
-function isSimpleStatement(node: ASTNode) {
-	return isStatement(node) && !isCompoundStatement(node)
-}
-
-function isCompoundStatement(node: ASTNode) {
-	return [
-		'BlockStatement',
-		'IfStatement',
-		'ForStatement',
-		'ForOfStatement',
-		'ForInStatement',
-		'WhileStatement'
-	].includes(node.type)
 }
 
 function hoist(nodes: ASTNode[]) {

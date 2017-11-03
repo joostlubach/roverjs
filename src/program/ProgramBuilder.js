@@ -56,6 +56,7 @@ export default class ProgramBuilder {
 
 	run(ast: ASTNode) {
 		this.runtime = new Runtime({
+			source:    this.program.code,
 			callbacks: {
 				node: node => {
 					if (!node.recordable) { return }
@@ -124,6 +125,9 @@ function markRecordableNodes(ast: ASTNode) {
 			node.recordable = true
 		},
 		ExpressionStatement(node) {
+			node.recordable = true
+		},
+		CallExpression(node) {
 			node.recordable = true
 		}
 	})
