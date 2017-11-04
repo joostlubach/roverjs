@@ -11,6 +11,7 @@ export type Props = {
 	label:      string,
 	children?:  any,
 	className?: ClassNameProp,
+	style:      Object,
 
 	color:    Color,
 	disabled: boolean,
@@ -47,7 +48,8 @@ export default class Button extends React.Component<*, Props, *> {
 				disabled: color.string(),
 				default:  color.string()
 			}),
-			color: colors.contrast(color).string()
+			color: colors.contrast(color).string(),
+			...this.props.style
 		}
 
 		return (

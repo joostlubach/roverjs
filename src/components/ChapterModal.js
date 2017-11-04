@@ -100,7 +100,7 @@ export default class ChapterModal extends React.Component<*, Props, *> {
 				<div className={$.chapterName}>
 					{chapter.name}
 				</div>
-				<Markdown className={$.chapterDescription}>
+				<Markdown key={chapter.id} className={$.chapterDescription}>
 					{chapter.description}
 				</Markdown>
 			</div>

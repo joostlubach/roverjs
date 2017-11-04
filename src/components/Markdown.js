@@ -28,7 +28,6 @@ const rules = {
 
 			return <a key={linkID++} href={href} target={target}>{content}</a>
 		},
-		
 	}
 }
 

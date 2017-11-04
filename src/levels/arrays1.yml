@@ -1,6 +1,6 @@
 name: Arrays 1
 instructions: |-
-  Just like before, part of the program has been written. This time, you should modify some arrays
+  In this level, part of the program has been written. This time, you should modify some arrays
   to get me to the flag.
 
   There are two arrays. I will use `stepsUp` to go up a few steps, and then `stepsRight` to go right

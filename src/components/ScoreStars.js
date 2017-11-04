@@ -139,7 +139,7 @@ const $ = jss({
 	},
 
 	grayStar: {
-		fill: colors.fg.dim
+		fill: colors.fg.inverted.alpha(0.4)
 	},
 
 	goldStars: {
