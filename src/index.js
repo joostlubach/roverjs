@@ -13,9 +13,10 @@ jss({
 			height: '100vh',
 		},
 		'body': {
-			height:  '100vh',
-			margin:  0,
-			padding: 0,
+			height:    '100vh',
+			margin:    0,
+			padding:   0,
+			overflow: 'hidden',
 
 			...layout.flex.column,
 

@@ -70,6 +70,20 @@ export default class ProgramBuilder {
 
 			this.program.startRecording()
 			this.runtime.evaluate(ast)
+
+			if (this.program.level.style === 'callback') {
+				if (!this.runtime.context.has('step')) {
+					this.runtime.throw(ReferenceError, "You should implement the `step` function", ast)
+				}
+
+				try {
+					const step = this.runtime.context.get('step')
+					this.program.runWithStepCallback(step)
+				} catch (error) {
+					this.runtime.rethrow(error, ast)
+				}
+			}
+
 			this.program.stopRecording()
 			return true
 		} catch (error) {
@@ -125,7 +139,9 @@ function markRecordableNodes(ast: ASTNode) {
 			node.recordable = true
 		},
 		ExpressionStatement(node) {
-			node.recordable = true
+			if (node.expression.type !== 'CallExpression') {
+				node.recordable = true
+			}
 		},
 		CallExpression(node) {
 			node.recordable = true

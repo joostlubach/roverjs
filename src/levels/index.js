@@ -6,6 +6,8 @@ import {Level} from '../program'
 
 import level1 from './level1.yml'
 import level10 from './level10.yml'
+import level11 from './level11.yml'
+import level12 from './level12.yml'
 import level2 from './level2.yml'
 import level3 from './level3.yml'
 import level4 from './level4.yml'
@@ -28,4 +30,6 @@ export default [
 	Level.deserialize(8, level8),
 	Level.deserialize(9, level9),
 	Level.deserialize(10, level10),
+	Level.deserialize(11, level11),
+	Level.deserialize(12, level12),
 ]

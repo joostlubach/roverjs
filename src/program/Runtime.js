@@ -104,8 +104,10 @@ export default class Runtime {
 	evaluate_VariableDeclaration(node: ASTNode) {
 		const isConstant = node.kind === 'const'
 
-		for (const {id, init} of node.declarations) {
-			this.currentScope.define(id.name, init == null ? undefined : this.evaluate(init), isConstant)
+		for (const declaration of node.declarations) {
+			const {id, init} = declaration
+			const initValue = init == null ? undefined : this.evaluate(init)
+			this.declareVariable(id, initValue, isConstant)
 		}
 	}
 
@@ -191,7 +193,11 @@ export default class Runtime {
 		try {
 			for (const key in iteratee) {
 				this.scoped(() => {
-					this.currentScope.define(name, key, kind === 'const')
+					try {
+						this.currentScope.define(name, key, kind === 'const')
+					} catch (error) {
+						this.rethrow(error, node.left)
+					}
 					this.scoped(() => {
 						this.evaluate(node.body)
 					})
@@ -213,7 +219,11 @@ export default class Runtime {
 		try {
 			for (const item of iteratee) {
 				this.scoped(scope => {
-					scope.define(name, item, kind === 'const')
+					try {
+						scope.define(name, item, kind === 'const')
+					} catch (error) {
+						this.rethrow(error, node.left)
+					}
 					this.scoped(() => {
 						this.evaluate(node.body)
 					})
@@ -311,18 +321,21 @@ export default class Runtime {
 	}
 
 	evaluate_CallExpression(node: ASTNode) {
-		const {object: receiver, value: callee} = this.evaluateMemberExpression(node.callee)
-		const args     = node.arguments.map(arg => this.evaluate(arg))
-
-		if (callee == null || !isFunction(callee.apply)) {
-			const source = this.nodeSource(node.callee)
-			const desc = source == null ? 'This' : `\`${source}\``
-			this.throw(TypeError, `${desc} is not a function`, node.callee)
-		}
-
 		try {
+			const {object: receiver, value: callee} = this.evaluateMemberExpression(node.callee)
+			const args     = node.arguments.map(arg => this.evaluate(arg))
+
+			if (callee == null || !isFunction(callee.apply)) {
+				const source = this.nodeSource(node.callee)
+				const desc = source == null ? 'This' : `\`${source}\``
+				this.throw(TypeError, `${desc} is not a function`, node.callee)
+			}
+
 			return callee.apply(receiver, args)
 		} catch (error) {
+			if (/Undefined variable/.test(error.message)) {
+				this.throw(ReferenceError, error.message.replace(/Undefined variable/, "Function not found"), node)
+			}
 			this.rethrow(error, node)
 		}
 	}
@@ -397,6 +410,35 @@ export default class Runtime {
 	}
 
 	//------
+	// Variables & destructuring
+
+	declareVariable(id: ASTNode, initValue: any, isConstant: boolean) {
+		try {
+			const variables = {}
+			this.destructure(variables, id, initValue)
+			for (const key in variables) {
+				this.currentScope.define(key, variables[key], isConstant)
+			}
+		} catch (error) {
+			this.rethrow(error, declaration)
+		}
+	}
+
+	destructure(variables: Object, id: ASTNode, value: any) {
+		if (id.type === 'ArrayPattern') {
+			for (const [i, element] of id.elements.entries()) {
+				this.destructure(variables, element, value[i])
+			}
+		} else if (id.type === 'ObjectPattern') {
+			for (const property of id.properties) {
+				this.destructure(variables, property.value, value[property.key.name])
+			}
+		} else {
+			variables[id.name] = value
+		}
+	}
+
+	//------
 	// Function creation
 
 	createFunction(node: ASTNode, bound: boolean) {
@@ -416,7 +458,11 @@ export default class Runtime {
 		const native = createNative(fn)
 
 		if (name != null) {
-			this.currentScope.define(name, native, false)
+			try {
+				this.currentScope.define(name, native, false)
+			} catch (error) {
+				this.rethrow(error, id)
+			}
 		}
 		return native
 	}

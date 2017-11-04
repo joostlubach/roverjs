@@ -14,8 +14,12 @@ export default class ViewStateStore {
 
 	@observable
 	panelSizes: PanelSizes = {
-		left: 640
+		left:   640,
+		bottom: 320
 	}
+
+	@observable
+	instructionsCollapsed: boolean = false
 
 	load() {
 		const json = window.localStorage.viewState || '{}'
@@ -24,7 +28,8 @@ export default class ViewStateStore {
 
 	save() {
 		const config = {
-			panelSizes: this.panelSizes
+			panelSizes:            this.panelSizes,
+			instructionsCollapsed: this.instructionsCollapsed
 		}
 		window.localStorage.viewState = JSON.stringify(config)
 	}

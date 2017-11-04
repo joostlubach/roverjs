@@ -2,7 +2,6 @@
 
 import EventEmitter from 'events'
 import type {Program, Step} from '.'
-import isEqual from 'lodash/isEqual'
 
 export type Options = {
 	fps?:                      number,
@@ -69,14 +68,14 @@ export default class Simulator extends EventEmitter {
 		}
 
 		this.currentStepIndex = index
-										
+
 		if (!this.verbose && direction !== 0 && step && !step.actionPerformed) {
 			// We're skipping steps that have not executed any program actions.
 			this.displayStep(index + direction, direction, callback)
 		} else {
-			this.emitStep(step)
+			this.emitStep(index, step)
 
-			if (step != null && step.endState.finished) {
+			if (step != null && step.endState.isFinished) {
 				this.emitDoneSoon()
 			} else if (callback) {
 				if (this.callbackTimeout != null) {
@@ -97,12 +96,12 @@ export default class Simulator extends EventEmitter {
 		}, this.frameDuration)
 	}
 
-	emitStep(step: ?Step) {
-		this.emit('step', step)
+	emitStep(index: number, step: ?Step) {
+		this.emit('step', index, step)
 	}
 
 	emitDone() {
-		this.emit('done')
+		this.emit('done', this.program.scoring)
 	}
 
 }

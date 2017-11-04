@@ -2,7 +2,7 @@
 
 import React from 'react'
 import {observer} from 'mobx-react'
-import {jss, colors, layout, fonts, shadows} from '../styles'
+import {jss, colors, layout, shadows} from '../styles'
 import {
 	Panels,
 	Grid,
@@ -14,10 +14,12 @@ import {
 	Instructions,
 	CodeEditor,
 	SimulatorToolbar,
+	StateInspector,
 	Scoring,
 	MessageBox
 } from '.'
 import {levelStore, viewStateStore, programStore, simulatorStore} from '../stores'
+import {Program} from '../program'
 import type {Item, ProgramState, ProgramScoring} from '../program'
 
 export type Props = {}
@@ -27,8 +29,8 @@ export default class App extends React.Component<*, Props, *> {
 
 	props: Props
 
-	async levelFinished(state: ProgramState) {
-		const {score, message} = state.scoring
+	async levelFinished(state: ProgramState, scoring: ProgramScoring) {
+		const {score, message} = scoring
 		levelStore.completeLevel(score)
 
 		const title = "Level completed"
@@ -60,7 +62,7 @@ export default class App extends React.Component<*, Props, *> {
 		}
 	}
 
-	async levelUnfinished(state: ProgramState) {
+	async levelUnfinished(state: ProgramState, scoring: ProgramScoring) {
 		// Only show the 'Rover did not make it to the flag' box once.
 		if (!state.atGoal && window.localStorage.levelUnfinishedBoxShown) { return }
 		window.localStorage.levelUnfinishedBoxShown = 'true'
@@ -101,16 +103,20 @@ export default class App extends React.Component<*, Props, *> {
 	}
 
 	render() {
+		const {level} = programStore
+
 		return (
 			<div className={$.app}>
 				<Panels
 					horizontal
-					initialSizes={viewStateStore.panelSizes}
-					onPanelResize={sizes => { viewStateStore.panelSizes = sizes }}
+					initialSizes={viewStateStore.panelSizes.main}
+					minimumSizes={{left: 100, bottom: 40}}
+					onPanelResize={sizes => { viewStateStore.panelSizes.main = sizes }}
 
-					left={this.renderCodePanel()}
 					main={this.renderMain()}
-					splitter={this.renderSplitter()}
+					left={this.renderCodePanel()}
+					bottom={level && level.stateInspector ? this.renderStateInspector() : null}
+					splitter={side => <div className={[$.splitter, $[`splitter_${side}`]]}/>}
 				/>
 				<MessageBox.Host/>
 			</div>
@@ -145,12 +151,26 @@ export default class App extends React.Component<*, Props, *> {
 		)
 	}
 
+	renderStateInspector() {
+		let state
+		if (simulatorStore.state != null) {
+			state = simulatorStore.state
+		} else {
+			state = new Program(programStore.level, '').defaultState()
+		}
+
+		return (
+			<StateInspector state={state}/>
+		)
+	}
+
 	renderGrid() {
 		const {level} = programStore
 		if (level == null) { return null }
 
 		const {state, done} = simulatorStore
-		const showItems = !level.dark || simulatorStore.finished
+		const showItems = !level.dark || simulatorStore.isFinished
+
 		const items = state == null || level.dark
 			? level.items
 			: state.items
@@ -166,9 +186,9 @@ export default class App extends React.Component<*, Props, *> {
 		const transitionDuration = simulatorStore.running
 			? simulatorStore.simulator.frameDuration
 			: 0
-		
+
 		return (
-			<Grid rows={level.rows} dark={level.dark && !simulatorStore.finished} columns={level.columns}>
+			<Grid rows={level.rows} dark={level.dark && !simulatorStore.isFinished} showCoordinates={level.coordinates} columns={level.columns}>
 				{showItems && items.map((item, index) => this.renderSprite(item, index))}
 
 				{level.goalPosition != null && <Goal position={level.goalPosition} type='goal'/>}
@@ -177,8 +197,8 @@ export default class App extends React.Component<*, Props, *> {
 					failedPosition={failedPosition}
 					direction={direction}
 					transitionDuration={transitionDuration}
-					jumpForJoy={done && (state && state.finished)}
-					shame={done && (state && !state.finished)}
+					jumpForJoy={done && (state && state.isFinished)}
+					shame={done && (state && !state.isFinished)}
 				/>
 			</Grid>
 		)
@@ -190,24 +210,18 @@ export default class App extends React.Component<*, Props, *> {
 		)
 	}
 
-	renderSplitter() {
-		return (
-			<div className={$.splitter}/>
-		)
-	}
-
 	onRunTap = e => {
 		programStore.runProgram(e.metaKey)
 	}
 
-	onSimulatorDone = () => {
+	onSimulatorDone = (scoring: ProgramScoring) => {
 		const {state} = simulatorStore
 		if (state == null) { return }
 
-		if (state.finished) {
-			this.levelFinished(state)
+		if (state.isFinished) {
+			this.levelFinished(state, scoring)
 		} else {
-			this.levelUnfinished(state)
+			this.levelUnfinished(state, scoring)
 		}
 	}
 
@@ -233,7 +247,8 @@ const $ = jss({
 	},
 
 	gridContainer: {
-		flex: [1, 0, 0],
+		flex:     [1, 0, 0],
+		overflow: 'hidden',
 		...layout.flex.center,
 
 		'& > :not(:last-child)': {
@@ -250,11 +265,18 @@ const $ = jss({
 		flex: [1, 0, 0]
 	},
 
-	splitter: {
+	splitter_left: {
 		...layout.overlay,
 		backgroundColor: colors.purple,
 		backgroundImage: colors.bevelGradient('left'),
 		boxShadow:       shadows.horizontal(2)
+	},
+
+	splitter_bottom: {
+		...layout.overlay,
+		backgroundColor: colors.purple,
+		backgroundImage: colors.bevelGradient('top'),
+		boxShadow:       shadows.vertical(2)
 	}
 
 })

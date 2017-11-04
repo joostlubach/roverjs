@@ -1,0 +1,48 @@
+name: Algorithms 3
+instructions: |-
+  Good job so far! Now, let's try to do things another way around. So far, you've
+  told me what to do from start to end.
+
+  What if I ask you to tell me what to do on each step? In the code below, there's
+  a `function` called `step`. It `return`s the instruction I have to perform. You
+  can `return` any of these three things (you will recogize them from the previous
+  level):
+
+  - `'move'` to move one step forward
+  - `{turn: 'left'}` to turn left 90°
+  - `{turn: 'right'}` to turn right 90°
+
+  The example code below tells me to move forward on each step on each step.
+  When I've reached the flag, or when I've performed 500 steps, I'm done.
+
+rows:    3
+columns: 7
+start:   [0, 1, 'right']
+goal:    [6, 1]
+
+items:
+  - [0, 0, 'water']
+  - [1, 0, 'water']
+  - [2, 0, 'water']
+  - [3, 0, 'water']
+  - [4, 0, 'water']
+  - [5, 0, 'water']
+  - [6, 0, 'water']
+  - [0, 2, 'water']
+  - [1, 2, 'water']
+  - [2, 2, 'water']
+  - [3, 2, 'water']
+  - [4, 2, 'water']
+  - [5, 2, 'water']
+  - [6, 2, 'water']
+
+initialCode: |-
+  function step() {
+    return 'move';
+  }
+
+  // ---- You cannot modify this code
+  while (!isFinished() && performedSteps() < 500) {
+    perform(step());
+  }
+  // ++++

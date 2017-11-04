@@ -13,16 +13,15 @@ export const base = {
 
 	'& h1': {
 		color: colors.primary,
-		font:  fonts.huge,
+		font:  fonts.large,
 
 		'&:not(:first-child)': {
 			paddingTop: '1.2em'
 		}
 	},
-
 	'& h2': {
 		color: colors.primary,
-		font:  fonts.large,
+		font:  fonts.normal,
 
 		'&:not(:first-child)': {
 			paddingTop: '0.6em'
@@ -44,13 +43,13 @@ export const base = {
 	},
 	'& ul, & ol': {
 		paddingLeft: '1.6em',
-		margin: 0
+		margin:      0
 	},
 	'& li': {
 		listStyle:  'disc',
 	},
 	'& a[href]': {
-		color: colors.secondary
+		color: colors.link
 	},
 
 	'& blockquote': {

@@ -8,6 +8,8 @@ export type Scoring = {
 	condition: (program: Program) => number
 }
 
+export type LevelStyle = 'basic' | 'callback'
+
 export default class Level {
 
 	constructor(id: number) {
@@ -19,8 +21,13 @@ export default class Level {
 
 		level.name = raw.name
 		level.instructions = raw.instructions
+		level.style = raw.style || 'basic'
+		level.stateInspector = raw.stateInspector
+
 		level.rows = raw.rows
 		level.columns = raw.columns
+		level.coordinates = raw.coordinates
+
 		level.startPosition  = {x: raw.start[0], y: raw.start[1]}
 		level.startDirection = raw.start[2]
 
@@ -44,12 +51,15 @@ export default class Level {
 		return level
 	}
 
-	id:           number
-	name:         string
-	instructions: ?string
+	id:             number
+	name:           string
+	instructions:   ?string
+	style:          LevelStyle
+	stateInspector: boolean
 
-	rows:    number
-	columns: number
+	rows:        number
+	columns:     number
+	coordinates: boolean
 
 	startPosition:  Position
 	startDirection: Direction

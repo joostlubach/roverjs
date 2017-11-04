@@ -1,9 +1,11 @@
 // @flow
 
 import React from 'react'
+import {observer} from 'mobx-react'
 import {jss, colors, layout, fonts} from '../styles'
 import {SVG, Markdown, Button} from '.'
 import type {Level} from '../program'
+import {viewStateStore} from '../stores'
 
 export type Props = {
 	level: Level
@@ -11,16 +13,15 @@ export type Props = {
 
 type State = {
 	collapsible: boolean,
-	collapsed:   boolean
 }
 
+@observer
 export default class Instructions extends React.Component<*, Props, *> {
 
 	props: Props
 
 	state: State = {
-		collapsible: false,
-		collapsed:   false
+		collapsible: false
 	}
 
 	bubble: ?HTMLElement = null
@@ -29,14 +30,17 @@ export default class Instructions extends React.Component<*, Props, *> {
 	updateCollapsible() {
 		if (!this.shouldUpdateCollapsible) { return }
 		this.shouldUpdateCollapsible = false
-		
+
 		const {bubble} = this
 		if (bubble == null) { return }
 
+		const hadClass = bubble.classList.contains($.collapsedBubble)
 		bubble.classList.remove($.collapsedBubble)
-		const collapsible = bubble.offsetHeight > 80
-		const collapsed   = collapsible && this.state.collapsed
-		this.setState({collapsible, collapsed: false})
+		const collapsible = bubble.offsetHeight > collapsedHeight
+		this.setState({collapsible})
+		if (hadClass) {
+			bubble.classList.add($.collapsedBubble)
+		}
 	}
 
 	componentDidMount() {
@@ -52,11 +56,17 @@ export default class Instructions extends React.Component<*, Props, *> {
 			this.shouldUpdateCollapsible = true
 		}
 	}
-	
+
 	render() {
 		const {level} = this.props
-		const {collapsed, collapsible} = this.state
+		const {collapsible} = this.state
+		const collapsed = viewStateStore.instructionsCollapsed
 		if (level.instructions == null) { return null }
+
+		const bubbleClassName = [
+			$.instructionsBubble,
+			collapsed && $.collapsedBubble
+		]
 
 		return (
 			<div className={$.instructions}>
@@ -81,7 +91,7 @@ export default class Instructions extends React.Component<*, Props, *> {
 						/>						
 					}
 				</div>
-				<div ref={el => { this.bubble = el }} className={[$.instructionsBubble, collapsed && $.collapsedBubble]}>
+				<div ref={el => { this.bubble = el }} className={bubbleClassName}>
 					<Markdown key={level.id}>{level.instructions}</Markdown>
 				</div>
 			</div>
@@ -89,17 +99,19 @@ export default class Instructions extends React.Component<*, Props, *> {
 	}
 
 	onExpandTap = () => {
-		this.setState({collapsed: false})
+		viewStateStore.instructionsCollapsed = false
 	}
 
 	onCollapseTap = () => {
-		this.setState({collapsed: true})
+		viewStateStore.instructionsCollapsed = true
 	}
 
 }
 
+const collapsedHeight = 86
+
 const $ = jss({
-	
+
 	instructions: {
 		...layout.flex.row,
 		alignItems: 'flex-start',
@@ -127,7 +139,7 @@ const $ = jss({
 
 		borderRadius: layout.radius.l,
 		padding:      layout.padding.m,
-		
+
 		background: colors.bg.instructions,
 		color:      colors.fg.instructions,
 		font:       fonts.small
@@ -136,9 +148,9 @@ const $ = jss({
 	collapsedBubble: {
 		position: 'relative',
 
-		maxHeight: 80,
-		overflow: 'hidden',
-		
+		maxHeight: collapsedHeight,
+		overflow:  'hidden',
+
 		'&::after': {
 			content: '""',
 			display: 'block',

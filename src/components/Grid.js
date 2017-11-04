@@ -2,13 +2,15 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {jss, colors, layout, shadows} from '../styles'
+import {jss, colors, layout, fonts, shadows} from '../styles'
 import times from 'lodash/times'
 
 export type Props = {
 	rows:    number,
 	columns: number,
-	dark:    boolean,
+
+	showCoordinates: boolean,
+	dark:            boolean,
 
 	className?: ClassNameProp,
 	children?:  any
@@ -44,14 +46,64 @@ export default class Grid extends React.Component<*, Props, *> {
 	}
 
 	render() {
-		const {rows, columns, dark, className} = this.props
+		const {showCoordinates, className} = this.props
+
+		return (
+			<div className={[$.gridContainer, className]}>
+				{showCoordinates && this.renderRowCoordinates()}
+				<div className={$.gridBody}>
+					{showCoordinates && this.renderColumnCoordinates()}
+					{this.renderGrid()}
+				</div>
+			</div>
+		)
+	}
+
+	renderColumnCoordinates() {
+		const {columns} = this.props
+
+		return (
+			<div className={$.columnCoordinates}>
+				{times(columns, coord =>
+					<div
+						key={coord}
+						className={[$.coordinate, $.columnCoordinate]}
+						style={{width: layout.gridCell.width}}
+					>
+						<div>{coord}</div>
+					</div>
+				)}
+			</div>
+		)
+	}
+
+	renderRowCoordinates() {
+		const {rows} = this.props
+
+		return (
+			<div className={$.rowCoordinates}>
+				{times(rows, coord =>
+					<div
+						key={coord}
+						className={[$.coordinate, $.rowCoordinate]}
+						style={{height: layout.gridCell.height}}
+					>
+						<div>{coord}</div>
+					</div>
+				)}
+			</div>
+		)
+	}
+
+	renderGrid() {
+		const {rows, columns, dark} = this.props
 		const size = {
 			width:  columns * layout.gridCell.width,
 			height: rows * layout.gridCell.height
 		}
 
 		return (
-			<div className={[$.grid, dark && $.gridDark, className]} style={size}>
+			<div className={[$.grid, dark && $.gridDark]} style={size}>
 				{this.renderCells()}
 				{this.renderContents()}
 			</div>
@@ -97,14 +149,54 @@ export default class Grid extends React.Component<*, Props, *> {
 
 }
 
+const borderWidth = 5
+const columnCoordinateHeight = fonts.tiny.size + 2 * borderWidth + 2 * layout.padding.xs
+
 const $ = jss({
+	gridContainer: {
+		...layout.flex.row
+	},
+
+	gridBody: {
+		...layout.flex.height
+	},
+
+	columnCoordinates: {
+		...layout.flex.row,
+		padding: borderWidth
+	},
+
+	rowCoordinates: {
+		...layout.flex.column,
+		marginTop: columnCoordinateHeight,
+		padding:   borderWidth
+	},
+
+	coordinate: {
+		...layout.flex.center,
+		padding: layout.padding.xs,
+
+		color:      colors.fg.inverted,
+		font:       fonts.tiny,
+		opacity:    0.8,
+		lineHeight: 1
+	},
+
+	columnCoordinate: {
+		textAlign: 'center'
+	},
+
+	rowCoordinate: {
+		textAlign: 'right'
+	},
+
 	grid: {
 		position: 'relative',
 		...layout.flex.column,
 
 		boxSizing:  'content-box',
 		background: colors.bg.grid,
-		border:     [5, 'solid', colors.border.grid],
+		border:     [borderWidth, 'solid', colors.border.grid],
 		boxShadow:  shadows.float(5)
 	},
 

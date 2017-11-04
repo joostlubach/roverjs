@@ -29,6 +29,10 @@ export default class SimulatorStore extends EventEmitter {
 	@observable
 	simulator: ?Simulator = null
 
+	/** The index of the most recently (or currently) executed step. */
+	@observable
+	currentStepIndex: ?number = null
+
 	/** The most recently (or currently) executed step. */
 	@observable
 	currentStep: ?Step = null
@@ -47,8 +51,11 @@ export default class SimulatorStore extends EventEmitter {
 
 	@computed
 	get state(): ProgramState {
-		if (this.currentStep == null) { return null }
-		return this.currentStep.endState
+		if (this.currentStep != null) {
+			return this.currentStep.endState
+		} else if (this.simulator != null && this.currentStepIndex < 0 && this.simulator.program.steps.length > 0) {
+			return this.simulator.program.steps[0].startState
+		}
 	}
 
 	/** Whether the simulator is currently running (and not paused). */
@@ -67,8 +74,8 @@ export default class SimulatorStore extends EventEmitter {
 
 	/** Whether the player has finished the level. */
 	@computed
-	get finished(): boolean {
-		return this.state != null && this.state.finished
+	get isFinished(): boolean {
+		return this.state != null && this.state.isFinished
 	}
 
 	@observable
@@ -146,7 +153,7 @@ export default class SimulatorStore extends EventEmitter {
 	@action
 	backward() {
 		if (this.running || this.simulator == null) { return }
-		
+
 		this.running = true
 		this.simulator.backward(() => {
 			this.running = false
@@ -154,15 +161,16 @@ export default class SimulatorStore extends EventEmitter {
 	}
 
 	@action
-	onSimulatorStep = (step: ?Step) => {
+	onSimulatorStep = (index: number, step: ?Step) => {
+		this.currentStepIndex = index
 		this.currentStep = step
 	}
 
 	@action
-	onSimulatorDone = () => {
+	onSimulatorDone = (scoring: ProgramScoring) => {
 		this.done = true
 		this.cleanUp()
-		this.emit('done')
+		this.emit('done', scoring)
 	}
 
 }

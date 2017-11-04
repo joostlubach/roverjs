@@ -29,13 +29,13 @@ initialCode: |-
   }
 
   // ---- You cannot modify these lines
-
-  move(); move();
+  move()
+  move();
   for (let i = 0; i < 3; i++) {
     moveAwayAndComeBack();
   }
-  move(); move();
-
+  move()
+  move();
   // ++++
 
 scoring:

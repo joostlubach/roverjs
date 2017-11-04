@@ -10,7 +10,10 @@ export type Props = {
 export default class Gutter extends React.Component<*, Props, *> {
 
 	get markers() {
-		return React.Children.map(this.props.children, child => {
+		const {children} = this.props
+		if (children == null) { return [] }
+
+		return React.Children.map(children, child => {
 			if (child == null) { return null }
 
 			return React.cloneElement(child, {

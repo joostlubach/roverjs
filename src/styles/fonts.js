@@ -33,15 +33,11 @@ export const caption = {
 }
 export const large = {
 	family: defaultFamily,
-	size:   20
+	size:   18
 }
 export const huge = {
 	family: defaultFamily,
-	size:   24
-}
-export const clock = {
-	family: defaultFamily,
-	size:   48
+	size:   22
 }
 
 export const monospace = {

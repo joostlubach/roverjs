@@ -15,9 +15,9 @@ export const amber  = new Color('#F6A623')
 export const red    = new Color('#CB2A3E')
 export const purple = new Color('#70657C')
 
-export const primary   = green
-export const secondary = blue
-export const link      = amber
+export const primary   = blue
+export const secondary = green
+export const link      = blue
 export const error     = red
 export const shadow    = black.alpha(0.3)
 export const focus     = blue.alpha(0.4)
@@ -32,7 +32,7 @@ export const bg = {
 	app:           purple.darken(0.4),
 	grid:          gray,
 	gridDark:      darkGray,
-	
+
 	overlay:       black.alpha(0.4)
 }
 

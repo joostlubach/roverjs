@@ -38,3 +38,17 @@ initialCode: |-
 
   move();
   turn('right');
+
+scoring:
+  tests:
+    long:
+      minLines: 8
+    usedFor:
+      regexp: for\s+\(
+
+  scores:
+    - score:   2
+      long:    false
+      usedFor: false
+      message: |-
+        You should try to write each instruction on a separate line!

@@ -1,5 +1,5 @@
 // @flow
-// @index
+// @index(d:)
 
 export {default as App} from './App'
 export {default as Button} from './Button'
@@ -21,7 +21,11 @@ export {default as Scoring} from './Scoring'
 export {default as SimulatorToolbar} from './SimulatorToolbar'
 export {default as Slider} from './Slider'
 export {default as Sprite} from './Sprite'
+export {default as StateInspector} from './StateInspector'
 export {default as Switch} from './Switch'
 export {default as Tappable} from './Tappable'
 export {default as ToolbarButton} from './ToolbarButton'
-export {default as codemirror} from './codemirror'
+
+// /index
+
+export {CodeMirror} from './codemirror'

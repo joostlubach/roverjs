@@ -1,0 +1,54 @@
+name: Using state
+instructions: |-
+  Ok, so all remaining levels will work like this. From this level on,
+  we keep the function `step` but we have removed the other code.
+
+  Also, we have annotated the Grid with the row and column numbers,
+  so you don't have to count the whole time.
+
+  ## About state
+
+  In the previous level, you couldn't know what to do, there was no
+  means to know where I was, where the goal flag was, or where the
+  water was. These sort of things are called "state".
+  
+  When your programs are run, there is also a "state", which changes
+  in each step. The state for each step is displayed in the STATE panel.
+  Use FWD to step through the program and see the state change.
+
+  ## Assignment
+
+  We've moved the flag a bit. When you get to the end, you need to turn
+  left and move one forward. Use the state parameter to determine when
+  to turn and when to move.
+
+# This creates an automatic script to run the 'step' callback.
+style: callback
+coordinates: true
+stateInspector: true
+
+rows:    3
+columns: 7
+
+start:   [0, 1, 'right']
+goal:    [6, 0]
+
+items:
+  - [0, 0, 'water']
+  - [1, 0, 'water']
+  - [2, 0, 'water']
+  - [3, 0, 'water']
+  - [4, 0, 'water']
+  - [5, 0, 'water']
+  - [0, 2, 'water']
+  - [1, 2, 'water']
+  - [2, 2, 'water']
+  - [3, 2, 'water']
+  - [4, 2, 'water']
+  - [5, 2, 'water']
+  - [6, 2, 'water']
+
+initialCode: |-
+  function step(state) {
+    return 'move';
+  }

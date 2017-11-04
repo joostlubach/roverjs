@@ -7,6 +7,8 @@ instructions: |-
   make me do a knight's move in the specified direction. If you do it right, the program will bring me to
   the flag.
 
+  Note that I have to face the same way *after* the knight move as *before* the knight move, or it won't work.
+
   If you're lost, here's that [MDN article](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)
   about functions.
 
@@ -22,13 +24,12 @@ initialCode: |-
   // ---- You cannot modify these lines
 
   knightMove('right');
-  knightMove('left');
   turn('right');
+  knightMove('left');
   knightMove('right');
+  knightMove('left');
   turn('left');
   knightMove('left');
-  knightMove('left');
-  turn('right');
   knightMove('right');
 
   // ++++
@@ -40,7 +41,7 @@ scoring:
     hasArg:
       regexp: function\s+knightMove\(.*[a-z].*\)
     short:
-      maxLines: 6
+      maxLines: 8
 
   scores:
     - score: 1
@@ -64,3 +65,6 @@ scoring:
       short:       false
       message: |-
         It seems your code is too long. You can do it in less lines of code!
+
+        Tip: can you find a way to use a conditional expression (`... ? ... : ...`) to turn the
+        opposite way given a direction?
