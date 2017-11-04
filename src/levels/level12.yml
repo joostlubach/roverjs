@@ -1,10 +1,8 @@
 name: Using state
 instructions: |-
   Ok, so all remaining levels will work like this. From this level on,
-  we keep the function `step` but we have removed the other code.
-
-  Also, we have annotated the Grid with the row and column numbers,
-  so you don't have to count the whole time.
+  we keep the function `step` but we have removed the other code. Also,
+  you cannot call the functions `move` or `turn` anymore!
 
   ## About state
 

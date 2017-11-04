@@ -73,8 +73,15 @@ export default class Panels extends React.Component<*, Props, *> {
 	}
 
 	renderMain(element: ?any) {
+		const style = {}
+		for (const side of ['left', 'right', 'top', 'bottom']) {
+			if (this.props[side] != null) {
+				style[side] = this.state.sizes[side]
+			}
+		}
+
 		return (
-			<div className={$.main} style={this.state.sizes}>
+			<div className={$.main} style={style}>
 				{element}
 			</div>
 		)

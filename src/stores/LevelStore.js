@@ -1,22 +1,84 @@
 // @flow
 
-import {observable, reaction, action} from 'mobx'
-import levels from '../levels'
+import {observable, computed, action} from 'mobx'
+import {chapters, levels} from '../levels'
 import type {Level} from '../program'
 import {programStore} from '.'
 import URL from 'url'
 
+export type Chapter = {
+	name:        string,
+	description: string,
+	levels:      Level[]
+}
+
 export default class LevelStore {
 
 	@observable
-	levels: Level[] = levels
+	currentChapter: ?Chapter = null
 
 	@observable
-	levelScores: Map<number, number> = new Map()
+	selectingChapter: boolean = false
+
+	@computed
+	get levels(): Level[] {
+		if (this.currentChapter == null) { return [] }
+		return this.currentChapter.levels
+	}
+
+	@observable
+	currentLevelNumber: number = 1
+
+	@computed
+	get currentLevel(): ?Level {
+		return this.levels[this.currentLevelNumber - 1]
+	}
+
+	@computed
+	get nextLevel(): ?Level {
+		if (this.currentLevelNumber >= this.levels.length) { return null }
+		return this.levels[this.currentLevelNumber]
+	}
+
+	@observable
+	levelScores: Map<string, number> = new Map()
+
+	chapterComplete(chapter: Chapter) {
+		for (const level of chapter.levels) {
+			if (!this.levelScores.has(level.id)) { return false }
+		}
+		return true
+	}
+
+	@action
+	selectChapter() {
+		this.selectingChapter = true
+	}
+
+	@action
+	cancelChapterSelection() {
+		this.selectingChapter = false
+	}
+
+	@action
+	loadLevel(id: string) {
+		for (const chapter of chapters) {
+			const index = chapter.levels.findIndex(level => level.id === id)
+			if (index === -1) { continue }
+
+			this.currentChapter = chapter
+			this.currentLevelNumber = index + 1
+			programStore.loadLevel(this.currentLevel)
+			break
+		}
+
+		this.selectingChapter = false
+		this.save()
+	}
 
 	@action
 	completeLevel(score: number) {
-		const currentLevel = programStore.level
+		const {currentLevel} = this
 		if (currentLevel == null) { return }
 
 		const existingScore = this.levelScores.get(currentLevel.id)
@@ -28,15 +90,15 @@ export default class LevelStore {
 
 	@action
 	next() {
-		const currentLevel = programStore.level
-		if (currentLevel == null) { return }
+		const {nextLevel} = this
+		if (nextLevel == null) { return }
 
-		this.goTo(currentLevel.id + 1)
+		this.loadLevel(nextLevel.id)
 	}
 
 	@action
-	goTo(levelID: number) {
-		const level = levels.find(lvl => lvl.id === levelID)
+	goTo(levelNumber: number) {
+		const level = levels[levelNumber - 1]
 		if (level == null) { return }
 
 		programStore.loadLevel(level)
@@ -46,20 +108,25 @@ export default class LevelStore {
 	isLevelSelectable(level: Level) {
 		const url = URL.parse(document.location.href, true)
 		if (url.query.dbg != null) { return true }
-		return level.id <= this.levelScores.size + 1
+
+		const {chapter} = level
+		const index = chapter.levels.indexOf(level)
+		if (index <= 0) { return true }
+
+		const previousLevel = chapter.levels[index - 1]
+		return this.levelScores.has(previousLevel.id)
 	}
 
 	@action
 	load() {
 		this.levelScores = new Map(JSON.parse(window.localStorage.levelScores || '[]'))
 
-		const currentLevelID = JSON.parse(window.localStorage.currentLevelID || '1')
-		const currentLevel = levels.find(lvl => lvl.id === currentLevelID)
-		programStore.loadLevel(currentLevel)
+		const currentLevelID = JSON.parse(window.localStorage.currentLevelID || '"intro"')
+		this.loadLevel(currentLevelID)
 	}
 
 	save() {
-		const currentLevel = programStore.level
+		const {currentLevel} = this
 		if (currentLevel != null) {
 			window.localStorage.currentLevelID = JSON.stringify(currentLevel.id)
 		}

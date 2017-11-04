@@ -1,6 +1,7 @@
 // @flow
 
 import type {Program, Position, Direction} from '.'
+import type {Chapter} from '../stores'
 
 export type Scoring = {
 	score:     number,
@@ -12,12 +13,13 @@ export type LevelStyle = 'basic' | 'callback'
 
 export default class Level {
 
-	constructor(id: number) {
+	constructor(chapter: Chapter, id: string) {
+		this.chapter = chapter
 		this.id = id
 	}
 
-	static deserialize(id: number, raw: Object) {
-		const level = new Level(id)
+	static deserialize(chapter: Chapter, id: string, raw: Object) {
+		const level = new Level(chapter, id)
 
 		level.name = raw.name
 		level.instructions = raw.instructions
@@ -51,7 +53,7 @@ export default class Level {
 		return level
 	}
 
-	id:             number
+	id:             string
 	name:           string
 	instructions:   ?string
 	style:          LevelStyle

@@ -1,0 +1,55 @@
+name: While loops
+instructions: |-
+  Apart from `move()` and `turn(direction)`, there is one more function you can use,
+  called `isFinished()`. It tells you when I've reached the flag.
+
+  Use a `while` loop to make me move forward until I've reached the flag.
+
+rows:    5
+columns: 3
+
+start: [1, 0, 'down']
+goal:  [1, 4]
+
+items:
+  - [0, 0, 'water']
+  - [0, 1, 'water']
+  - [0, 2, 'water']
+  - [0, 3, 'water']
+  - [0, 4, 'water']
+  - [2, 0, 'water']
+  - [2, 1, 'water']
+  - [2, 2, 'water']
+  - [2, 3, 'water']
+  - [2, 4, 'water']
+
+scoring:
+  tests:
+    whileLoop:
+      regexp: while\s*\(
+    short:
+      maxLines: 3
+
+  scores:
+    - score: 1
+      whileLoop: false
+      short:     false
+      message: |-
+        Okay, you finished, but your program is too long, and you
+        haven't used a `while` loop.
+
+        To get three stars, use a `while` loop...
+
+    - score: 2
+      whileLoop: true
+      short:     false
+      message: |-
+        Great, but try to use only three lines of code for your program...    
+
+    - score: 2
+      whileLoop: false
+      short:   true
+      message: |-
+        You haven't used a `while` loop in your code.
+        
+        To get three stars, use a `while` loop...

@@ -1,0 +1,11 @@
+- id: intro
+  name:   Introduction
+  levels: ['intro']
+  description: |-
+    In this chapter, Rover explains how everything goes.
+
+- id: loops
+  name:   Loops
+  levels: ['loops1', 'loops2']
+  description: |-
+    Learn about `for` and `while` loops, and about `for ... of` and `for ... in`.

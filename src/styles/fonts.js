@@ -40,6 +40,17 @@ export const huge = {
 	size:   22
 }
 
+export const digital = {
+	family:     'Alpha Smart',
+	fontWeight: 'normal',
+	size:       18
+}
+export const digitalLarge = {
+	family:     'Alpha Smart',
+	fontWeight: 'normal',
+	size:       20
+}
+
 export const monospace = {
 	family:     monospaceFamily,
 	fontWeight: 200,

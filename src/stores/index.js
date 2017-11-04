@@ -16,3 +16,5 @@ export const levelStore = new LevelStore()
 export const programStore = new ProgramStore()
 export const simulatorStore = new SimulatorStore()
 export const viewStateStore = new ViewStateStore()
+
+window.levelStore = levelStore

@@ -16,7 +16,7 @@ export const red    = new Color('#CB2A3E')
 export const purple = new Color('#70657C')
 
 export const primary   = blue
-export const secondary = green
+export const secondary = amber
 export const link      = blue
 export const error     = red
 export const shadow    = black.alpha(0.3)

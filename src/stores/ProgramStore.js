@@ -36,12 +36,8 @@ export default class ProgramStore extends EventEmitter {
 		this.loadCode()
 	}
 
-	isActiveLevel(level: Level) {
-		return this.level === level
-	}
-
 	loadCode() {
-		const codes = JSON.parse(window.localStorage.codes || '[]')
+		const codes = JSON.parse(window.localStorage.codes || '{}')
 		this.code = codes[this.level.id]
 		if (this.code == null) {
 			this.code = this.level.initialCode
@@ -53,7 +49,7 @@ export default class ProgramStore extends EventEmitter {
 	saveCode() {
 		if (this.level == null) { return }
 
-		const codes = JSON.parse(window.localStorage.codes || '[]')
+		const codes = JSON.parse(window.localStorage.codes || '{}')
 		codes[this.level.id] = this.code
 		window.localStorage.codes = JSON.stringify(codes)
 	}

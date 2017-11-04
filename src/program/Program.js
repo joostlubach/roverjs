@@ -74,7 +74,7 @@ export default class Program {
 	//------
 	// Interface
 
-	interfaceMethods = ['perform', 'performedSteps', 'move', 'turn', 'isFinished', 'getState']
+	interfaceMethods = ['perform', 'stepCount', 'move', 'turn', 'isFinished', 'getState']
 
 	get interface(): Object {
 		const iface = {}
@@ -94,7 +94,7 @@ export default class Program {
 		}
 	}
 
-	performedSteps() {
+	stepCount() {
 		return this.steps.length
 	}
 

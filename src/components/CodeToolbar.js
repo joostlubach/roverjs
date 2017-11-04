@@ -3,7 +3,7 @@
 import React from 'react'
 import {observer} from 'mobx-react'
 import {jss, layout, colors, fonts, shadows} from '../styles'
-import {SVG, Markdown, ToolbarButton, Button, MessageBox, ScoreStars} from '.'
+import {SVG, Markdown, ToolbarButton, Button, MessageBox, LevelButton} from '.'
 import {levelStore, programStore} from '../stores'
 
 export type Props = {}
@@ -44,17 +44,21 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
 					{this.renderLevelName()}
 					{this.renderLevelSelector()}
 				</div>
-				{this.renderResetButton()}
+				<div className={$.buttons}>
+					{this.renderResetButton()}
+					{this.renderChaptersButton()}
+				</div>
 			</div>
 		)
 	}
 
 	renderLevelName() {
-		const {level} = programStore
+		const {currentChapter} = levelStore
+		if (currentChapter == null) { return null }
 
 		return (
-			<div className={$.levelName}>
-				{level.name}
+			<div className={$.chapterName}>
+				{currentChapter.name}
 			</div>
 		)
 	}
@@ -62,25 +66,15 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
 	renderLevelSelector() {
 		return (
 			<div className={$.levelSelector}>
-				{levelStore.levels.map(level => this.renderLevelButton(level))}
+				{levelStore.levels.map((level, i) =>
+					<LevelButton
+						key={level.id}
+						level={level}
+						number={i + 1}
+						small
+					/>
+				)}
 			</div>
-		)
-	}
-
-	renderLevelButton(level: Level) {
-		const score = levelStore.levelScores.get(level.id)
-
-		return (
-			<Button
-				key={level.id}
-				label={level.id.toString()}
-				small
-				color={programStore.isActiveLevel(level) ? colors.green : colors.purple.lighten(0.2)}
-				disabled={!levelStore.isLevelSelectable(level)}
-				onTap={this.onLevelTap.bind(this, level)}
-			>
-				{score && <ScoreStars score={score} starSize={10} padding={4} animated={false}/>}
-			</Button>
 		)
 	}
 
@@ -95,24 +89,35 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
 		)
 	}
 
+	renderChaptersButton() {
+		return (
+			<ToolbarButton
+				className={$.chaptersButton}
+				icon='book'
+				label="CHAPTERS"
+				onTap={this.onChaptersTap}
+			/>
+		)
+	}
+
 	renderAboutBody() {
 		return (
 			<Markdown className={$.about}>{about}</Markdown>
 		)
 	}
 
-	onLevelTap = (level: Level) => {
-		levelStore.goTo(level.id)
-	}
-
 	onResetTap = () => {
 		this.confirmAndReset()
 	}
 
+	onChaptersTap = () => {
+		levelStore.selectChapter()
+	}
+
 	onAboutTap = () => {
 		MessageBox.show({
-			title: "Rover the Robot",
-			body:  this.renderAboutBody(),
+			title:   "Rover the Robot",
+			body:    this.renderAboutBody(),
 			buttons: [{
 				label: "Whatever"
 			}]
@@ -137,6 +142,7 @@ const $ = jss({
 		minHeight: 96,
 
 		...layout.flex.row,
+		alignItems:     'center',
 		justifyContent: 'space-between',
 		padding:        layout.padding.s,
 
@@ -148,8 +154,9 @@ const $ = jss({
 	},
 
 	left: {
+		alignSelf:  'flex-start',
+		alignItems: 'stretch',
 		...layout.flex.column,
-		alignItems: 'stretch'
 	},
 
 	about: {
@@ -170,8 +177,9 @@ const $ = jss({
 		marginLeft:     layout.padding.m
 	},
 
-	levelName: {
-		font:  fonts.large
+	chapterName: {
+		font:          fonts.digitalLarge,
+		textTransform: 'uppercase',
 	},
 
 	levelSelector: {
@@ -186,7 +194,7 @@ const $ = jss({
 		}
 	},
 
-	resetButton: {
-		alignSelf: 'center'
+	buttons: {
+		...layout.row()
 	}
 })

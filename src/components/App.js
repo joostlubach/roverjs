@@ -16,6 +16,7 @@ import {
 	SimulatorToolbar,
 	StateInspector,
 	Scoring,
+	ChapterModal,
 	MessageBox
 } from '.'
 import {levelStore, viewStateStore, programStore, simulatorStore} from '../stores'
@@ -42,23 +43,24 @@ export default class App extends React.Component<*, Props, *> {
 			/>
 		)
 
-		const nextLevelAvailable = levelStore.levels.length > programStore.level.id
-		const nextLevel = await MessageBox.show({
+		const nextLevelAvailable = levelStore.nextLevel != null
+		const result = await MessageBox.show({
 			title,
 			body,
 
 			buttons: nextLevelAvailable ? [
-				{label: "Try again", result: false},
-				{label: "Next level", result: true},
+				{label: "Try again", result: 'try-again'},
+				{label: "Next level", result: 'next-level'},
 			] : [
-				{label: "Look at your victory", result: null}
+				{label: "Look at your victory", result: null},
+				{label: "Go to chapters", result: 'chapters'},
 			]
 		})
 
-		if (nextLevel === true) {
-			levelStore.next()
-		} else if (nextLevel === false) {
-			simulatorStore.reset()
+		switch (result) {
+		case 'try-again': simulatorStore.reset(); break
+		case 'next-level': levelStore.next(); break
+		case 'chapters': levelStore.selectChapter(); break
 		}
 	}
 
@@ -103,20 +105,24 @@ export default class App extends React.Component<*, Props, *> {
 	}
 
 	render() {
-		const {level} = programStore
+		const {currentLevel} = levelStore
 
 		return (
 			<div className={$.app}>
 				<Panels
 					horizontal
-					initialSizes={viewStateStore.panelSizes.main}
+					initialSizes={viewStateStore.panelSizes}
 					minimumSizes={{left: 100, bottom: 40}}
-					onPanelResize={sizes => { viewStateStore.panelSizes.main = sizes }}
+					onPanelResize={sizes => { viewStateStore.panelSizes = sizes }}
 
 					main={this.renderMain()}
 					left={this.renderCodePanel()}
-					bottom={level && level.stateInspector ? this.renderStateInspector() : null}
+					bottom={currentLevel && currentLevel.stateInspector ? this.renderStateInspector(currentLevel) : null}
 					splitter={side => <div className={[$.splitter, $[`splitter_${side}`]]}/>}
+				/>
+				<ChapterModal
+					isOpen={levelStore.selectingChapter}
+					onRequestClose={() => { levelStore.cancelChapterSelection() }}
 				/>
 				<MessageBox.Host/>
 			</div>
@@ -124,21 +130,21 @@ export default class App extends React.Component<*, Props, *> {
 	}
 
 	renderCodePanel() {
-		const {level} = programStore
-		if (level == null) { return }
+		const {currentLevel} = levelStore
+		if (currentLevel == null) { return }
 
 		return (
 			<div className={$.codePanel}>
 				<CodeToolbar/>
-				<Instructions level={level}/>
+				<Instructions level={currentLevel}/>
 				<CodeEditor className={$.codeEditor}/>
 			</div>
 		)
 	}
 
 	renderMain() {
-		const {level} = programStore
-		const hasApples = level != null && level.hasApples
+		const {currentLevel} = levelStore
+		const hasApples = currentLevel != null && currentLevel.hasApples
 
 		return (
 			<div className={$.main}>
@@ -151,12 +157,12 @@ export default class App extends React.Component<*, Props, *> {
 		)
 	}
 
-	renderStateInspector() {
+	renderStateInspector(level: Level) {
 		let state
 		if (simulatorStore.state != null) {
 			state = simulatorStore.state
 		} else {
-			state = new Program(programStore.level, '').defaultState()
+			state = new Program(level, '').defaultState()
 		}
 
 		return (
@@ -165,33 +171,33 @@ export default class App extends React.Component<*, Props, *> {
 	}
 
 	renderGrid() {
-		const {level} = programStore
-		if (level == null) { return null }
+		const {currentLevel} = levelStore
+		if (currentLevel == null) { return null }
 
 		const {state, done} = simulatorStore
-		const showItems = !level.dark || simulatorStore.isFinished
+		const showItems = !currentLevel.dark || simulatorStore.isFinished
 
-		const items = state == null || level.dark
-			? level.items
+		const items = state == null || currentLevel.dark
+			? currentLevel.items
 			: state.items
 		const position = state == null
-			? level.startPosition
+			? currentLevel.startPosition
 			: state.position
 		const failedPosition = (state == null || simulatorStore.done)
 			? null
 			: state.failedPosition
 		const direction = state == null
-			? level.startDirection
+			? currentLevel.startDirection
 			: state.direction
 		const transitionDuration = simulatorStore.running
 			? simulatorStore.simulator.frameDuration
 			: 0
 
 		return (
-			<Grid rows={level.rows} dark={level.dark && !simulatorStore.isFinished} showCoordinates={level.coordinates} columns={level.columns}>
+			<Grid rows={currentLevel.rows} dark={currentLevel.dark && !simulatorStore.isFinished} showCoordinates={currentLevel.coordinates} columns={currentLevel.columns}>
 				{showItems && items.map((item, index) => this.renderSprite(item, index))}
 
-				{level.goalPosition != null && <Goal position={level.goalPosition} type='goal'/>}
+				{currentLevel.goalPosition != null && <Goal position={currentLevel.goalPosition} type='goal'/>}
 				<Robot
 					position={position}
 					failedPosition={failedPosition}

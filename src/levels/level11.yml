@@ -13,7 +13,11 @@ instructions: |-
   - `{turn: 'right'}` to turn right 90°
 
   The example code below tells me to move forward on each step on each step.
-  When I've reached the flag, or when I've performed 500 steps, I'm done.
+  When I've reached the flag, I'll stop.
+
+  ## Assignment
+
+  Just tell me to go forward (`return 'move';`) on each step!
 
 rows:    3
 columns: 7
@@ -38,11 +42,11 @@ items:
 
 initialCode: |-
   function step() {
-    return 'move';
+    // Tell me what to do here.
   }
 
   // ---- You cannot modify this code
-  while (!isFinished() && performedSteps() < 500) {
+  while (!isFinished() && stepCount() < 500) {
     perform(step());
   }
   // ++++

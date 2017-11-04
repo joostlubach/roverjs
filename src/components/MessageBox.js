@@ -165,7 +165,7 @@ const $ = jss({
 	host: {
 		...layout.overlay,
 		position: 'fixed',
-		zIndex:   layout.z.popup,
+		zIndex:   layout.z.messageBox,
 
 		pointerEvents: 'none'
 	},
@@ -211,7 +211,7 @@ const $ = jss({
 		overflow:   'auto',
 		maxWidth:   480,
 
-		border: [4, 'solid', colors.amber],
+		border: [4, 'solid', colors.primary],
 
 		pointerEvents: 'auto',
 
@@ -221,13 +221,14 @@ const $ = jss({
 
 	header: {
 		...layout.flex.center,
-		borderRadius: [layout.radius.m, layout.radius.m, 0, 0],
-		padding:      [layout.padding.m, layout.padding.m, 0],
-		color:        colors.blue
-	},
+		borderRadius: [layout.radius.m - 4, layout.radius.m - 4, 0, 0],
+		padding:      layout.padding.s,
 
-	title: {
-		font:         fonts.large,
+		background:   colors.primary,
+		color:        colors.fg.inverted,
+
+		font:          fonts.digitalLarge,
+		textTransform: 'uppercase',
 	},
 
 	body: {

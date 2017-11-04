@@ -66,7 +66,9 @@ export default class ProgramBuilder {
 		})
 
 		try {
-			this.runtime.context.assign(this.program.interface, true)
+			if (this.program.level.style === 'basic') {
+				this.runtime.context.assign(this.program.interface, true)
+			}
 
 			this.program.startRecording()
 			this.runtime.evaluate(ast)

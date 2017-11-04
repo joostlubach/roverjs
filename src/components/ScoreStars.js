@@ -2,21 +2,25 @@
 
 import React from 'react'
 import CSSTransitionGroup from 'react-addons-css-transition-group'
-import {jss, layout} from '../styles'
+import {jss, layout, colors} from '../styles'
 import {SVG} from '.'
 import times from 'lodash/times'
 
 export type Props = {
 	score:      number,
+	maxScore:   number,
 	starSize:   number,
 	padding:    number,
 	animated:   boolean,
+	showGray:   boolean,
 	className?: ClassNameProp
 }
 export const defaultProps = {
+	maxScore: 3,
 	starSize: 48,
 	padding:  layout.padding.m,
 	animated: true,
+	showGray: false
 }
 
 type State = {
@@ -68,14 +72,42 @@ export default class Scoring extends React.Component<*, Props, *> {
 	}
 
 	render() {
-		const {score, animated, starSize, padding, className} = this.props
-		const currentScore = animated ? this.state.currentScore : score
-
-		const width = starSize * score + padding * (score - 1)
+		const {maxScore, showGray, starSize, padding, className} = this.props
+		const width = starSize * maxScore + padding * (maxScore - 1)
 		const height = starSize
 
 		return (
-			<CSSTransitionGroup className={[$.scoreStars, className]} style={{width, height}} component="div" transitionName={$.anim} transitionEnterTimeout={animDuration} transitionLeaveTimeout={animDuration}>
+			<div className={[$.scoreStars, className]} style={{width, height}}>
+				{showGray && this.renderGrayStars()}
+				{this.renderStars()}
+			</div>
+		)
+	}
+
+	renderGrayStars() {
+		const {starSize, maxScore, padding} = this.props
+
+		return (
+			<div className={$.grayStars}>
+				{times(maxScore, i => (
+					<SVG
+						key={i}
+						name='star-gray'
+						className={$.grayStar}
+						size={{width: starSize, height: starSize}}
+						style={{marginLeft: i === 0 ? 0 : padding}}
+					/>
+				))}
+			</div>
+		)
+	}
+
+	renderStars() {
+		const {score, animated, starSize, padding} = this.props
+		const currentScore = animated ? this.state.currentScore : score
+
+		return (
+			<CSSTransitionGroup component="div" className={$.goldStars} transitionName={$.anim} transitionEnterTimeout={animDuration} transitionLeaveTimeout={animDuration}>
 				{times(currentScore, i => (
 					<SVG
 						key={i}
@@ -96,6 +128,22 @@ const animDuration = 400
 
 const $ = jss({
 	scoreStars: {
+		position: 'relative'
+	},
+
+	grayStars: {
+		...layout.overlay,
+		...layout.flex.row,
+		alignItems:     'center',
+		justifyContent: 'flex-start',
+	},
+
+	grayStar: {
+		fill: colors.fg.dim
+	},
+
+	goldStars: {
+		...layout.overlay,
 		...layout.flex.row,
 		alignItems:     'center',
 		justifyContent: 'flex-start',

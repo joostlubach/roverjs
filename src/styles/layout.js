@@ -89,7 +89,9 @@ export const buttonPadding = [8, 16]
 export const leftNavWidth  = 244
 
 export const z = {
-	popup: 1000
+	modal:      100,
+	messageBox: 200,
+	popup:      1000
 }
 
 export const durations = {
