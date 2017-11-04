@@ -72,8 +72,8 @@ export default class Scoring extends React.Component<*, Props, *> {
 	}
 
 	render() {
-		const {maxScore, showGray, starSize, padding, className} = this.props
-		const width = starSize * maxScore + padding * (maxScore - 1)
+		const {maxScore, score, showGray, starSize, padding, className} = this.props
+		const width = starSize * (showGray ? maxScore : score) + padding * (maxScore - 1)
 		const height = starSize
 
 		return (

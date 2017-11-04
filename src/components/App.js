@@ -52,7 +52,7 @@ export default class App extends React.Component<*, Props, *> {
 				{label: "Try again", result: 'try-again'},
 				{label: "Next level", result: 'next-level'},
 			] : [
-				{label: "Look at your victory", result: null},
+				{label: "Try again", result: 'try-again'},
 				{label: "Go to chapters", result: 'chapters'},
 			]
 		})
@@ -214,10 +214,6 @@ export default class App extends React.Component<*, Props, *> {
 		return (
 			<ItemSprite key={index} item={item}/>
 		)
-	}
-
-	onRunTap = e => {
-		programStore.runProgram(e.metaKey)
 	}
 
 	onSimulatorDone = (scoring: ProgramScoring) => {

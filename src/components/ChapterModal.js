@@ -190,12 +190,12 @@ const $ = jss({
 	},
 
 	chapterDescription: {
-		font: fonts.small,
+		font:          fonts.small,
+		paddingBottom: layout.padding.m,
+		borderBottom:  [1, 'solid', colors.border.medium],
 	},
 
 	levelSelector: {
-		borderTop: [1, 'solid', colors.border.medium],
-		marginTop: layout.padding.m,
 		padding:   [layout.padding.m, 0],
 
 		...layout.row(),

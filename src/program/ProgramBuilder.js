@@ -91,8 +91,6 @@ export default class ProgramBuilder {
 		} catch (error) {
 			if (error.node != null) {
 				this.errors.push(error)
-			} else if (error.name === 'InfiniteLoopException') {
-				console.error("Your program resulted in an infinite loop") //eslint-disable-line
 			} else {
 				throw error
 			}

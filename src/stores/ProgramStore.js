@@ -30,6 +30,9 @@ export default class ProgramStore extends EventEmitter {
 	@observable
 	errors: CodeError[] = []
 
+	@observable
+	hasInfiniteLoop: boolean = false
+
 	@action
 	loadLevel(level: Level) {
 		this.level = level
@@ -74,6 +77,7 @@ export default class ProgramStore extends EventEmitter {
 
 		// Report errors.
 		this.errors = builder.errors
+		this.hasInfiniteLoop = builder.errors.find(error => error.name === 'InfiniteLoopException') != null
 
 		// If successful, run a simulation of the created program.
 		simulatorStore.reset()

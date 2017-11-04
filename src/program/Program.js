@@ -43,6 +43,10 @@ export default class Program {
 	state:   ProgramState
 	scoring: ProgramScoring
 
+	get isEmpty(): boolean {
+		return this.steps.filter(step => step.actionPerformed).length === 0
+	}
+
 	//------
 	// State
 

@@ -26,16 +26,18 @@ export default class LevelButton extends React.Component<*, Props, *> {
 	static defaultProps = defaultProps
 
 	render() {
-		const {level, number, color, small} = this.props
+		const {level, number, small} = this.props
 		const score = levelStore.levelScores.get(level.id)
 		const starSize = small ? 10 : 15
 		const isSelectable = levelStore.isLevelSelectable(level)
-		const isCurrentLevel = level === levelStore.currentLevel
+		const isCurrent = levelStore.currentLevel != null && level.id === levelStore.currentLevel.id
+
+		const color = isCurrent
+			? colors.green
+			: this.props.color
 
 		return (
 			<Button
-				className={[$.levelButton, isCurrentLevel && $.currentLevelButton]}
-				style={{borderWidth: small ? 2 : 4}}
 				label={number.toString()}
 				small={small}
 				color={color}
@@ -53,13 +55,3 @@ export default class LevelButton extends React.Component<*, Props, *> {
 	}
 
 }
-
-const $ = jss({
-	levelButton: {
-		border: [1, 'solid', colors.transparent]
-	},
-
-	currentLevelButton: {
-		border: [1, 'solid', colors.green]
-	},
-})

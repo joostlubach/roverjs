@@ -3,7 +3,7 @@
 import React from 'react'
 import {observer} from 'mobx-react'
 import {jss, layout, colors, fonts, shadows} from '../styles'
-import {ToolbarButton, Switch, Slider} from '.'
+import {ToolbarButton, Switch, Slider, SpinningRover, MessageBox, Markdown, SVG} from '.'
 import {programStore, simulatorStore} from '../stores'
 
 export type Props = {}
@@ -119,6 +119,34 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 		)
 	}
 
+	runProgram() {
+		programStore.runProgram()
+
+		if (programStore.program.isEmpty) {
+			MessageBox.show({
+				title:   "Program empty",
+				message: "Your program did not perform any action.",
+				body:    <SVG name='robot-lame' width={64} height={64} className={$.roverLame}/>,
+				buttons: [{label: "Oops!"}]
+			})
+		}
+
+		if (programStore.hasInfiniteLoop) {
+			MessageBox.show({
+				title:   "Infinite loop",
+				message: "Your program probably contains an infinite loop.",
+
+				body: (
+					<div className={$.infiniteLoop}>
+						<SpinningRover/>,
+						<Markdown>{infiniteLoopExplanation}</Markdown>
+					</div>
+				),
+				buttons: [{label: "Oops!"}]
+			})
+		}
+	}
+
 	//------
 	// Event handlers
 
@@ -129,10 +157,10 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 			// Reset everything, and wait a while to run, to allow everything to reset
 			// without animation.
 			simulatorStore.reset()
-			setTimeout(() => { programStore.runProgram() }, 200)
+			setTimeout(() => { this.runProgram() }, 200)
 		} else {
 			// Run immediately.
-			programStore.runProgram()
+			this.runProgram()
 		}
 	}
 
@@ -143,10 +171,10 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 			// Reset everything, and wait a while to run, to allow everything to reset
 			// without animation.
 			simulatorStore.reset()
-			setTimeout(() => { programStore.runProgram(true) }, 200)
+			setTimeout(() => { this.runProgram(true) }, 200)
 		} else {
 			// Run immediately.
-			programStore.runProgram(true)
+			this.runProgram(true)
 		}
 	}
 
@@ -163,6 +191,15 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 	}
 
 }
+
+const infiniteLoopExplanation = `An infinite loop is a situation where your program keeps running
+indefinitely.
+
+This often happens when using a \`for\` or \`while\` loop. If you're using a loop, make sure that your
+loop has a *stopping* condition, meaning that the \`condition\` in \`while (condition) {...}\` or
+\`for (...; condition; ...) {...}\` should at some point become \`false\`.
+
+Another possibility is that you call some function which calls itself.`
 
 const $ = jss({
 	toolbar: {
@@ -213,4 +250,13 @@ const $ = jss({
 	verboseSwitch: {
 		marginBottom: layout.padding.xs
 	},
+
+	infiniteLoop: {
+		...layout.flex.center,
+		textAlign: 'center'
+	},
+
+	roverLame: {
+		fill: colors.purple
+	}
 })
