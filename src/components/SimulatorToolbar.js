@@ -122,7 +122,7 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 	runProgram() {
 		programStore.runProgram()
 
-		if (programStore.program.isEmpty) {
+		if (programStore.errors.length === 0 && programStore.program.isEmpty) {
 			MessageBox.show({
 				title:   "Program empty",
 				message: "Your program did not perform any action.",

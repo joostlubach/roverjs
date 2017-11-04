@@ -130,7 +130,7 @@ const about = `Rover the Robot was created by [Joost Lubach](https://github.com/
 tool for JavaScript.
 
 Thanks to [Simon Child](https://thenounproject.com/Simon%20Child/) for the Robot icon, and
-to [Freepik](https://www.flaticon.com/authors/freepik) for the tree icon. All the ugly other
+to [Freepik](https://www.flaticon.com/authors/freepik) for the tree icon. All the ugly
 ones I have made myself 🙌.
 
 This project is open source. You can find the source here:
