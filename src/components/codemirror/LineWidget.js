@@ -44,8 +44,6 @@ export default class LineWidget extends React.Component<*, Props, *> {
 		const {element, lineWidget} = this
 		if (element == null || lineWidget == null) { return }
 
-		console.log('destroy')
-
 		lineWidget.clear()
 		unmountComponentAtNode(this.element)
 	}

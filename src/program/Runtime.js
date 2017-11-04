@@ -42,7 +42,9 @@ export default class Runtime {
 
 		const {type} = node
 		if (this[`evaluate_${type}`] == null) {
-			throw new Error(`Unsupported node: ${node.type}`)
+			const source = this.nodeSource(node, 'this')
+			const desc = source == null ? 'This' : `\`${source.split(/\s/)[0]}\``
+			this.throw(UnsupportedException, `${desc} is not supported`, node)
 		} else {
 			return this[`evaluate_${type}`](node)
 		}
@@ -312,8 +314,10 @@ export default class Runtime {
 		const {object: receiver, value: callee} = this.evaluateMemberExpression(node.callee)
 		const args     = node.arguments.map(arg => this.evaluate(arg))
 
-		if (!isFunction(callee.apply)) {
-			this.throw(TypeError, `${this.nodeSource(node.callee, 'this')} is not a function`)
+		if (callee == null || !isFunction(callee.apply)) {
+			const source = this.nodeSource(node.callee)
+			const desc = source == null ? 'This' : `\`${source}\``
+			this.throw(TypeError, `${desc} is not a function`, node.callee)
 		}
 
 		try {
@@ -457,7 +461,11 @@ export default class Runtime {
 			}
 		} else if (left.type === 'MemberExpression') {
 			const {object: receiver, property} = this.evaluateMemberExpression(left)
-			receiver[property] = value
+			try {
+				receiver[property] = value
+			} catch (error) {
+				this.rethrow(error, left)
+			}
 		} else {
 			this.throw(TypeError, `Invalid assignment left hand side`, left)
 		}
@@ -469,6 +477,11 @@ export default class Runtime {
 		}
 
 		const object   = this.evaluate(node.object)
+		if (object == null) {
+			const source = this.nodeSource(node.object)
+			this.throw(ReferenceError, `\`${source}\` is null`, node.object)
+		}
+
 		const property = node.computed
 			? this.evaluate(node.property)
 			: node.property.name
@@ -483,9 +496,9 @@ export default class Runtime {
 	//------
 	// Errors & utility
 
-	nodeSource(node: ASTNode, defaultText: string) {
-		if (this.source == null) { return defaultText }
-		return '`' + this.source.slice(node.start, node.end) + '`'
+	nodeSource(node: ASTNode): ?string {
+		if (this.source == null) { return null }
+		return this.source.slice(node.start, node.end)
 	}
 
 	throw(ErrorType: Class<Error>, message: string, node: ASTNode) {
@@ -562,6 +575,14 @@ const binaryOperators = {
 	['^']: (l, r) => l ^ r,
 }
 
-export function InfiniteLoopException() {}
+export function InfiniteLoopException() {
+	this.message = "Your program contains an infinite loop"
+}
 InfiniteLoopException.prototype = new Error()
 InfiniteLoopException.prototype.name = 'InfiniteLoopException'
+
+export function UnsupportedException(message) {
+	this.message = message
+}
+UnsupportedException.prototype = new Error()
+UnsupportedException.prototype.name = 'UnsupportedException'
