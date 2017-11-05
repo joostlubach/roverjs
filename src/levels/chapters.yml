@@ -12,7 +12,7 @@
 
 - id:     variables
   name:   Variables
-  levels: ['variables1']
+  levels: ['variables1', 'variables2']
   description: |-
     Learn about variables, their types, and when to use `let` and `const`.
 

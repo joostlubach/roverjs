@@ -6,14 +6,17 @@ instructions: |-
   - The string `'move'`
   - The string `'turn-around'`, which should make me turn 180 degrees
   - An object `{turn: 'left'}` or `{turn: 'right'}`
-  - An object `{move: N}` where N is the number of steps to move.
+  - A number, which indicates the number of steps to move.
+
+  The array also contains other (invalid) instructions. These can be anything. Invalid
+  instructions should be **ignored**!
 
   Modify your algorithm from level 9 to understand these new instructions.
 
   *Tips:*
 
-  - Use `function`s to implement the `'turn-around'` and the `{move: N}` instructions
-  - Check the type of each instruction
+  - Check the type of each instruction (how do you check a type of a variable in JavaScript?)
+  - Use `function`s to implement the `'turn-around'` and the move N forward instructions
 
 rows:    6
 columns: 6
@@ -44,7 +47,7 @@ items:
 
 initialCode: |-
   // ---- You cannot modify these lines
-  const instructions = [/*<*/{move: 2}, 'turn-around', 'move', {turn: 'left'}, {move: 4}, {turn: 'left'}, {move: 3}, {turn: 'left'}, 'move'/*>*/];
+  const instructions = [/*<*/2, null, 'something-else', null, {turn: 'around'}, 'turn-around', {turn: 2}, 'move', {turn: 'left'}, null, undefined, '24-02-1983', 4, {turn: 'left'}, 3, null, {turn: 'left'}, 'move'/*>*/];
   // ++++
 
   // Write your code here:
@@ -57,6 +60,8 @@ scoring:
       regexp: for\s+\(let.*instructions
     usedForOf:
       regexp: for\s+\(.*of\sinstructions
+    usedTypeof:
+      regexp: typeof\s+\w
     usedFunction:
       regexp: function\s+\w
 
@@ -85,3 +90,8 @@ scoring:
       message: |-
         As your algorithms grow more complex, use `function`s to separate your code. Why not
         write a `function` to perform the `turn-around` move, or to move `n` places ahead?
+
+    - score: 2
+      usedTypeof: false
+      message: |-
+        Try to check the type of instructions using the `typeof` operator.

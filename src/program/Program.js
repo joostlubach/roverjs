@@ -60,7 +60,6 @@ export default class Program {
 		})
 	}
 
-
 	//------
 	// Reset & run
 
@@ -139,6 +138,10 @@ export default class Program {
 
 	@action
 	turn(direction: TurnDirection): boolean {
+		if (direction !== 'left' && direction !== 'right') {
+			throw new TypeError(`Invalid turn direction: "${direction}"`)
+		}
+
 		let newDir
 		switch (this.state.direction) {
 		case 'up':    newDir = direction === 'left' ? 'left' : 'right'; break

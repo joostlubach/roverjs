@@ -321,21 +321,28 @@ export default class Runtime {
 	}
 
 	evaluate_CallExpression(node: ASTNode) {
+		let receiver
+		let callee
 		try {
-			const {object: receiver, value: callee} = this.evaluateMemberExpression(node.callee)
-			const args     = node.arguments.map(arg => this.evaluate(arg))
-
-			if (callee == null || !isFunction(callee.apply)) {
-				const source = this.nodeSource(node.callee)
-				const desc = source == null ? 'This' : `\`${source}\``
-				this.throw(TypeError, `${desc} is not a function`, node.callee)
-			}
-
-			return callee.apply(receiver, args)
+			const {object, value} = this.evaluateMemberExpression(node.callee)
+			receiver = object
+			callee = value
 		} catch (error) {
 			if (/Undefined variable/.test(error.message)) {
 				this.throw(ReferenceError, error.message.replace(/Undefined variable/, "Function not found"), node)
 			}
+		}
+
+		if (callee == null || !isFunction(callee.apply)) {
+			const source = this.nodeSource(node.callee)
+			const desc = source == null ? 'This' : `\`${source}\``
+			this.throw(TypeError, `${desc} is not a function`, node.callee)
+		}
+
+		try {
+			const args = node.arguments.map(arg => this.evaluate(arg))
+			return callee.apply(receiver, args)
+		} catch (error) {
 			this.rethrow(error, node)
 		}
 	}

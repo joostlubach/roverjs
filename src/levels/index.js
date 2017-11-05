@@ -10,7 +10,8 @@ export const levels = {
 	loops2:      require('./loops2.yml'),
 
 	variables1:  require('./variables1.yml'),
-
+	variables2:  require('./variables2.yml'),
+	
 	functions1:  require('./functions1.yml'),
 	functions2:  require('./functions2.yml'),
 	functions3:  require('./functions3.yml'),
