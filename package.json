@@ -1,6 +1,6 @@
 {
   "name": "robot",
-  "version": "0.1.0+4",
+  "version": "0.1.0+5",
   "private": true,
   "scripts": {
     "start": "gulp development",
@@ -97,6 +97,7 @@
     "gulp-svgstore": "^6.1.0",
     "gulp-uglify": "^3.0.0",
     "gulp-util": "^3.0.8",
+    "rollupify": "^0.4.0",
     "uglify-js": "^3.1.6",
     "uglifyify": "^4.0.4",
     "vinyl-source-stream": "^1.1.0",
