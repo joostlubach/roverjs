@@ -44,7 +44,7 @@ const $ = jss({
 		right:    -size.width + layout.padding.xs,
 		top:      -size.height + layout.padding.xs,
 
-		transformOrigin: 'bottom left'
+		transformOrigin: 'bottom left',
 	},
 
 	balloon: {

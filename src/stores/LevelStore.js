@@ -3,7 +3,7 @@
 import {observable, computed, action} from 'mobx'
 import {chapters, levels} from '../levels'
 import type {Level} from '../program'
-import {programStore} from '.'
+import {programStore, viewStateStore} from '.'
 import URL from 'url'
 
 export type Chapter = {
@@ -69,6 +69,7 @@ export default class LevelStore {
 			this.currentChapter = chapter
 			this.currentLevelNumber = index + 1
 			programStore.loadLevel(this.currentLevel)
+			viewStateStore.selectedLock = null
 			break
 		}
 

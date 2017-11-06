@@ -13,9 +13,9 @@ start: [0, 1, 'right']
 goal:  [2, 4]
 
 items:
-  - [1, 1, 'key', {variableType: 'number'}]
-  - [2, 2, 'lock', {variableType: 'number', accept: 'value => Math.pow(value, 3)'}]
-  - [2, 3, 'lock', {variableType: 'number', accept: 'value => value < 6'}]
+  - [1, 1, 'key', {color: 'red', keyType: 'number'}]
+  - [2, 2, 'lock', {color: 'red', accept: '({red}) => Math.pow(red, 3)'}]
+  - [2, 3, 'lock', {color: 'red', accept: '({red}) => red < 6'}]
 
   - [0, 2, 'tree']
   - [0, 3, 'water']

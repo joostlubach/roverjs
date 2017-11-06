@@ -11,3 +11,4 @@ export {default as Water} from './Water'
 // /index
 
 export * from './Key'
+export * from './Lock'

@@ -3,36 +3,34 @@
 import {parse} from 'acorn'
 import {Runtime} from '..'
 import Item, {item} from './Item'
-import {keyColor} from './Key'
-import type {KeyVariableType, KeyColor} from './Key'
+import type {KeyColor} from './Key'
 import type {ProgramState} from '..'
+import some from 'lodash/some'
 
 @item
 export default class Lock extends Item {
 	type     = 'lock'
 	blocking = true
 
-	variableType: KeyVariableType = 'any'
+	color: KeyColor
 	accept: ?string = null
 
-	acceptFunction: ((value: ?mixed) => ?mixed) = value => value
+	acceptsKeys:    string[] = []
+	acceptFunction: (value: ?mixed) => ?mixed
 
 	init() {
-		if (this.accept != null) {
-			this.acceptFunction = compileAcceptFunction(this.accept)
+		this.acceptFunction = compileAcceptFunction(this.accept)
+
+		if (this.acceptsKeys.length === 0) {
+			this.acceptsKeys = [this.color]
 		}
 	}
 
-	get color(): KeyColor {
-		return keyColor(this.variableType)
-	}
-
 	unlock(state: ProgramState, value: ?mixed) {
-		// Check the state for whether the key has been picked up at all.
-		if (!(this.color in state.keys)) { return false }
+		// Check the state for whether all keys have been picked up at all.
+		if (!some(this.acceptsKeys, color => color in state.keys)) { return false }
 
-		const keyValue = state.keys[this.color]
-		const expectedValue = this.acceptFunction(keyValue)
+		const expectedValue = this.acceptFunction(state.keys)
 		return value === expectedValue
 	}
 }
@@ -46,8 +44,11 @@ function compileAcceptFunction(source: string): (value: ?mixed) => ?mixed {
 		}
 
 		const runtime = new Runtime()
+		runtime.context.define('disabled', disabledLock)
 		return runtime.evaluate(node)
 	} catch (error) {
 		throw new Error(`Error while compiling lock accept function \`${source}\`: ${error.message}`)
 	}
 }
+
+export const disabledLock = Symbol('disabled')

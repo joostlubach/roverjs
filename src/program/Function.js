@@ -35,23 +35,14 @@ export default class Function {
 	}
 
 	assignArguments(scope: Scope, args: any[]) {
-		const params = [...this.params]
-
-		let rest
-		for (const arg of args) {
-			if (rest) {
-				rest.push(arg)
-			} else {
-				const param = params.shift()
-				if (param == null) { break }
-
-				if (param.type === 'Identifier') {
-					scope.define(param.name, arg, false)
-				} else if (param.type === 'RestElement') {
-					scope.define(param.argument.name, rest = [], false)
-				}
-			}
+		const id = {
+			type:     'ArrayPattern',
+			elements: this.params
 		}
+
+		const destructured = {}
+		this.runtime.destructure(destructured, id, args)
+		scope.assign(destructured)
 	}
 
 }

@@ -46,9 +46,10 @@ export const fg = {
 }
 
 export const keys = {
-	yellow:  amber,
+	yellow:  yellow.darken(0.2),
 	red:     red,
-	green:   green,
+	green:   green.darken(0.4),
+	blue:    blue,
 	rainbow: 'url(#rainbow)' // Defined in App.js
 }
 

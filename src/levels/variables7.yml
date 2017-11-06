@@ -12,9 +12,9 @@ start: [0, 1, 'right']
 goal:  [2, 4]
 
 items:
-  - [1, 1, 'key', {variableType: 'string'}]
-  - [2, 2, 'lock', {variableType: 'string', accept: "value => value + ',' + value"}]
-  - [2, 3, 'lock', {variableType: 'string', accept: "value => value.length"}]
+  - [1, 1, 'key', {color: 'green', keyType: 'string'}]
+  - [2, 2, 'lock', {color: 'green', accept: "({green}) => green + ',' + green"}]
+  - [2, 3, 'lock', {color: 'green', accept: "({green}) => green.length"}]
 
   - [0, 2, 'tree']
   - [0, 3, 'water']

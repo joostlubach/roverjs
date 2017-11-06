@@ -3,10 +3,9 @@
 import Item, {item} from './Item'
 import type {ProgramState} from '..'
 import sample from 'lodash/sample'
-import times from 'lodash/times'
 
-export type KeyVariableType = 'any' | 'number' | 'string' | 'boolean'
-export type KeyColor        = 'yellow' | 'red' | 'green' | 'rainbow'
+export type KeyType  = 'any' | 'number' | 'string' | 'boolean'
+export type KeyColor = 'yellow' | 'red' | 'blue' | 'rainbow'
 
 @item
 export default class Key extends Item {
@@ -14,12 +13,9 @@ export default class Key extends Item {
 	type     = 'key'
 	blocking = false
 
-	variableType: KeyVariableType = 'any'
-	value: ?mixed
-
-	get color(): string {
-		return keyColor(this.variableType)
-	}
+	color:   KeyColor
+	keyType: KeyType
+	value:   ?mixed
 
 	pickUp(state: ProgramState): ?mixed {
 		const value = this.getValue()
@@ -37,9 +33,9 @@ export default class Key extends Item {
 	}
 
 	generateValue() {
-		const type = this.variableType === 'any'
+		const type = this.keyType === 'any'
 			? sample(['boolean', 'string', 'number', 'null'])
-			: this.variableType
+			: this.keyType
 
 		switch (type) {
 		case 'boolean': return sample([true, false])
@@ -49,15 +45,6 @@ export default class Key extends Item {
 		}
 	}
 
-}
-
-export function keyColor(variableType: KeyVariableType): KeyColor {
-	switch (variableType) {
-	case 'boolean': return 'yellow'
-	case 'number':  return 'red'
-	case 'string':  return 'green'
-	default:        return 'rainbow'
-	}
 }
 
 export const exampleWords = ['hello', 'lock', 'rover', 'key', 'level', 'javascript']

@@ -133,9 +133,9 @@ export default class App extends React.Component<*, Props, *> {
 				<svg width={0} height={0} style={{position: 'absolute'}} xmlns="http://www.w3.org/2000/svg">
 					<defs>
 						<linearGradient id="rainbow" x1={0} y1={0} x2={1} y2={1}>
-							<stop stopColor={colors.red.string()} offset="0%"/>
-							<stop stopColor={colors.amber.string()} offset="50%"/>
-							<stop stopColor={colors.green.string()} offset="100%"/>
+							<stop stopColor={colors.keys.red} offset="0%"/>
+							<stop stopColor={colors.keys.yellow} offset="50%"/>
+							<stop stopColor={colors.keys.green} offset="100%"/>
 						</linearGradient>
 					</defs>
 				</svg>
@@ -197,9 +197,11 @@ export default class App extends React.Component<*, Props, *> {
 	renderLockAcceptTable() {
 		if (viewStateStore.selectedLock == null) { return null }
 
+		const {currentLevel} = levelStore
 		return (
 			<LockAcceptTable
 				lock={viewStateStore.selectedLock}
+				level={currentLevel}
 				onCloseTap={() => { viewStateStore.selectedLock = null }}
 			/>
 		)
@@ -266,7 +268,7 @@ export default class App extends React.Component<*, Props, *> {
 
 	renderItemBalloon(balloon: any, index: number) {
 		return (
-			<Sprite key={index} position={balloon.position}>
+			<Sprite key={index} style={{pointerEvents: 'none'}} position={balloon.position}>
 				<TextBalloon balloon={balloon}/>
 			</Sprite>
 		)

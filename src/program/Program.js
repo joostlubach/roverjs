@@ -72,6 +72,7 @@ export default class Program {
 
 	reset() {
 		this.state = this.defaultState()
+		this.scoring = null
 	}
 
 	runWithStepCallback(step: (state: ProgramState) => Instruction) {
@@ -197,8 +198,6 @@ export default class Program {
 
 		if (this.isFinished()) {
 			this.scoring = this.calculateScoring()
-		} else {
-			this.scoring = null
 		}
 	}
 

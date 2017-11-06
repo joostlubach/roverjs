@@ -76,7 +76,7 @@ export default class ProgramStore extends EventEmitter {
 		let success = true
 		for (let run = 0; run < 50; run++) {
 			success = this.runProgramOnce(firstStepOnly)
-			if (!success || !this.program.state.isFinished) {
+			if (!success || !this.program.isFinished()) {
 				break
 			}
 		}
@@ -92,8 +92,8 @@ export default class ProgramStore extends EventEmitter {
 
 	@action
 	runProgramOnce(firstStepOnly: boolean = false) {
-		if (this.level == null) { return }
-		if (simulatorStore.active) { return }
+		if (this.level == null) { return false }
+		if (simulatorStore.active) { return false }
 
 		// Create a new program.
 		const program = this.program = new Program(this.level, this.code)

@@ -1,0 +1,50 @@
+name: Boolean logic 2
+instructions: |-
+  One key, two locks. If you look at the locks, you see that one lock opens
+  with a key smaller than `5`, and the other lock opens with a key greater
+  than or equal to `5`.
+
+  Note that the cross in the locking schemes means that you *cannot* open
+  this door at all with this key.
+
+  You should decide which path to take based on the value of your key!
+
+  If you don't understand the locks, make sure you've completed the Variables
+  chapter!
+
+rows: 5
+columns: 3
+
+start: [1, 4, 'up']
+goal:  [1, 0]
+
+items:
+  - [1, 1, 'tree']
+  - [0, 3, 'tree']
+  - [2, 3, 'tree']
+  - [0, 4, 'tree']
+  - [2, 4, 'tree']
+
+  - [1, 3, 'key', {color: 'red', keyType: 'number'}]
+  - [0, 1, 'lock', {color: 'red', accept: '({red}) => red <= 5 ? red : disabled'}]
+  - [2, 1, 'lock', {color: 'red', accept: '({red}) => red > 5 ? red : disabled'}]
+
+scoring:
+  tests:
+    short:
+      maxLines: 16
+    veryShort:
+      maxLines: 13
+
+  scores:
+    - score: 1
+      short: false
+      message: |-
+        Try to see if you can write your code shorter. For instance, can you use a variable to
+        store whether you want to take the left path or the right path?
+
+    - score: 2
+      veryShort: false
+      message: |-
+        Perhaps if you use a conditional expression (`... ? ... : ...`) you can get it done in
+        13 lines of code?

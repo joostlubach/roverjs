@@ -16,6 +16,12 @@
   description: |-
     Learn about variables, their types, and when to use `let` and `const`.
 
+- id:     boolean
+  name:   Boolean logic
+  levels: ['boolean1', 'boolean2']
+  description: |-
+    Learn about boolean logic, `&&` and `||`.
+
 - id:     functions
   name:   Functions
   levels: ['functions1', 'functions2', 'functions3']

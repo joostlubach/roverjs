@@ -3,11 +3,12 @@
 import React from 'react'
 import {jss, layout, colors, fonts, presets} from '../styles'
 import {SVG, Button} from '../components'
-import {exampleWords} from '../program'
-import type {Lock} from '../program'
+import {exampleWords, disabledLock} from '../program'
+import type {Lock, KeyColor} from '../program'
 
 export type Props = {
 	lock:       Lock,
+	level:      Level,
 	onCloseTap: () => void
 }
 
@@ -15,22 +16,17 @@ export default class LockAcceptTable extends React.Component<*, Props, *> {
 
 	props: Props
 
-	get values(): Array<?mixed> {
-		const {lock} = this.props
-		const values = []
+	get values(): Array<{[color: KeyColor]: ?mixed}> {
+		const {lock: {acceptsKeys}, level} = this.props
 
-		if (lock.variableType === 'any') {
-			values.push(null)
+		let values = []
+		for (const color of acceptsKeys) {
+			const key = level.items.find(item => item.type === 'key' && item.color === color)
+			if (key == null) { continue }
+
+			values = cartesian(values, color, valuesForKeyType(key.keyType))
 		}
-		if (lock.variableType === 'any' || lock.variableType === 'boolean') {
-			values.push(true, false)
-		}
-		if (lock.variableType === 'any' || lock.variableType === 'string') {
-			values.push(...exampleWords)
-		}
-		if (lock.variableType === 'any' || lock.variableType === 'number') {
-			values.push(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-		}
+
 		return values
 	}
 
@@ -65,14 +61,20 @@ export default class LockAcceptTable extends React.Component<*, Props, *> {
 	}
 
 	renderHeaderRow() {
+		const {values} = this
+		if (values.length === 0) { return null }
+
+		const acceptedColors = Object.keys(values[0])
 		const {lock} = this.props
 
 		return (
 			<div className={$.headerRow}>
-				<div className={[$.headerCell, $.keyValueHeader]}>
-					<SVG name='key' className={$.headerIcon} style={{fill: colors.keys[lock.color]}}/>
-					<span>If the key has this value:</span>
-				</div>
+				{acceptedColors.map(color => (
+					<div key={color} className={[$.headerCell, $.keyValueHeader]}>
+						<SVG name='key' className={$.headerIcon} style={{fill: colors.keys[color]}}/>
+						<span>If this key has this value:</span>
+					</div>
+				))}
 				<div className={[$.headerCell, $.expectedValueHeader]}>
 					<SVG name='lock' className={$.headerIcon} style={{fill: colors.keys[lock.color]}}/>
 					<span>You should unlock with this value:</span>
@@ -81,22 +83,58 @@ export default class LockAcceptTable extends React.Component<*, Props, *> {
 		)
 	}
 
-	renderRow(keyValue: ?mixed) {
+	renderRow(values: {[color: KeyColor]: ?mixed}, index: number) {
 		const {lock} = this.props
-		const expectedValue = lock.acceptFunction(keyValue)
+		const expectedValue = lock.acceptFunction(values)
 
 		return (
-			<div key={keyValue} className={$.row}>
-				<div className={[$.cell, $.keyValueCell]}>
-					{JSON.stringify(keyValue)}
-				</div>
+			<div key={index} className={$.row}>
+				{Object.keys(values).map(color => (
+					<div key={color} className={[$.cell, $.keyValueCell]}>
+						{JSON.stringify(values[color])}
+					</div>
+				))}
 				<div className={[$.cell, $.expectedValueCell]}>
-					{JSON.stringify(expectedValue)}
+					{expectedValue === disabledLock
+						? <SVG className={$.disabledLock} name='cross'/>
+						: JSON.stringify(expectedValue)}
 				</div>
 			</div>
 		)
 	}
 
+}
+
+function cartesian(data: Object[], color: KeyColor, values: mixed[]) {
+	if (data.length === 0) {
+		return values.map(value => ({[color]: value}))
+	}
+
+	const result = []
+	for (let i = 0; i < data.length; i++) {
+		for (const value of values) {
+			result.push({...data[i], [color]: value})
+		}
+	}
+	return result
+}
+
+function valuesForKeyType(keyType: KeyType) {
+	const values = []
+
+	if (keyType === 'any') {
+		values.push(null)
+	}
+	if (keyType === 'any' || keyType === 'boolean') {
+		values.push(true, false)
+	}
+	if (keyType === 'any' || keyType === 'string') {
+		values.push(...exampleWords)
+	}
+	if (keyType === 'any' || keyType === 'number') {
+		values.push(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+	}
+	return values
 }
 
 const $ = jss({
@@ -174,4 +212,10 @@ const $ = jss({
 	keyValueCell: {
 		borderRight: [1, 'solid', colors.fg.inverted.alpha(0.2)]
 	},
+
+	disabledLock: {
+		width:  16,
+		height: 16,
+		fill:   colors.red
+	}
 })

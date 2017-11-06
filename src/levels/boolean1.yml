@@ -1,0 +1,44 @@
+name: Boolean logic 1
+instructions: |-
+  In this level, there are two keys and one lock. The lock can be unlocked using
+  a combination of both keys.
+
+rows: 5
+columns: 3
+
+start: [1, 4, 'up']
+goal:  [1, 0]
+
+items:
+  - [0, 1, 'tree']
+  - [2, 1, 'tree']
+  - [0, 2, 'tree']
+  - [2, 2, 'tree']
+  - [0, 3, 'tree']
+  - [2, 3, 'tree']
+  - [0, 4, 'tree']
+  - [2, 4, 'tree']
+
+  - [1, 3, 'key', {color: 'green', keyType: 'boolean'}]
+  - [1, 2, 'key', {color: 'red', keyType: 'boolean'}]
+  - [1, 1, 'lock', {color: 'rainbow', acceptsKeys: ['red', 'green'], accept: '({red, green}) => red && green'}]
+
+scoring:
+  tests:
+    short:
+      maxLines: 16
+    veryShort:
+      maxLines: 13
+
+  scores:
+    - score: 1
+      short: false
+      message: |-
+        Try to see if you can write your code shorter. For instance, can you use a variable to
+        store whether you want to take the left path or the right path?
+
+    - score: 2
+      veryShort: false
+      message: |-
+        Perhaps if you use a conditional expression (`... ? ... : ...`) you can get it done in
+        13 lines of code?

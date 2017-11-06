@@ -432,12 +432,24 @@ export default class Runtime {
 
 	destructure(variables: Object, id: ASTNode, value: any) {
 		if (id.type === 'ArrayPattern') {
-			for (const [i, element] of id.elements.entries()) {
-				this.destructure(variables, element, value[i])
+			for (const element of id.elements) {
+				const remaining = [...value]
+				if (element.type === 'RestElement') {
+					variables[element.argument.name] = remaining
+					break
+				}
+
+				this.destructure(variables, element, remaining.shift())
 			}
 		} else if (id.type === 'ObjectPattern') {
+			const remaining = {...value}
 			for (const property of id.properties) {
+				if (property.type === 'RestElement') {
+					variables[element.argument.name] = remaining
+					break
+				}
 				this.destructure(variables, property.value, value[property.key.name])
+				delete remaining[property.key.name]
 			}
 		} else {
 			variables[id.name] = value
