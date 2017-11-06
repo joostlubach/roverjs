@@ -1,5 +1,5 @@
 // @flow
-// @index
+// @index(d:)
 
 export {default as Context} from './Context'
 export {default as Function} from './Function'
@@ -13,6 +13,7 @@ export {default as Simulator} from './Simulator'
 
 // /index
 
+export * from './items'
 export * from './Program'
 export * from './ProgramState'
 export * from './ProgramBuilder'

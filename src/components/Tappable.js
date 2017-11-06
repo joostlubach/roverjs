@@ -40,7 +40,7 @@ export default function Tappable(props: Props) {
 
 	return (
 		<Component
-			className={[$.tappable, focusable && $.focusable, className]}
+			className={[$.tappable, focusable && $.focusable, disabled && $.disabled, className]}
 			style={style}
 			role="button"
 			tabIndex={disabled ? -1 : 0}
@@ -107,8 +107,13 @@ function isInteractiveElement(element: HTMLElement) {
 
 const $ = jss({
 	tappable: {
+		cursor:     'pointer',
 		userSelect: 'none',
 		outline:    'none',
+	},
+
+	disabled: {
+		cursor: 'default'
 	},
 
 	focusable: {

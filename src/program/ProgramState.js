@@ -1,10 +1,12 @@
 // @flow
 
 import cloneDeep from 'lodash/cloneDeep'
-import type {Item} from '.'
+import type {Item, KeyColor} from '.'
 
 export type Position  = {x: number, y: number}
 export type Direction = 'up' | 'down' | 'left' | 'right'
+
+export type TextBalloon = {position: Position, text: string}
 
 export default class ProgramState {
 
@@ -18,16 +20,33 @@ export default class ProgramState {
 	program: Program
 	level:   Level
 
+	//------
+	// 'Visible' state
+
 	position:  Position
 	direction: Direction
 	apples:    number
+	keys:      {[color: KeyColor]: mixed}
 
+	//------
+	// 'Internal' state
+
+	stepFailed: boolean = false
+	roverBalloon: ?TextBalloon = null
+	itemBalloons: TextBalloon[] = []
 	failedPosition: ?Position = null
 	items: Item[] = []
 
 	clone(): ProgramState {
 		const values = cloneDeep(this)
 		return new ProgramState(this.program, values)
+	}
+
+	prepare() {
+		this.stepFailed = false
+		this.failedPosition = null
+		this.roverBalloon = null
+		this.itemBalloons = []
 	}
 
 	//------
@@ -39,6 +58,19 @@ export default class ProgramState {
 
 	facing(direction: Direction) {
 		return this.direction === direction
+	}
+
+	get facingPosition(): Position {
+		let {x, y} = this.position
+
+		switch (this.direction) {
+		case 'up':    y -= 1; break
+		case 'down':  y += 1; break
+		case 'left':  x -= 1; break
+		case 'right': x += 1; break
+		}
+
+		return {x, y}
 	}
 
 	//------

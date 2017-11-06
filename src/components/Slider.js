@@ -146,7 +146,7 @@ const $ = jss({
 
 		marginLeft: -thumbSize / 2,
 
-		backgroundColor: colors.bg.dark,
+		backgroundColor: colors.bg.control,
 		boxShadow:       [
 			['inset', 0, 0, 5, 0, colors.white.alpha(0.4)],
 			['inset', 1, 1, 1, 0, colors.white],

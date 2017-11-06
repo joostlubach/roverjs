@@ -2,7 +2,7 @@
 
 import React from 'react' // eslint-disable-line
 import {render} from 'react-dom'
-import App from './components/App'
+import {App} from './app'
 import {jss, layout, fonts} from './styles'
 
 render(<App />, document.getElementsByTagName('main')[0])

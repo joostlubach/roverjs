@@ -2,6 +2,7 @@
 
 import type {Program, Position, Direction} from '.'
 import type {Chapter} from '../stores'
+import {Item, Apple, Key} from './items'
 
 export type Scoring = {
 	score:     number,
@@ -9,7 +10,7 @@ export type Scoring = {
 	condition: (program: Program) => number
 }
 
-export type LevelStyle = 'basic' | 'callback'
+export type LevelStyle  = 'basic' | 'callback'
 
 export default class Level {
 
@@ -40,8 +41,8 @@ export default class Level {
 
 		level.dark = raw.dark
 		if (raw.items != null) {
-			level.items = raw.items.map(([x, y, type]) => {
-				return Item.create(type, {x, y})
+			level.items = raw.items.map(([x, y, type, props]) => {
+				return Item.create(type, {x, y}, props)
 			})
 		}
 
@@ -66,8 +67,8 @@ export default class Level {
 	startPosition:  Position
 	startDirection: Direction
 
-	goalPosition:   ?Position = null
-	goalApples: ?number = null
+	goalPosition: ?Position = null
+	goalApples:   ?number = null
 
 	dark:  boolean
 	items: Item[]    = []
@@ -77,6 +78,16 @@ export default class Level {
 
 	get hasApples(): boolean {
 		return this.items.filter(item => item instanceof Apple).length > 0
+	}
+
+	get keyColors(): KeyColor[] {
+		return this.items
+			.filter(item => item instanceof Key)
+			.map(item => item.color)
+	}
+
+	get hasKeys(): boolean {
+		return this.items.filter(item => item instanceof Key).length > 0
 	}
 
 }
@@ -120,41 +131,3 @@ function buildScoringCondition(conditions: Object, tests: Object) {
 		return true
 	}
 }
-
-export class Item {
-
-	constructor(position: Position) {
-		this.position = position
-	}
-
-	static create(type: string, position: Position) {
-		const ItemClass = itemClasses.find(C => new C().type === type)
-		if (ItemClass == null) {
-			throw new TypeError(`Item type \`${type}\` unknown`)
-		}
-
-		return new ItemClass(position)
-	}
-
-	type:     string
-	blocking: boolean
-	position: Position
-
-}
-
-export class Water extends Item {
-	type     = 'water'
-	blocking = true
-}
-
-export class Tree extends Item {
-	type     = 'tree'
-	blocking = true
-}
-
-export class Apple extends Item {
-	type     = 'apple'
-	blocking = false
-}
-
-const itemClasses = [Water, Tree, Apple]

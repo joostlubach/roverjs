@@ -2,7 +2,7 @@
 
 import React from 'react'
 import {jss, jssKeyframes, colors, layout} from '../styles'
-import {Sprite, SVG} from '.'
+import {Sprite, SVG, TextBalloon} from '.'
 import type {Props as SpriteProps} from './Sprite'
 import type {Position, Direction} from '../program'
 
@@ -10,8 +10,10 @@ export type Props = SpriteProps & {
 	failedPosition:     ?Position,
 	direction:          Direction,
 	transitionDuration: number,
-	jumpForJoy:         boolean,
-	shame:              boolean
+
+	textBalloon: TextBalloon,
+	jumpForJoy:  boolean,
+	shame:       boolean
 }
 
 export const defaultProps = {
@@ -25,7 +27,7 @@ type State = {
 	degrees:        number
 }
 
-export default class Robot extends React.Component<*, Props, *> {
+export default class Rover extends React.Component<*, Props, *> {
 
 	constructor(props: Props) {
 		super(props)
@@ -83,19 +85,23 @@ export default class Robot extends React.Component<*, Props, *> {
 	}
 
 	render() {
-		const {transitionDuration, jumpForJoy, shame} = this.props
+		const {transitionDuration, jumpForJoy, shame, textBalloon} = this.props
 
 		const position = this.state.failedPosition || this.props.position
-		const style = {
+		const spriteStyle = {
+			transitionDuration: `${transitionDuration}ms`
+		}
+		const svgContainerStyle = {
 			transform:          `rotateZ(${this.state.degrees}deg)`,
 			transitionDuration: `${transitionDuration}ms`
 		}
 
 		return (
-			<Sprite className={[$.robot]} position={position} style={style}>
-				<div className={[$.svgContainer, jumpForJoy && $.jumpingForJoy1]}>
+			<Sprite className={[$.robot]} position={position} style={spriteStyle}>
+				<div className={[$.svgContainer, jumpForJoy && $.jumpingForJoy1]} style={svgContainerStyle}>
 					<SVG className={[$.svg, shame && $.shaming, jumpForJoy && $.jumpingForJoy2]} name='robot'/>
 				</div>
+				{textBalloon && <TextBalloon balloon={textBalloon}/>}
 			</Sprite>
 		)
 	}

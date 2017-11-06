@@ -11,7 +11,11 @@ export const levels = {
 
 	variables1:  require('./variables1.yml'),
 	variables2:  require('./variables2.yml'),
-	
+	variables3:  require('./variables3.yml'),
+	variables4:  require('./variables4.yml'),
+	variables5:  require('./variables5.yml'),
+	variables6:  require('./variables6.yml'),
+
 	functions1:  require('./functions1.yml'),
 	functions2:  require('./functions2.yml'),
 	functions3:  require('./functions3.yml'),

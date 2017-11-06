@@ -57,6 +57,7 @@
     "sw-precache-webpack-plugin": "0.11.4",
     "url": "^0.11.0",
     "url-loader": "0.5.9",
+    "uuid": "^3.1.0",
     "webpack": "3.5.1",
     "webpack-dev-server": "2.8.2",
     "webpack-manifest-plugin": "1.2.1",

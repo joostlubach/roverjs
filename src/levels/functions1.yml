@@ -4,6 +4,9 @@ instructions: |-
   break and eat some. No complicated stuff yet, just make me eat the apples and get
   to the flag.
 
+  You do not have to use `pickUp` for me to eat apples! I eat them anyway. That's
+  just how much I like them.
+
 rows:    5
 columns: 5
 

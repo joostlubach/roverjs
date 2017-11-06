@@ -7,7 +7,7 @@ import type {Props as SpriteProps} from './Sprite'
 
 export type Props = SpriteProps & {}
 
-export default class Robot extends React.Component<*, Props, *> {
+export default class Goal extends React.Component<*, Props, *> {
 
 	props: Props
 

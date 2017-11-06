@@ -2,8 +2,8 @@
 
 import React from 'react'
 import {observer} from 'mobx-react'
-import {jss, colors, layout, fonts, shadows} from '../styles'
-import {CodeMirror} from './codemirror'
+import {jss, layout, presets} from '../styles'
+import {CodeMirror} from '../components/codemirror'
 import type {ProgramState} from '../program'
 
 export type Props = {
@@ -12,7 +12,7 @@ export type Props = {
 }
 
 export const defaultProps = {
-	hideKeys: ['items', 'failedPosition']
+	hideKeys: ['items', 'stepFailed', 'failedPosition']
 }
 
 @observer
@@ -63,17 +63,9 @@ const $ = jss({
 	},
 
 	header: {
+		...presets.panelHeader,
 		position:     'relative',
 		marginTop:    -4,
-		zIndex:       10,
-		background:   colors.purple.darken(0.05),
-		borderBottom: [1, 'solid', colors.white.alpha(0.2)],
-		boxShadow:    shadows.toolbar,
-
-		color:         colors.fg.inverted,
-		padding:       layout.padding.s,
-		font:          fonts.smallCaps,
-		textTransform: 'uppercase'
 	},
 
 	codeMirror: {

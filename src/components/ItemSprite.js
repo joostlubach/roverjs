@@ -1,12 +1,13 @@
 // @flow
 
 import React from 'react'
-import {jss, layout} from '../styles'
-import {Sprite, SVG} from '.'
+import {jss, layout, colors} from '../styles'
+import {Sprite, SVG, Tappable} from '.'
 import type {Item} from '../program'
 
 export type Props = {
-	item: Item
+	item:  Item,
+	onTap: ?(() => void)
 }
 
 export default class ItemSprite extends React.Component<*, Props, *> {
@@ -14,11 +15,24 @@ export default class ItemSprite extends React.Component<*, Props, *> {
 	props: Props
 
 	render() {
-		const {position, type} = this.props.item
+		const {item, onTap} = this.props
+		const {position, type} = item
+
+		const Component = onTap == null ? 'div' : Tappable
+		const tapProps  = onTap == null ? {} : {onTap}
+
+		let name = type
+
+		const style = {}
+		if (item.type === 'key' || item.type === 'lock') {
+			style.fill = colors.keys[item.color]
+		}
 
 		return (
-			<Sprite className={$.sprite} position={position}>
-				<SVG className={$.svg} name={type}/>
+			<Sprite position={position}>
+				<Component className={$.content} {...tapProps}>
+					<SVG className={$.svg} name={name} style={style}/>
+				</Component>
 			</Sprite>
 		)
 	}
@@ -26,7 +40,8 @@ export default class ItemSprite extends React.Component<*, Props, *> {
 }
 
 const $ = jss({
-	sprite: {
+	content: {
+		...layout.overlay,
 		...layout.flex.center
 	},
 

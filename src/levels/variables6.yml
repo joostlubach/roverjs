@@ -1,0 +1,44 @@
+name: Variables 5
+instructions: |-
+  Heyy a rainbow key! Rainbow keys can be *anything*: booleans, numbers, strings, or
+  even `null`.
+
+  The rainbow lock also accepts anything! Click on the lock to see what it accepts
+  for each key value.
+
+rows: 5
+columns: 4
+
+start: [0, 1, 'right']
+goal:  [2, 4]
+
+items:
+  - [1, 1, 'key', {variableType: 'any'}]
+  - [2, 2, 'lock', {variableType: 'any', accept: "value => typeof value"}]
+
+  - [0, 2, 'tree']
+  - [0, 3, 'water']
+  - [0, 4, 'water']
+  - [0, 0, 'tree']
+  - [1, 0, 'tree']
+  - [1, 2, 'tree']
+  - [1, 3, 'tree']
+  - [1, 4, 'tree']
+  - [1, 0, 'tree']
+  - [2, 0, 'tree']
+  - [3, 0, 'tree']
+  - [3, 1, 'tree']
+  - [3, 2, 'tree']
+  - [3, 3, 'tree']
+  - [3, 4, 'tree']
+
+scoring:
+  tests:
+    typeof:
+      regexp: typeof\s+
+
+  scores:
+    - score: 2
+      typeof: false
+      message: |-
+        Can you think of some JavaScript code to get the *type* of a variable?

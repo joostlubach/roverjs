@@ -8,6 +8,7 @@ export * as colors from './colors'
 export * as fonts from './fonts'
 export * as layout from './layout'
 export * as markdown from './markdown'
+export * as presets from './presets'
 export * as shadows from './shadows'
 
 // /index

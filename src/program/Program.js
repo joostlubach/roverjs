@@ -1,7 +1,9 @@
 // @flow
 
-import {Level, ProgramState} from '.'
+import {Level, Lock, ProgramState} from '.'
 import type {ASTNodeLocation} from '.'
+import isFunction from 'lodash/isFunction'
+import {colors} from '../styles'
 
 export type Step = {
 	codeLocation: {
@@ -52,11 +54,16 @@ export default class Program {
 
 	defaultState() {
 		return new ProgramState(this, {
-			position:       this.level.startPosition,
-			direction:      this.level.startDirection,
-			items:          [...this.level.items],
+			position:  this.level.startPosition,
+			direction: this.level.startDirection,
+			apples:    0,
+			keys:      {},
+
+			stepFailed:     false,
 			failedPosition: null,
-			apples:         0
+			roverBalloon:   null,
+			itemBalloons:   [],
+			items:          [...this.level.items]
 		})
 	}
 
@@ -77,7 +84,7 @@ export default class Program {
 	//------
 	// Interface
 
-	interfaceMethods = ['perform', 'stepCount', 'move', 'turn', 'isFinished', 'getState']
+	interfaceMethods = ['perform', 'stepCount', 'move', 'turn', 'pickUp', 'unlock', 'isFinished', 'getState']
 
 	get interface(): Object {
 		const iface = {}
@@ -90,7 +97,7 @@ export default class Program {
 	perform(instruction: Instruction) {
 		if (instruction === 'move') {
 			this.move()
-		} else if (instruction.turn === 'left' || instruction.turn === 'right') {
+		} else if (instruction != null && (instruction.turn === 'left' || instruction.turn === 'right')) {
 			this.turn(instruction.turn)
 		} else {
 			throw new TypeError(`Unsupported instruction: ${JSON.stringify(instruction)}`)
@@ -111,29 +118,22 @@ export default class Program {
 
 	@action
 	move(): boolean {
-		let {x, y} = this.state.position
-
-		switch (this.state.direction) {
-		case 'up':    y -= 1; break
-		case 'down':  y += 1; break
-		case 'left':  x -= 1; break
-		case 'right': x += 1; break
-		}
+		const {x, y} = this.state.facingPosition
 
 		if (!this.state.canMoveTo(x, y)) {
 			this.state.failedPosition = {x, y}
-			return false
+			this.state.stepFailed = true
+			return
 		}
 
 		this.state.position = {x, y}
 
 		const item = this.state.itemAt(x, y)
 		if (item != null && item.type === 'apple') {
+			this.state.roverBalloon = {text: 'YUM', color: colors.green}
 			this.state.apples += 1
-			this.state.items = this.state.items.filter(i => i !== item)
+			this.removeItem(item)
 		}
-
-		return true
 	}
 
 	@action
@@ -151,15 +151,44 @@ export default class Program {
 		}
 
 		this.state.direction = newDir
-		return true
+	}
+
+	@action
+	pickUp(): ?mixed {
+		const {x, y} = this.state.position
+		const item = this.state.itemAt(x, y)
+		if (item == null || !isFunction(item.pickUp)) { return null }
+
+		this.removeItem(item)
+		return item.pickUp(this.state)
+	}
+
+	@action
+	unlock(value: ?mixed) {
+		const {x, y} = this.state.facingPosition
+		const item = this.state.itemAt(x, y)
+		if (!(item instanceof Lock)) {
+			this.state.stepFailed = true
+			this.state.roverBalloon = {text: '?', color: colors.blue}
+			return
+		}
+
+		if (!item.unlock(this.state, value)) {
+			this.state.stepFailed = true
+			this.state.itemBalloons.push({position: this.state.facingPosition, text: 'NO', color: colors.red})
+			return
+		}
+
+		this.state.itemBalloons.push({position: this.state.facingPosition, text: 'YES', color: colors.green})
+		this.removeItem(item)
+	}
+
+	removeItem(item: Item) {
+		this.state.items = this.state.items.filter(i => i !== item)
 	}
 
 	//------
 	// Actions
-
-	prepareState() {
-		this.state.failedPosition = null
-	}
 
 	afterAction() {
 		if (this.recordingStep != null) {
@@ -254,8 +283,11 @@ function action(target: Class<Program>, key: string, descriptor: Object) {
 
 function wrapAction(fn: Function) {
 	return function wrapped() {
-		this.prepareState()
-		fn.apply(this, arguments)
-		this.afterAction()
+		this.state.prepare()
+		try {
+			return fn.apply(this, arguments)
+		} finally {
+			this.afterAction()
+		}
 	}
 }

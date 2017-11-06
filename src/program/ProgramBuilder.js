@@ -90,6 +90,7 @@ export default class ProgramBuilder {
 			return true
 		} catch (error) {
 			if (error.node != null) {
+				console.error(error) // eslint-disable-line no-console
 				this.errors.push(error)
 			} else {
 				throw error

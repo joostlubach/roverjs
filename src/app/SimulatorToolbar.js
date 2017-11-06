@@ -3,7 +3,7 @@
 import React from 'react'
 import {observer} from 'mobx-react'
 import {jss, layout, colors, fonts, shadows} from '../styles'
-import {ToolbarButton, Switch, Slider, SpinningRover, MessageBox, Markdown, SVG} from '.'
+import {ToolbarButton, Switch, Slider, SpinningRover, MessageBox, Markdown, SVG} from '../components'
 import {programStore, simulatorStore} from '../stores'
 
 export type Props = {}
@@ -119,8 +119,8 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 		)
 	}
 
-	runProgram() {
-		programStore.runProgram()
+	runProgram(firstStepOnly: boolean) {
+		programStore.runProgram(firstStepOnly)
 
 		if (programStore.errors.length === 0 && programStore.program.isEmpty) {
 			MessageBox.show({

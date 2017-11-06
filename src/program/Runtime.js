@@ -330,6 +330,8 @@ export default class Runtime {
 		} catch (error) {
 			if (/Undefined variable/.test(error.message)) {
 				this.throw(ReferenceError, error.message.replace(/Undefined variable/, "Function not found"), node)
+			} else {
+				this.rethrow(error, node)
 			}
 		}
 

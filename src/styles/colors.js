@@ -25,7 +25,8 @@ export const search    = blue
 
 export const bg = {
 	light:         white,
-	dark:          darkGray,
+	control:       darkGray,
+	dark:          new Color('#333'),
 
 	toolbar:       new Color('#444').alpha(0.9),
 	instructions:  new Color('#E7E5D3'),
@@ -42,6 +43,13 @@ export const fg = {
 	dashboard:    new Color('#B1CCDB'),
 	instructions: new Color('#444'),
 	inverted:     white
+}
+
+export const keys = {
+	yellow:  amber,
+	red:     red,
+	green:   green,
+	rainbow: 'url(#rainbow)' // Defined in App.js
 }
 
 export const placeholder = fg.normal.alpha(0.3)
@@ -94,8 +102,8 @@ export function contrast(backgroundColor: Color): Color {
 	return backgroundColor.luminosity() < 0.5 ? fg.inverted : fg.normal
 }
 
-export function linearGradient(side: string, from: Color, to: Color): string {
-	return `linear-gradient(${side}, ${from.string()}, ${to.string()})`
+export function linearGradient(side: string, ...stops: Color[]): string {
+	return `linear-gradient(${side}, ${stops.map(stop => stop.string()).join(', ')})`
 }
 
 export function bevelGradient(side: string) {

@@ -1,8 +1,9 @@
 // @flow
 
 import React from 'react'
+import {observer} from 'mobx-react'
 import {jss, colors, layout, fonts} from '../styles'
-import {Modal, Tappable, LevelButton, Markdown} from '.'
+import {Modal, Tappable, LevelButton, Markdown} from '../components'
 import {chapters} from '../levels'
 import {levelStore} from '../stores'
 import type {Chapter, Level} from '../stores'
@@ -16,6 +17,7 @@ type State = {
 	selectedChapter: ?Chapter
 }
 
+@observer
 export default class ChapterModal extends React.Component<*, Props, *> {
 
 	props: Props
@@ -196,10 +198,16 @@ const $ = jss({
 	},
 
 	levelSelector: {
-		padding:   [layout.padding.m, 0],
+		marginTop:   layout.padding.m,
+		marginRight: -layout.padding.m,
 
-		...layout.row(),
-		flexWrap: 'wrap'
+		...layout.flex.row,
+		flexWrap: 'wrap',
+
+		'& > *': {
+			marginRight:  layout.padding.m,
+			marginBottom: layout.padding.m
+		}
 	}
 
 })

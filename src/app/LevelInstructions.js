@@ -3,7 +3,7 @@
 import React from 'react'
 import {observer} from 'mobx-react'
 import {jss, colors, layout, fonts} from '../styles'
-import {SVG, Markdown, Button} from '.'
+import {SVG, Markdown, Button} from '../components'
 import type {Level} from '../program'
 import {viewStateStore} from '../stores'
 
@@ -16,7 +16,7 @@ type State = {
 }
 
 @observer
-export default class Instructions extends React.Component<*, Props, *> {
+export default class LevelInstructions extends React.Component<*, Props, *> {
 
 	props: Props
 

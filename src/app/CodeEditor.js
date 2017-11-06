@@ -2,7 +2,7 @@
 
 import React from 'react'
 import {observer} from 'mobx-react'
-import {CodeMirror, Marker, Gutter, GutterMarker, LineWidget, LineClass} from './codemirror'
+import {CodeMirror, Marker, Gutter, GutterMarker, LineWidget, LineClass} from '../components/codemirror'
 import {jss, jssKeyframes, colors, layout, fonts} from '../styles'
 import {programStore, simulatorStore} from '../stores'
 import type {ASTNodeLocation} from '../program'
@@ -155,12 +155,12 @@ export default class CodeEditor extends React.Component<*, Props, *> {
 		const {currentStep, done} = simulatorStore
 		if (currentStep == null || done) { return null }
 
-		const {codeLocation, endState: {failedPosition}} = currentStep
+		const {codeLocation, endState: {stepFailed}} = currentStep
 		return (
 			<Marker
 				from={locationToCodeMirrorLocation(codeLocation.start)}
 				to={locationToCodeMirrorLocation(codeLocation.end)}
-				className={failedPosition == null ? $.currentStepSuccess : $.currentStepFailure}
+				className={stepFailed ? $.currentStepFailure : $.currentStepSuccess}
 			/>
 		)
 	}

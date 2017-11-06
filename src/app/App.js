@@ -6,22 +6,27 @@ import {jss, colors, layout, shadows} from '../styles'
 import {
 	Panels,
 	Grid,
-	Inventory,
 	ItemSprite,
-	Robot,
+	Sprite,
+	Rover,
 	Goal,
+	Scoring,
+	MessageBox,
+	TextBalloon
+} from '../components'
+import {
+	Inventory,
 	CodeToolbar,
-	Instructions,
+	LevelInstructions,
 	CodeEditor,
 	SimulatorToolbar,
 	StateInspector,
-	Scoring,
 	ChapterModal,
-	MessageBox
+	LockAcceptTable
 } from '.'
 import {levelStore, viewStateStore, programStore, simulatorStore} from '../stores'
 import {Program} from '../program'
-import type {Item, ProgramState, ProgramScoring} from '../program'
+import type {Item, ProgramState, ProgramScoring, Lock} from '../program'
 
 export type Props = {}
 
@@ -105,8 +110,6 @@ export default class App extends React.Component<*, Props, *> {
 	}
 
 	render() {
-		const {currentLevel} = levelStore
-
 		return (
 			<div className={$.app}>
 				<Panels
@@ -117,7 +120,7 @@ export default class App extends React.Component<*, Props, *> {
 
 					main={this.renderMain()}
 					left={this.renderCodePanel()}
-					bottom={currentLevel && currentLevel.stateInspector ? this.renderStateInspector(currentLevel) : null}
+					bottom={this.renderBottomPanel()}
 					splitter={side => <div className={[$.splitter, $[`splitter_${side}`]]}/>}
 				/>
 				<ChapterModal
@@ -125,6 +128,29 @@ export default class App extends React.Component<*, Props, *> {
 					onRequestClose={() => { levelStore.cancelChapterSelection() }}
 				/>
 				<MessageBox.Host/>
+
+				{/* Used for rainbow colored keys. */}
+				<svg width={0} height={0} style={{position: 'absolute'}} xmlns="http://www.w3.org/2000/svg">
+					<defs>
+						<linearGradient id="rainbow" x1={0} y1={0} x2={1} y2={1}>
+							<stop stopColor={colors.red.string()} offset="0%"/>
+							<stop stopColor={colors.amber.string()} offset="50%"/>
+							<stop stopColor={colors.green.string()} offset="100%"/>
+						</linearGradient>
+					</defs>
+				</svg>
+			</div>
+		)
+	}
+
+	renderMain() {
+		return (
+			<div className={$.main}>
+				<SimulatorToolbar/>
+				<div className={$.gridContainer}>
+					{this.renderGrid()}
+					<Inventory/>
+				</div>
 			</div>
 		)
 	}
@@ -136,25 +162,23 @@ export default class App extends React.Component<*, Props, *> {
 		return (
 			<div className={$.codePanel}>
 				<CodeToolbar/>
-				<Instructions level={currentLevel}/>
+				<LevelInstructions level={currentLevel}/>
 				<CodeEditor className={$.codeEditor}/>
 			</div>
 		)
 	}
 
-	renderMain() {
+	renderBottomPanel() {
 		const {currentLevel} = levelStore
-		const hasApples = currentLevel != null && currentLevel.hasApples
+		if (currentLevel == null) { return null }
 
-		return (
-			<div className={$.main}>
-				<SimulatorToolbar/>
-				<div className={$.gridContainer}>
-					{this.renderGrid()}
-					{hasApples && <Inventory/>}
-				</div>
-			</div>
-		)
+		if (viewStateStore.selectedLock != null) {
+			return this.renderLockAcceptTable()
+		} else if (currentLevel.stateInspector) {
+			return this.renderStateInspector(currentLevel)
+		} else {
+			return null
+		}
 	}
 
 	renderStateInspector(level: Level) {
@@ -170,6 +194,17 @@ export default class App extends React.Component<*, Props, *> {
 		)
 	}
 
+	renderLockAcceptTable() {
+		if (viewStateStore.selectedLock == null) { return null }
+
+		return (
+			<LockAcceptTable
+				lock={viewStateStore.selectedLock}
+				onCloseTap={() => { viewStateStore.selectedLock = null }}
+			/>
+		)
+	}
+
 	renderGrid() {
 		const {currentLevel} = levelStore
 		if (currentLevel == null) { return null }
@@ -180,6 +215,12 @@ export default class App extends React.Component<*, Props, *> {
 		const items = state == null || currentLevel.dark
 			? currentLevel.items
 			: state.items
+		const roverBalloon = state == null
+			? null
+			: state.roverBalloon
+		const itemBalloons = state == null
+			? []
+			: state.itemBalloons
 		const position = state == null
 			? currentLevel.startPosition
 			: state.position
@@ -195,24 +236,39 @@ export default class App extends React.Component<*, Props, *> {
 
 		return (
 			<Grid rows={currentLevel.rows} dark={currentLevel.dark && !simulatorStore.isFinished} showCoordinates={currentLevel.coordinates} columns={currentLevel.columns}>
-				{showItems && items.map((item, index) => this.renderSprite(item, index))}
+				{showItems && items.map(item => this.renderSprite(item))}
 
 				{currentLevel.goalPosition != null && <Goal position={currentLevel.goalPosition} type='goal'/>}
-				<Robot
+				<Rover
 					position={position}
 					failedPosition={failedPosition}
 					direction={direction}
 					transitionDuration={transitionDuration}
 					jumpForJoy={done && (state && state.isFinished)}
 					shame={done && (state && !state.isFinished)}
+					textBalloon={roverBalloon}
 				/>
+
+				{showItems && itemBalloons.map((balloon, index) => this.renderItemBalloon(balloon, index))}
 			</Grid>
 		)
 	}
 
-	renderSprite(item: Item, index: number) {
+	renderSprite(item: Item) {
+		const onTap = item.type === 'lock'
+			? this.onLockTap.bind(this, item)
+			: null
+
 		return (
-			<ItemSprite key={index} item={item}/>
+			<ItemSprite key={item.id} item={item} onTap={onTap}/>
+		)
+	}
+
+	renderItemBalloon(balloon: any, index: number) {
+		return (
+			<Sprite key={index} position={balloon.position}>
+				<TextBalloon balloon={balloon}/>
+			</Sprite>
 		)
 	}
 
@@ -225,6 +281,10 @@ export default class App extends React.Component<*, Props, *> {
 		} else {
 			this.levelUnfinished(state, scoring)
 		}
+	}
+
+	onLockTap = (lock: Lock) => {
+		viewStateStore.selectedLock = lock
 	}
 
 	onProgramError = () => {
@@ -268,6 +328,13 @@ const $ = jss({
 	},
 
 	splitter_left: {
+		...layout.overlay,
+		backgroundColor: colors.purple,
+		backgroundImage: colors.bevelGradient('left'),
+		boxShadow:       shadows.horizontal(2)
+	},
+
+	splitter_right: {
 		...layout.overlay,
 		backgroundColor: colors.purple,
 		backgroundImage: colors.bevelGradient('left'),

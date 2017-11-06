@@ -47,6 +47,9 @@ export default class ProgramStore extends EventEmitter {
 		}
 
 		simulatorStore.reset()
+		this.errors = []
+		this.program = null
+		this.hasInfiniteLoop = false
 	}
 
 	saveCode() {
