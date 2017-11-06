@@ -29,6 +29,8 @@ export default class ProgramBuilder {
 
 	runtime: ?Runtime = null
 
+	evaluatedNodes: number = 0
+
 	build(code: string): boolean {
 		const ast = this.compile(code)
 		if (ast == null) { return false }
@@ -59,6 +61,10 @@ export default class ProgramBuilder {
 			source:    this.program.code,
 			callbacks: {
 				node: node => {
+					if (this.evaluatedNodes++ > 10000) {
+						throw new InfiniteLoopException()
+					}
+
 					if (!node.recordable) { return }
 					this.program.recordStep(node.loc)
 				}
@@ -149,3 +155,9 @@ function markRecordableNodes(ast: ASTNode) {
 		}
 	})
 }
+
+export function InfiniteLoopException() {
+	this.message = "Your program contains an infinite loop"
+}
+InfiniteLoopException.prototype = new Error()
+InfiniteLoopException.prototype.name = 'InfiniteLoopException'

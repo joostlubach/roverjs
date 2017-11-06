@@ -14,6 +14,7 @@ export {default as Simulator} from './Simulator'
 // /index
 
 export * from './items'
+export * from './Runtime'
 export * from './Program'
 export * from './ProgramState'
 export * from './ProgramBuilder'

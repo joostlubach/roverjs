@@ -31,14 +31,8 @@ export default class Runtime {
 	/** Set when a return or break has been called. */
 	interruptType: ?('return' | 'break' | 'continue')
 
-	evaluatedNodes: number = 0
-
 	evaluate(node: ASTNode) {
 		this.runCallbacks(node)
-
-		if (this.evaluatedNodes++ > 10000) {
-			throw new InfiniteLoopException()
-		}
 
 		const {type} = node
 		if (this[`evaluate_${type}`] == null) {
@@ -99,6 +93,9 @@ export default class Runtime {
 			this.evaluate(bodyNode)
 			if (this.interruptType != null) { break }
 		}
+	}
+
+	evaluate_EmptyStatement(node: ASTNode) {
 	}
 
 	evaluate_VariableDeclaration(node: ASTNode) {
@@ -630,12 +627,6 @@ const binaryOperators = {
 	['&']: (l, r) => l & r,
 	['^']: (l, r) => l ^ r,
 }
-
-export function InfiniteLoopException() {
-	this.message = "Your program contains an infinite loop"
-}
-InfiniteLoopException.prototype = new Error()
-InfiniteLoopException.prototype.name = 'InfiniteLoopException'
 
 export function UnsupportedException(message) {
 	this.message = message
