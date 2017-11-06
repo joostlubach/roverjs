@@ -1,18 +1,23 @@
 name: Variables 4
 instructions: |-
-  So, a key is actually a variable. In the previous level, the key always had the
-  value `true` (a Boolean value).
+  So, a key is actually a variable. When you call `unlock(key);` you use the
+  key to unlock the lock.
 
-  In this level, the key will be some number. You don't know which number until
-  you pick it up. It changes every time you restart the level.
-  
-  The lock can also be unlocked with a number. But! The number for unlocking the lock
-  is not the same as the value of the key. You have to do something to the
-  key before unlocking the lock.
+  The lock can only be unlocked with a specific value. In the previous level,
+  the key had the value `true` and the door could be unlocked with the value `true`,
+  so using `unlock(key);` worked in the previous level. (If you go back, to the
+  previous level, you'll see that `unlock(true);` would have also worked).
 
-  If you click on the lock, you will see what value the lock will accept given the
-  value of the key. From this table, can you figure out what you have to do to the
-  variable to unlock the lock?
+  The lock in this level is a bit more difficult. They key in this level is a
+  *number*, and the lock can also be unlocked with a *number*. However, the
+  number to unlock the lock is double the number of the key. So, if the key is `8`,
+  the lock can be unlocked with the number `16`.
+
+  How would you change your code to unlock the lock in this level?
+
+  *Tip:*
+
+  - Click on the lock to see how you can unlock it, given the value of the key.
 
 rows: 5
 columns: 4

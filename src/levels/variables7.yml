@@ -1,8 +1,9 @@
 name: Variables 5
 instructions: |-
-  This time, we're not going to reveal what you have to do with the key to
-  unlock the lock. Click on the lock to reveal how the lock works, and try
-  to figure out how what to do with the key to unlock the lock.
+  In this level, the key is a `string`, and there are again two locks.
+  
+  Each lock works differently, so click on them to see what you
+  have to do with the key to unlock them.
 
 rows: 5
 columns: 4
@@ -11,8 +12,9 @@ start: [0, 1, 'right']
 goal:  [2, 4]
 
 items:
-  - [1, 1, 'key', {variableType: 'number'}]
-  - [2, 2, 'lock', {variableType: 'number', accept: 'value => -value'}]
+  - [1, 1, 'key', {variableType: 'string'}]
+  - [2, 2, 'lock', {variableType: 'string', accept: "value => value + ',' + value"}]
+  - [2, 3, 'lock', {variableType: 'string', accept: "value => value.length"}]
 
   - [0, 2, 'tree']
   - [0, 3, 'water']

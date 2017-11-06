@@ -147,7 +147,7 @@ export default class Runtime {
 
 			for (const stmt of cs.consequent) {
 				this.evaluate(stmt)
-				if (this.interruptType === 'break') {
+				if (this.interruptType != null) {
 					this.interruptType = null
 					broken = true
 					break

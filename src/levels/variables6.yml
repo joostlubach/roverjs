@@ -1,10 +1,10 @@
-name: Variables 5
+name: Variables 6
 instructions: |-
-  Heyy a rainbow key! Rainbow keys can be *anything*: booleans, numbers, strings, or
-  even `null`.
+  This level has two locks! Figure out how you can unlock them.
 
-  The rainbow lock also accepts anything! Click on the lock to see what it accepts
-  for each key value.
+  As you can see from the unlock schema of the the lower lock,
+  it accepts a boolean, and not a number. Can you figure out
+  what to do with the key to unlock the door?
 
 rows: 5
 columns: 4
@@ -13,8 +13,9 @@ start: [0, 1, 'right']
 goal:  [2, 4]
 
 items:
-  - [1, 1, 'key', {variableType: 'any'}]
-  - [2, 2, 'lock', {variableType: 'any', accept: "value => typeof value"}]
+  - [1, 1, 'key', {variableType: 'number'}]
+  - [2, 2, 'lock', {variableType: 'number', accept: 'value => Math.pow(value, 3)'}]
+  - [2, 3, 'lock', {variableType: 'number', accept: 'value => value < 6'}]
 
   - [0, 2, 'tree']
   - [0, 3, 'water']
@@ -34,11 +35,21 @@ items:
 
 scoring:
   tests:
-    typeof:
-      regexp: typeof\s+
+    pow:
+      regexp: Math\.pow\s*\(
+    lessThan:
+      regexp: \s*<\s*
 
   scores:
     - score: 2
-      typeof: false
+      pow: false
       message: |-
-        Can you think of some JavaScript code to get the *type* of a variable?
+        What is the 'proper way' to calculate a cube in JavaScript?
+
+        If you don't know, look it up on Google!
+
+    - score: 2
+      lessThan: false
+      message: |-
+        The lower lock accepts `true` if the value is less than 6. Do you know how to check for this
+        in JavaScript?
