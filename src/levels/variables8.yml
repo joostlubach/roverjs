@@ -15,7 +15,7 @@ goal:  [2, 4]
 items:
   - [1, 1, 'key', {variableType: 'any'}]
   - [2, 2, 'lock', {variableType: 'any', accept: "value => typeof value"}]
-  - [2, 3, 'lock', {variableType: 'any', accept: "value => value == null ? 'null' : value === true ? 1 : value === false ? 0 : typeof value === 'string' ? value.length : value > 5"}]
+  - [2, 3, 'lock', {variableType: 'any', accept: "value => value == null ? 'null' : value === true ? 1 : value === false ? 0 : typeof value === 'string' ? value.length : value % 2 === 0"}]
 
   - [0, 2, 'tree']
   - [0, 3, 'water']
@@ -37,9 +37,17 @@ scoring:
   tests:
     typeof:
       regexp: typeof\s+
+    mod:
+      regexp: \s*%\s*
 
   scores:
     - score: 2
       typeof: false
       message: |-
         Can you think of some JavaScript code to get the *type* of a variable?
+
+    - score: 2
+      mod: false
+      message: |-
+        This is tricky, but try to find out what the 'common' way is to find out if a number is even!
+        Tip: look for the *modulo* operator!

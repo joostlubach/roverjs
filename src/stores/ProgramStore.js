@@ -68,6 +68,30 @@ export default class ProgramStore extends EventEmitter {
 
 	@action
 	runProgram(firstStepOnly: boolean = false) {
+		// In the (non deterministic) levels with keys, there is a chance that users will accidentally
+		// open a lock without implementing the right algorithm. So, we 'cheat' a little by running
+		// the program 100 times. If any of them fail, we show the failed simulation.
+
+		// In deterministic levels, this will not be very useful, but it's not a problem either.
+		let success = true
+		for (let run = 0; run < 100; run++) {
+			success = this.runProgramOnce(firstStepOnly)
+			if (!success || !this.program.state.isFinished) {
+				break
+			}
+		}
+
+		// If successful, run a simulation of the created program.
+		simulatorStore.reset()
+		if (this.program != null && success) {
+			simulatorStore.simulate(this.program, firstStepOnly)
+		} else {
+			this.emit('error')
+		}
+	}
+
+	@action
+	runProgramOnce(firstStepOnly: boolean = false) {
 		if (this.level == null) { return }
 		if (simulatorStore.active) { return }
 
@@ -82,13 +106,7 @@ export default class ProgramStore extends EventEmitter {
 		this.errors = builder.errors
 		this.hasInfiniteLoop = builder.errors.find(error => error.name === 'InfiniteLoopException') != null
 
-		// If successful, run a simulation of the created program.
-		simulatorStore.reset()
-		if (success) {
-			simulatorStore.simulate(program, firstStepOnly)
-		} else {
-			this.emit('error')
-		}
+		return success
 	}
 
 }

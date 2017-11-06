@@ -609,6 +609,7 @@ const binaryOperators = {
 	['-']: (l, r) => l - r,
 	['*']: (l, r) => l * r,
 	['/']: (l, r) => l / r,
+	['%']: (l, r) => l % r,
 
 	// Comparison
 	['==']:  (l, r) => l == r, // eslint-disable-line
