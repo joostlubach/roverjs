@@ -65,7 +65,9 @@ function createBundler(watch, modifyStream) {
 		config.scripts.preamble,
 		config.scripts.source
 	]
-	const transforms = ['babelify', 'yamlify']
+
+	const transforms = []
+	transforms.push('babelify', 'yamlify')
 	if (config.scripts.uglify) {
 		transforms.push('uglifyify')
 	}
