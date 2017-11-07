@@ -14,7 +14,11 @@ export type Chapter = {
 
 export default class GitHubLevelStore {
 
-	chapters = []
+	_chapters = []
+
+	get chapters() {
+		return this._chapters
+	}
 
 	@observable
 	currentChapter: ?Chapter = null
@@ -64,7 +68,7 @@ export default class GitHubLevelStore {
 
 	@action
 	loadLevel(id: string) {
-		for (const chapter of this.chapters) {
+		for (const chapter of this._chapters) {
 			const index = chapter.levels.findIndex(level => level.id === id)
 			if (index === -1) { continue }
 
@@ -123,7 +127,7 @@ export default class GitHubLevelStore {
 	@action
 	async load() {
 		try {
-			this.chapters = await this.fetchChapters()
+			this._chapters = await this.fetchChapters()
 
 			this.levelScores = new Map(JSON.parse(window.localStorage.levelScores || '[]'))
 
@@ -160,10 +164,10 @@ export default class GitHubLevelStore {
 	}
 
 	async fetchLevels(chapterDescriptors) {
-		let levelNames = []
-		for (const descriptor of chapterDescriptors) {
-			levelNames = [...levelNames, ...descriptor.levels]
-		}
+		const levelNames = chapterDescriptors.reduce((prev, descriptor) => {
+			prev = [...prev, ...descriptor.levels]
+			return prev
+		}, [])
 
 		const promises = levelNames.map(levelName => this.fetchLevel(levelName))
 		const results = await Promise.all(promises)

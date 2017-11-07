@@ -8,8 +8,6 @@ import {Modal, Tappable, LevelButton, Markdown} from '../components'
 import {levelStore} from '../stores'
 import type {Chapter, Level} from '../stores'
 
-const chapters = levelStore.chapters
-
 export type Props = {
 	isOpen:         boolean,
 	onRequestClose: () => void
@@ -29,6 +27,7 @@ export default class ChapterModal extends React.Component<*, Props, *> {
 
 	selectCurrentChapter() {
 		let chapter = levelStore.currentChapter
+		const chapters = levelStore.chapters
 		if (levelStore.chapterComplete(chapter)) {
 			const index = chapters.findIndex(c => c.id === chapter.id)
 			chapter = chapters[index + 1] || chapter
@@ -73,7 +72,7 @@ export default class ChapterModal extends React.Component<*, Props, *> {
 
 		return (
 			<div className={$.chapterList}>
-				{chapters.map((chapter, i) => (
+				{levelStore.chapters.map((chapter, i) => (
 					<Tappable
 						key={chapter.id}
 						className={[$.chapterButton, isSelectedChapter(chapter) && $.selectedChapterButton]}
