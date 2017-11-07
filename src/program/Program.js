@@ -1,7 +1,8 @@
 // @flow
 
 import {Level, Lock, ProgramState} from '.'
-import type {ASTNodeLocation, KeyColor} from '.'
+import type {KeyColor} from '.'
+import type {ASTNodeLocation} from 'js-eval'
 import isFunction from 'lodash/isFunction'
 import {colors} from '../styles'
 

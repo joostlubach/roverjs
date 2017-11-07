@@ -1,7 +1,7 @@
 // @flow
 
 import {parse} from 'acorn'
-import {Runtime} from '..'
+import {Runtime} from 'js-eval'
 import Item, {item} from './Item'
 import type {KeyColor} from './Key'
 import type {ProgramState} from '..'

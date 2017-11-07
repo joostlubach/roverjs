@@ -2,22 +2,9 @@
 
 import {parse} from 'acorn'
 import * as walk from 'acorn/dist/walk'
-import {Runtime, Program} from '.'
+import {Runtime} from 'js-eval'
+import {Program} from '.'
 import shuffle from 'lodash/shuffle'
-
-export type ASTNode = {
-	type:  string,
-	value: string,
-	loc: {
-		start: ASTNodeLocation,
-		end:   ASTNodeLocation
-	}
-}
-
-export type ASTNodeLocation = {
-	line:   number,
-	column: number
-}
 
 export default class ProgramBuilder {
 
