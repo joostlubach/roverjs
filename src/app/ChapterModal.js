@@ -4,9 +4,11 @@ import React from 'react'
 import {observer} from 'mobx-react'
 import {jss, colors, layout, fonts} from '../styles'
 import {Modal, Tappable, LevelButton, Markdown} from '../components'
-import {chapters} from '../levels'
+// import {chapters} from '../levels'
 import {levelStore} from '../stores'
 import type {Chapter, Level} from '../stores'
+
+const chapters = levelStore.chapters
 
 export type Props = {
 	isOpen:         boolean,
