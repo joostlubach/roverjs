@@ -34,8 +34,8 @@ items:
 
 initialCode: |-
   // ---- You cannot modify these lines
-  let stepsDown = 3
-  let stepsLeft = 0
+  let stepsDown = 3;
+  let stepsLeft = 0;
   // ++++
 
   // Change the variables here.

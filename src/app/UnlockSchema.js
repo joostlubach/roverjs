@@ -3,7 +3,7 @@
 import React from 'react'
 import {jss, layout, colors, fonts, presets} from '../styles'
 import {SVG, Button} from '../components'
-import {exampleWords, disabledLock} from '../program'
+import {disabledLock} from '../program'
 import type {Lock, KeyColor} from '../program'
 
 export type Props = {
@@ -12,7 +12,7 @@ export type Props = {
 	onCloseTap: () => void
 }
 
-export default class LockAcceptTable extends React.Component<*, Props, *> {
+export default class UnlockSchema extends React.Component<*, Props, *> {
 
 	props: Props
 

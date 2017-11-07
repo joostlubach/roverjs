@@ -39,17 +39,24 @@ scoring:
       regexp: Math\.pow\s*\(
     lessThan:
       regexp: \s*<\s*
+    short:
+      maxLines: 9
 
   scores:
-    - score: 2
+    - score: 1
       pow: false
       message: |-
         What is the 'proper way' to calculate a cube in JavaScript?
 
         If you don't know, look it up on Google!
 
-    - score: 2
+    - score: 1
       lessThan: false
       message: |-
         The lower lock accepts `true` if the value is less than 6. Do you know how to check for this
         in JavaScript?
+
+    - score: 2
+      short: false
+      message: |-
+        Try to see if you can solve it in only 9 lines of code!

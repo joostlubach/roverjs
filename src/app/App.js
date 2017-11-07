@@ -22,7 +22,7 @@ import {
 	SimulatorToolbar,
 	StateInspector,
 	ChapterModal,
-	LockAcceptTable
+	UnlockSchema
 } from '.'
 import {levelStore, viewStateStore, programStore, simulatorStore} from '../stores'
 import {Program, ProgramState} from '../program'
@@ -173,7 +173,7 @@ export default class App extends React.Component<*, Props, *> {
 		if (currentLevel == null) { return null }
 
 		if (viewStateStore.selectedLock != null) {
-			return this.renderLockAcceptTable()
+			return this.renderUnlockSchema()
 		} else if (currentLevel.stateInspector) {
 			return this.renderStateInspector(currentLevel)
 		} else {
@@ -194,12 +194,12 @@ export default class App extends React.Component<*, Props, *> {
 		)
 	}
 
-	renderLockAcceptTable() {
+	renderUnlockSchema() {
 		if (viewStateStore.selectedLock == null) { return null }
 
 		const {currentLevel} = levelStore
 		return (
-			<LockAcceptTable
+			<UnlockSchema
 				lock={viewStateStore.selectedLock}
 				level={currentLevel}
 				onCloseTap={() => { viewStateStore.selectedLock = null }}

@@ -10,10 +10,10 @@ instructions: |-
 
   The lock in this level is a bit more difficult. They key in this level is a
   *number*, and the lock can also be unlocked with a *number*. However, the
-  number to unlock the lock is double the number of the key. So, if the key is `8`,
+  number to unlock the lock is *double* the number of the key. So, if the key is `8`,
   the lock can be unlocked with the number `16`.
 
-  How would you change your code to unlock the lock in this level?
+  How would you write your code to unlock the lock in this level?
 
   *Tip:*
 
