@@ -11,6 +11,9 @@ export const panelHeader = {
 	borderBottom: [1, 'solid', colors.white.alpha(0.2)],
 	boxShadow:    shadows.toolbar,
 
+	minHeight:    34,
+	...layout.row(),
+
 	color:         colors.fg.inverted,
 	padding:       [layout.padding.xs, layout.padding.s],
 	font:          fonts.smallCaps,

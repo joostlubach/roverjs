@@ -25,8 +25,8 @@ import {
 	LockAcceptTable
 } from '.'
 import {levelStore, viewStateStore, programStore, simulatorStore} from '../stores'
-import {Program} from '../program'
-import type {Item, ProgramState, ProgramScoring, Lock} from '../program'
+import {Program, ProgramState} from '../program'
+import type {Item, ProgramScoring, Lock} from '../program'
 
 export type Props = {}
 
@@ -186,7 +186,7 @@ export default class App extends React.Component<*, Props, *> {
 		if (simulatorStore.state != null) {
 			state = simulatorStore.state
 		} else {
-			state = new Program(level, '').defaultState()
+			state = ProgramState.default(new Program(level, ''))
 		}
 
 		return (

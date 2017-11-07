@@ -1,7 +1,7 @@
 // @flow
 
 import cloneDeep from 'lodash/cloneDeep'
-import type {Item, KeyColor, ProgramConfig} from '.'
+import type {Item, KeyColor} from '.'
 
 export type Position  = {x: number, y: number}
 export type Direction = 'up' | 'down' | 'left' | 'right'
@@ -36,34 +36,32 @@ export default class ProgramState {
 	program: Program
 	level:   Level
 
+	static visibleProperties: {[key: string]: boolean} = {}
+
 	//------
 	// Visible state
 
-	position:  Position
-	direction: Direction
-	apples:    number
-	keys:      {[color: KeyColor]: mixed}
+	@visible()
+	position: Position = {x: 0, y: 0}
+
+	@visible()
+	direction: Direction = 'up'
+
+	@visible()
+	apples: number = 0
+
+	@visible()
+	keys: {[color: KeyColor]: mixed} = {}
 
 	//------
 	// Invisible state (not shown in StateInspector)
 
-	@visible(false)
-	stepFailed: boolean = false
-
-	@visible(false)
-	roverBalloon: ?TextBalloon = null
-
-	@visible(false)
-	itemBalloons: TextBalloon[] = []
-
-	@visible(false)
+	stepFailed:     boolean = false
+	roverBalloon:   ?TextBalloon = null
+	itemBalloons:   TextBalloon[] = []
 	failedPosition: ?Position = null
-
-	@visible(false)
-	items: Item[] = []
-
-	@visible(false)
-	keyValues: {[color: KeyColor]: ?mixed} = {}
+	items:          Item[] = []
+	keyValues:      {[color: KeyColor]: ?mixed} = {}
 
 	clone(): ProgramState {
 		const values = cloneDeep(this)
@@ -120,11 +118,13 @@ export default class ProgramState {
 	// Finished
 
 	@enumerable()
+	@visible()
 	get isFinished(): boolean {
-		return this.isAtGoal && this.hasEnoughApples
+		return this.isAtGoal && this.hasEnoughApples !== false
 	}
 
 	@enumerable()
+	@visible()
 	get isAtGoal(): boolean {
 		const {goalPosition} = this.level
 		if (goalPosition == null) { return false }
@@ -133,7 +133,9 @@ export default class ProgramState {
 	}
 
 	@enumerable()
-	get hasEnoughApples(): boolean {
+	@visible()
+	get hasEnoughApples(): ?boolean {
+		if (!this.level.hasApples) { return undefined }
 		if (this.level.goalApples == null) { return true }
 		return this.apples >= this.level.goalApples
 	}
@@ -147,7 +149,11 @@ function enumerable(enumerable: boolean = true) {
 }
 
 function visible(visible: boolean = true) {
-	return (target: any, key: string, descriptor: Object) => {
-		return {...descriptor, visible}
+	return (target: any, key: string) => {
+		if (visible) {
+			target.constructor.visibleProperties[key] = true
+		} else {
+			target.constructor.visibleProperties[key] = false
+		}
 	}
 }
