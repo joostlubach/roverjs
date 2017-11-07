@@ -1,6 +1,6 @@
 {
   "name": "robot",
-  "version": "0.1.0+7",
+  "version": "0.1.0+8",
   "repository": "https://github.com/joostlubach/roverjs",
   "scripts": {
     "start": "gulp development",
