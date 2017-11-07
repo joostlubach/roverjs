@@ -1,7 +1,7 @@
 // @flow
 
 import {Level, Lock, ProgramState} from '.'
-import type {ASTNodeLocation} from '.'
+import type {ASTNodeLocation, KeyColor} from '.'
 import isFunction from 'lodash/isFunction'
 import {colors} from '../styles'
 
@@ -34,9 +34,9 @@ export default class Program {
 	// Constructor
 
 	constructor(level: Level, code: string) {
-		this.level = level
-		this.code  = code
-		this.state = this.defaultState()
+		this.level  = level
+		this.code   = code
+		this.state  = ProgramState.default(this)
 	}
 
 	level: Level
@@ -50,28 +50,10 @@ export default class Program {
 	}
 
 	//------
-	// State
-
-	defaultState() {
-		return new ProgramState(this, {
-			position:  this.level.startPosition,
-			direction: this.level.startDirection,
-			apples:    0,
-			keys:      {},
-
-			stepFailed:     false,
-			failedPosition: null,
-			roverBalloon:   null,
-			itemBalloons:   [],
-			items:          [...this.level.items]
-		})
-	}
-
-	//------
 	// Reset & run
 
-	reset() {
-		this.state = this.defaultState()
+	reset(keyValues: {[color: KeyColor]: ?mixed}) {
+		this.state = ProgramState.default(this, keyValues)
 		this.scoring = null
 	}
 
@@ -174,6 +156,11 @@ export default class Program {
 			return
 		}
 
+		this.state.roverBalloon = {text: JSON.stringify(value) + '?', color: colors.blue, style: 'monospace'}
+
+		// Record a step inbetween to show the question and answer separately in the simulator.
+		this.splitStep()
+
 		if (!item.unlock(this.state, value)) {
 			this.state.stepFailed = true
 			this.state.itemBalloons.push({position: this.state.facingPosition, text: 'NO', color: colors.red})
@@ -191,11 +178,14 @@ export default class Program {
 	//------
 	// Actions
 
-	afterAction() {
+	beforeAction() {
+		this.state.prepare()
 		if (this.recordingStep != null) {
 			this.recordingStep.actionPerformed = true
 		}
+	}
 
+	afterAction() {
 		if (this.isFinished()) {
 			this.scoring = this.calculateScoring()
 		}
@@ -212,7 +202,7 @@ export default class Program {
 		this.recordingStep = null
 	}
 
-	recordStep(codeLocation: {start: ASTNodeLocation, end: ASTNodeLocation}) {
+	recordStep(codeLocation: {start: ASTNodeLocation, end: ASTNodeLocation}): Step {
 		const state = this.state.clone()
 		if (this.recordingStep != null) {
 			this.recordingStep.endState = state
@@ -221,6 +211,16 @@ export default class Program {
 		const step = {codeLocation, startState: state, endState: state, actionPerformed: false}
 		this.steps.push(step)
 		this.recordingStep = step
+		return step
+	}
+
+	splitStep() {
+		const {recordingStep} = this
+		if (recordingStep == null) { return }
+
+		const step = this.recordStep(recordingStep.codeLocation)
+		step.actionPerformed = recordingStep.actionPerformed
+		return step
 	}
 
 	stopRecording() {
@@ -282,7 +282,7 @@ function action(target: Class<Program>, key: string, descriptor: Object) {
 
 function wrapAction(fn: Function) {
 	return function wrapped() {
-		this.state.prepare()
+		this.beforeAction()
 		try {
 			return fn.apply(this, arguments)
 		} finally {

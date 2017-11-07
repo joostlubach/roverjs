@@ -7,7 +7,8 @@ import {SVG} from '.'
 import type {TextBalloon as TextBalloonType} from '../program'
 
 export type Props = {
-	balloon: TextBalloonType
+	balloon:    TextBalloonType,
+	className?: ClassNameProp
 }
 
 export default class TextBalloon extends React.Component<*, Props, *> {
@@ -15,14 +16,20 @@ export default class TextBalloon extends React.Component<*, Props, *> {
 	props: Props
 
 	render() {
-		const {balloon: {text, color}} = this.props
+		const {balloon: {text, color, style}, className} = this.props
 
 		return (
-			<CSSTransitionGroup component='div' className={$.anim} transitionName={$.anim} transitionAppear transitionAppearTimeout={animDuration} transitionEnter={false} transitionLeave={false}>
+			<CSSTransitionGroup component='div' className={[$.balloon, className]} transitionName={$.anim} transitionAppear transitionAppearTimeout={animDuration} transitionEnter={false} transitionLeave={false}>
 				<div className={$.content}>
-					<SVG className={$.balloon} style={{fill: color.string()}} name='balloon'/>
+					<div className={$.background}>
+						<SVG className={$.balloonLeft} style={{fill: color.string()}} name='balloon-left'/>
+						<SVG className={$.balloonRight} style={{fill: color.string()}} name='balloon-right'/>
+						<div className={$.balloonCenter} style={{background: color.string()}}/>
+					</div>
 					<div className={$.text}>
-						<span style={{color: colors.contrast(color).string()}}>{text}</span>
+						<span style={{color: colors.contrast(color).string()}} className={style && $[`text_${style}`]}>
+							{text}
+						</span>
 					</div>
 				</div>
 			</CSSTransitionGroup>
@@ -34,30 +41,63 @@ export default class TextBalloon extends React.Component<*, Props, *> {
 const animDuration = 200
 
 const size = {
-	width:  64,
-	height: 36
+	width:  57,
+	height: 30
 }
 
 const $ = jss({
 	content: {
 		position: 'absolute',
-		right:    -size.width + layout.padding.xs,
-		top:      -size.height + layout.padding.xs,
+		left:     layout.gridCell.width - layout.padding.xs,
+		bottom:   layout.gridCell.height - layout.padding.xs,
 
 		transformOrigin: 'bottom left',
 	},
 
-	balloon: {
-		...size
+	background: {
+		...layout.overlay,
+	},
+
+	balloonLeft: {
+		position: 'absolute',
+		left:     0,
+		width:    30,
+		top:      0,
+		height:   size.height
+	},
+
+	balloonRight: {
+		position: 'absolute',
+		right:    0,
+		width:    27,
+		top:      0,
+		height:   size.height
+	},
+
+	balloonCenter: {
+		position: 'absolute',
+		left:     30,
+		right:    27,
+		top:      0,
+		bottom:   0
 	},
 
 	text: {
-		...layout.overlay,
+		position: 'relative',
+		minWidth: size.width,
+		height:   size.height,
 		...layout.flex.center,
+
+		padding:     layout.padding.xs,
+		paddingLeft: layout.padding.xs + 4,
 
 		font:       fonts.tiny,
 		fontWeight: 'bold',
 		textAlign:  'center'
+	},
+
+	text_monospace: {
+		font: fonts.monospaceTiny
 	},
 
 	anim: {

@@ -2,7 +2,6 @@
 
 import Item, {item} from './Item'
 import type {ProgramState} from '..'
-import sample from 'lodash/sample'
 
 export type KeyType  = 'any' | 'number' | 'string' | 'boolean'
 export type KeyColor = 'yellow' | 'red' | 'blue' | 'rainbow'
@@ -18,33 +17,31 @@ export default class Key extends Item {
 	value:   ?mixed
 
 	pickUp(state: ProgramState): ?mixed {
-		const value = this.getValue()
-
+		const value = state.keyValues[this.color]
 		state.keys[this.color] = value
 		return value
 	}
 
-	getValue() {
-		if (typeof this.value !== 'undefined') {
-			return this.value
-		} else {
-			return this.generateValue()
+	get possibleValues(): mixed[] {
+		if (this.value != null) {
+			return [this.value]
 		}
-	}
 
-	generateValue() {
-		const type = this.keyType === 'any'
-			? sample(['boolean', 'string', 'number', 'null'])
-			: this.keyType
+		const values = []
 
-		switch (type) {
-		case 'boolean': return sample([true, false])
-		case 'string':  return sample(exampleWords)
-		case 'number':  return Math.floor(Math.random() * 10)
-		default:        return null
+		if (this.keyType === 'any') {
+			values.push(null)
 		}
+		if (this.keyType === 'any' || this.keyType === 'boolean') {
+			values.push(true, false)
+		}
+		if (this.keyType === 'any' || this.keyType === 'string') {
+			values.push('hello', 'lock', 'rover', 'key', 'level', 'javascript')
+		}
+		if (this.keyType === 'any' || this.keyType === 'number') {
+			values.push(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+		}
+		return values
 	}
 
 }
-
-export const exampleWords = ['hello', 'lock', 'rover', 'key', 'level', 'javascript']

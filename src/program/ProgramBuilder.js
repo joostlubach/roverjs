@@ -3,6 +3,7 @@
 import {parse} from 'acorn'
 import * as walk from 'acorn/dist/walk'
 import {Runtime, Program} from '.'
+import shuffle from 'lodash/shuffle'
 
 export type ASTNode = {
 	type:  string,
@@ -35,7 +36,26 @@ export default class ProgramBuilder {
 		const ast = this.compile(code)
 		if (ast == null) { return false }
 
-		return this.run(ast)
+		// Run the program for all possible key values in random order. If any of them fails, stop.
+		// This is to make sure that players cannot cheat in the key levels by using constant values
+		// and just trying a few times. In levels without keys, the value of allKeyValues will be
+		// an empty array, so then we just run once.
+		const allKeyValues = shuffle(this.program.level.allKeyValues())
+		if (allKeyValues.length === 0) {
+			return this.run(ast)
+		}
+
+		let success = true
+		for (const keyValues of allKeyValues) {
+			this.program.reset(keyValues)
+
+			success = this.run(ast)
+			if (!success || this.program.isFinished()) {
+				break
+			}
+		}
+
+		return success
 	}
 
 	compile(code: string) {
@@ -65,8 +85,9 @@ export default class ProgramBuilder {
 						throw new InfiniteLoopException()
 					}
 
-					if (!node.recordable) { return }
-					this.program.recordStep(node.loc)
+					if (node.recordable) {
+						this.program.recordStep(node.loc)
+					}
 				}
 			}
 		})

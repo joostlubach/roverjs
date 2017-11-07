@@ -19,15 +19,7 @@ export default class LockAcceptTable extends React.Component<*, Props, *> {
 	get values(): Array<{[color: KeyColor]: ?mixed}> {
 		const {lock: {acceptsKeys}, level} = this.props
 
-		let values = []
-		for (const color of acceptsKeys) {
-			const key = level.items.find(item => item.type === 'key' && item.color === color)
-			if (key == null) { continue }
-
-			values = cartesian(values, color, valuesForKeyType(key.keyType))
-		}
-
-		return values
+		return level.allKeyValues(acceptsKeys)
 	}
 
 	render() {
@@ -103,38 +95,6 @@ export default class LockAcceptTable extends React.Component<*, Props, *> {
 		)
 	}
 
-}
-
-function cartesian(data: Object[], color: KeyColor, values: mixed[]) {
-	if (data.length === 0) {
-		return values.map(value => ({[color]: value}))
-	}
-
-	const result = []
-	for (let i = 0; i < data.length; i++) {
-		for (const value of values) {
-			result.push({...data[i], [color]: value})
-		}
-	}
-	return result
-}
-
-function valuesForKeyType(keyType: KeyType) {
-	const values = []
-
-	if (keyType === 'any') {
-		values.push(null)
-	}
-	if (keyType === 'any' || keyType === 'boolean') {
-		values.push(true, false)
-	}
-	if (keyType === 'any' || keyType === 'string') {
-		values.push(...exampleWords)
-	}
-	if (keyType === 'any' || keyType === 'number') {
-		values.push(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-	}
-	return values
 }
 
 const $ = jss({

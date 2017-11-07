@@ -119,8 +119,8 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 		)
 	}
 
-	runProgram(firstStepOnly: boolean) {
-		programStore.runProgram(firstStepOnly)
+	runAndSimulate(firstStepOnly: boolean) {
+		programStore.runAndSimulate(firstStepOnly)
 
 		if (programStore.errors.length === 0 && programStore.program.isEmpty) {
 			MessageBox.show({
@@ -157,10 +157,10 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 			// Reset everything, and wait a while to run, to allow everything to reset
 			// without animation.
 			simulatorStore.reset()
-			setTimeout(() => { this.runProgram() }, 200)
+			setTimeout(() => { this.runAndSimulate() }, 200)
 		} else {
 			// Run immediately.
-			this.runProgram()
+			this.runAndSimulate()
 		}
 	}
 
@@ -171,10 +171,10 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 			// Reset everything, and wait a while to run, to allow everything to reset
 			// without animation.
 			simulatorStore.reset()
-			setTimeout(() => { this.runProgram(true) }, 200)
+			setTimeout(() => { this.runAndSimulate(true) }, 200)
 		} else {
 			// Run immediately.
-			this.runProgram(true)
+			this.runAndSimulate(true)
 		}
 	}
 

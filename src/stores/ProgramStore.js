@@ -67,22 +67,18 @@ export default class ProgramStore extends EventEmitter {
 	}
 
 	@action
-	runProgram(firstStepOnly: boolean = false) {
+	runAndSimulate(firstStepOnly: boolean = false) {
 		// In the (non deterministic) levels with keys, there is a chance that users will accidentally
 		// open a lock without implementing the right algorithm. So, we 'cheat' a little by running
 		// the program 50 times. If any of them fail, we show the failed simulation.
 
 		// In deterministic levels, this will not be very useful, but it's not a problem either.
-		let success = true
-		for (let run = 0; run < 50; run++) {
-			success = this.runProgramOnce(firstStepOnly)
-			if (!success || !this.program.isFinished()) {
-				break
-			}
-		}
+		const success = this.runProgram(firstStepOnly)
+
+		// Prepare for simulation.
+		simulatorStore.reset()
 
 		// If successful, run a simulation of the created program.
-		simulatorStore.reset()
 		if (this.program != null && success) {
 			simulatorStore.simulate(this.program, firstStepOnly)
 		} else {
@@ -91,7 +87,7 @@ export default class ProgramStore extends EventEmitter {
 	}
 
 	@action
-	runProgramOnce(firstStepOnly: boolean = false) {
+	runProgram(firstStepOnly: boolean = false) {
 		if (this.level == null) { return false }
 		if (simulatorStore.active) { return false }
 

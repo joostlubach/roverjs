@@ -3,6 +3,8 @@
 import type {Program, Position, Direction} from '.'
 import type {Chapter} from '../stores'
 import {Item, Apple, Key} from './items'
+import {cartesian} from '../util'
+import sample from 'lodash/sample'
 
 export type Scoring = {
 	score:     number,
@@ -80,14 +82,75 @@ export default class Level {
 		return this.items.filter(item => item instanceof Apple).length > 0
 	}
 
-	get keyColors(): KeyColor[] {
-		return this.items
-			.filter(item => item instanceof Key)
-			.map(item => item.color)
+	//------
+	// Keys
+
+	/**
+	 * Gets all keys present in this leve..
+	 */
+	get keys(): Key[] {
+		return this.items.filter(item => item instanceof Key)	
 	}
 
 	get hasKeys(): boolean {
-		return this.items.filter(item => item instanceof Key).length > 0
+		return this.keys.length > 0
+	}
+
+	/**
+	 * Finds the key in this level with the given color.
+	 * 
+	 * @param keyColor The color of the key to find.
+	 */
+	findKey(keyColor: KeyColor) {
+		return this.keys.find(key => key.color === keyColor)
+	}
+
+	/**
+	 * Gets the key colors present in this level.
+	 */
+	get keyColors(): KeyColor[] {
+		return this.keys.map(item => item.color)
+	}
+
+	/**
+	 * Generates a sample set of key values for thevgiven keys.
+	 * 
+	 * @param keyColors
+	 *   The colors of the keys to generate a sample for. If omitted, all keys in this
+	 *   level are used.
+	 * @returns
+	 *   A sample set of values for the given keys.
+	 */
+	generateKeyValuesSample(keyColors: KeyColor[] = this.keyColors): {[color: KeyColor]: ?mixed} {
+		const values = {}
+		for (const color of keyColors) {
+			const key = this.findKey(color)
+			if (key == null) { continue }
+
+			values[color] = sample(key.possibleValues)
+		}
+		return values
+	}
+
+	/**
+	 * Generates the cartesian product of all possible key values for the given keys.
+	 * 
+	 * @param keyColors
+	 *   The colors of the keys to generate values for. If omitted, all keys in this
+	 *   level are used.
+	 * @returns
+	 *   A list of all set of values for the given keys.
+	 */
+	allKeyValues(keyColors: KeyColor[] = this.keyColors): Array<{[color: KeyColor]: ?mixed}> {
+		let values = []
+		for (const color of keyColors) {
+			const key = this.findKey(color)
+			if (key == null) { continue }
+
+			values = cartesian(values, color, key.possibleValues)
+		}
+
+		return values
 	}
 
 }

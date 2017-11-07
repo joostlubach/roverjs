@@ -7,19 +7,18 @@ import {CodeMirror} from '../components/codemirror'
 import type {ProgramState} from '../program'
 
 export type Props = {
-	state:    ProgramState,
-	hideKeys: string[]
-}
-
-export const defaultProps = {
-	hideKeys: ['items', 'stepFailed', 'failedPosition']
+	state: ProgramState
 }
 
 @observer
 export default class StateInspector extends React.Component<*, Props, *> {
 
 	props: Props
-	static defaultProps = defaultProps
+
+	shouldDisplayProperty(key: string) {
+		const desc = Object.getOwnPropertyDescriptor(this.props.state, key)
+		return desc != null && desc.visible !== false
+	}
 
 	render() {
 		return (
@@ -39,8 +38,8 @@ export default class StateInspector extends React.Component<*, Props, *> {
 	}
 
 	renderCodeMirror() {
-		const {state, hideKeys} = this.props
-		const replacer = (k, v) => hideKeys.includes(k) ? undefined : v
+		const {state} = this.props
+		const replacer = (k, v) => this.shouldDisplayProperty(k) ? v : null
 		const json = JSON.stringify(state, replacer, 2)
 
 		return (

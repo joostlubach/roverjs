@@ -1,12 +1,12 @@
 // @flow
 
 import cloneDeep from 'lodash/cloneDeep'
-import type {Item, KeyColor} from '.'
+import type {Item, KeyColor, ProgramConfig} from '.'
 
 export type Position  = {x: number, y: number}
 export type Direction = 'up' | 'down' | 'left' | 'right'
 
-export type TextBalloon = {position: Position, text: string}
+export type TextBalloon = {position: Position, text: string, style?: 'monospace'}
 
 export default class ProgramState {
 
@@ -17,11 +17,27 @@ export default class ProgramState {
 		Object.assign(this, initialValues)
 	}
 
+	static default(program: Program, keyValues?: {[color: KeyColor]: ?mixed}) {
+		return new ProgramState(program, {
+			position:  program.level.startPosition,
+			direction: program.level.startDirection,
+			apples:    0,
+			keys:      {},
+
+			stepFailed:     false,
+			failedPosition: null,
+			roverBalloon:   null,
+			itemBalloons:   [],
+			items:          [...program.level.items],
+			keyValues:      keyValues || program.level.generateKeyValuesSample()
+		})
+	}
+
 	program: Program
 	level:   Level
 
 	//------
-	// 'Visible' state
+	// Visible state
 
 	position:  Position
 	direction: Direction
@@ -29,13 +45,25 @@ export default class ProgramState {
 	keys:      {[color: KeyColor]: mixed}
 
 	//------
-	// 'Internal' state
+	// Invisible state (not shown in StateInspector)
 
+	@visible(false)
 	stepFailed: boolean = false
+
+	@visible(false)
 	roverBalloon: ?TextBalloon = null
+
+	@visible(false)
 	itemBalloons: TextBalloon[] = []
+
+	@visible(false)
 	failedPosition: ?Position = null
+
+	@visible(false)
 	items: Item[] = []
+
+	@visible(false)
+	keyValues: {[color: KeyColor]: ?mixed} = {}
 
 	clone(): ProgramState {
 		const values = cloneDeep(this)
@@ -115,5 +143,11 @@ export default class ProgramState {
 function enumerable(enumerable: boolean = true) {
 	return (target: any, key: string, descriptor: Object) => {
 		return {...descriptor, enumerable}
+	}
+}
+
+function visible(visible: boolean = true) {
+	return (target: any, key: string, descriptor: Object) => {
+		return {...descriptor, visible}
 	}
 }
