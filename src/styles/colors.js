@@ -18,10 +18,14 @@ export const purple = new Color('#70657C')
 export const primary   = blue
 export const secondary = amber
 export const link      = blue
-export const error     = red
+export const error     = red.lighten(0.3)
 export const shadow    = black.alpha(0.3)
 export const focus     = blue.alpha(0.4)
 export const search    = blue
+
+export const positive  = green
+export const neutral   = blue
+export const negative  = red
 
 export const bg = {
 	light:         white,
@@ -72,10 +76,6 @@ export const leftnav = {
 	bright:          new Color('white'),
 	accent:          secondary,
 }
-
-export const positive  = green
-export const neutral   = blue
-export const negative  = red
 
 export const overlay   = new Color('black').alpha(0.3)
 export const highlight = green

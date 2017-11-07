@@ -332,7 +332,7 @@ function getErrorLocation(error: CodeError): {from: ASTNodeLocation, to: ASTNode
 
 const errorAnim = jssKeyframes('error', {
 	'0%':   {animationTimingFunction: 'ease-out'},
-	'50%':  {backgroundColor: colors.red.alpha(0.05).string(), animationTimingFunction: 'ease-in'},
+	'50%':  {backgroundColor: colors.error.alpha(0.05).string(), animationTimingFunction: 'ease-in'},
 	'100%': {},
 })
 
@@ -359,11 +359,11 @@ const $ = jss({
 	},
 
 	currentStepSuccess: {
-		background: colors.green
+		background: colors.positive
 	},
 
 	currentStepFailure: {
-		background: colors.red
+		background: colors.negative
 	},
 
 	readOnlyLine: {
@@ -385,14 +385,14 @@ const $ = jss({
 		borderRadius: 5,
 
 		border:      [1, 'solid', 'white'],
-		background:  colors.red,
+		background:  colors.error,
 
 		cursor: 'pointer'
 	},
 
 	errorMarker: {
-		background:   colors.red.alpha(0.1),
-		borderBottom: [1, 'dashed', colors.red]
+		background:   colors.error.alpha(0.1),
+		borderBottom: [1, 'dashed', colors.error]
 	},
 
 	emptyErrorMarker: {
@@ -412,15 +412,15 @@ const $ = jss({
 			height:   0,
 
 			border:            [4, 'solid', colors.transparent],
-			borderBottomColor: colors.red
+			borderBottomColor: colors.error
 		}
 	},
 
 	errorLineWidget: {
-		border:      [1, 'solid', colors.red],
+		border:      [1, 'solid', colors.error],
 		borderWidth: `1px 0`,
-		background:  colors.red.alpha(0.6),
-		color:       colors.contrast(colors.red),
+		background:  colors.error.alpha(0.6),
+		color:       colors.contrast(colors.error),
 		font:        fonts.normal,
 		padding:     [2, layout.padding.s]
 	}
