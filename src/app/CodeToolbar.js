@@ -134,7 +134,7 @@ to [Freepik](https://www.flaticon.com/authors/freepik) for the tree icon. All th
 ones I have made myself 🙌.
 
 This project is open source. You can find the source here:
-[joostlubach/robot-client](https://github.com/joostlubach/robot-client).`
+[joostlubach/roverjs](https://github.com/joostlubach/roverjs).`
 
 const $ = jss({
 	toolbar: {
