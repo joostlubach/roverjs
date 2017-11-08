@@ -178,7 +178,7 @@ export default class LevelStore {
 }
 
 function loadChapters() {
-	const serialized = JSON.parse(localStorage.levelCache || '[]')
+	const serialized = JSON.parse(localStorage.chapterCache || '[]')
 
 	return serialized.map(serialized => {
 		const chapter = {
@@ -198,5 +198,5 @@ function saveChapters(chapters: Chapter[]) {
 		}
 	})
 
-	localStorage.levelCache = JSON.stringify(serialized)
+	localStorage.chapterCache = JSON.stringify(serialized)
 }
