@@ -16,10 +16,9 @@ export default class GitHubLevelFetcher {
 	async fetchChapters() {
 		const chaptersYAML = await this.fetchYAML('chapters.yml')
 
-		const promises = []
-		for (const [i, id] of chaptersYAML.chapters.entries()) {
-			promises.push(this.fetchChapter(i + 1, id))
-		}
+		const promises = chaptersYAML.chapters.map((id, i) => {
+			return this.fetchChapter(i + 1, id)
+		})
 
 		return Promise.all(promises)
 	}
