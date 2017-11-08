@@ -2,7 +2,7 @@
 
 import React from 'react'
 import {observer} from 'mobx-react'
-import {jss, colors, layout, fonts, shadows} from '../styles'
+import {jss, colors, layout, shadows} from '../styles'
 import {
 	Panels,
 	Grid,
@@ -13,8 +13,6 @@ import {
 	Scoring,
 	MessageBox,
 	TextBalloon,
-	Spinner,
-	SVG
 } from '../components'
 import {
 	Inventory,
@@ -24,7 +22,8 @@ import {
 	SimulatorToolbar,
 	StateInspector,
 	ChapterModal,
-	UnlockSchema
+	UnlockSchema,
+	SplashScreen
 } from '.'
 import {levelStore, viewStateStore, programStore, simulatorStore} from '../stores'
 import {Program, ProgramState} from '../program'
@@ -114,6 +113,7 @@ export default class App extends React.Component<*, Props, *> {
 	render() {
 		const {loading, loadError} = levelStore
 		const hasChapters = levelStore.chapters.length > 0
+		const showSplash = loading || !hasChapters
 
 		return (
 			<div className={$.app}>
@@ -131,8 +131,7 @@ export default class App extends React.Component<*, Props, *> {
 					/>
 				}
 
-				{loading && this.renderLoading()}
-				{!loading && loadError != null && !hasChapters && this.renderLoadError(loadError)}
+				{showSplash && <SplashScreen loading={loading} error={loadError}/>}
 
 				<ChapterModal
 					isOpen={levelStore.selectingChapter}
@@ -150,34 +149,6 @@ export default class App extends React.Component<*, Props, *> {
 						</linearGradient>
 					</defs>
 				</svg>
-			</div>
-		)
-	}
-
-	renderLoading() {
-		return (
-			<div className={$.loading}>
-				<Spinner size={48} color={colors.fg.inverted}/>
-			</div>
-		)
-	}
-
-	renderLoadError(error: Error) {
-		const {response} = error
-		const status = response == null ? null : response.status
-
-		let message: string
-		if (status === 403) {
-			message = "You have exceeded GitHub's API rate limit. Wait a while before trying again."
-		} else {
-			message = error.message
-		}
-
-		return (
-			<div className={$.loading}>
-				<SVG name='robot-lame' style={{fill: colors.purple}}/>
-				<div className={$.errorTitle}>Error while loading</div>
-				<div className={$.errorDetail}>{message}</div>
 			</div>
 		)
 	}
@@ -342,27 +313,6 @@ const $ = jss({
 		backgroundColor:  colors.bg.app,
 		backgroundImage:  'url(/images/bg.png)',
 		backgroundRepeat: 'repeat'
-	},
-
-	loading: {
-		...layout.overlay,
-		...layout.flex.center,
-
-		color: colors.fg.inverted,
-
-		'& :not(:last-child)': {
-			marginBottom: layout.padding.m
-		}
-	},
-
-	errorTitle: {
-		font:       fonts.large,
-		fontWeight: 700
-	},
-
-	errorDetail: {
-		font:    fonts.small,
-		opacity: 0.8
 	},
 
 	main: {
