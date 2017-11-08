@@ -1,89 +1,69 @@
 // @flow
 
-import yaml from 'js-yaml'
-import * as github from './github'
+import YAML from 'js-yaml'
+import GitHub from './GitHub'
+import {Level} from '../program'
+import type {Chapter} from '../stores/LevelStore'
 
 export default class GitHubLevelFetcher {
 
-	constructor(repositoryURL: string, branch: string) {
-		this.repositoryURL = repositoryURL
-		this.branch = branch
+	constructor(repository: string, branch: string) {
+		this.gitHub = new GitHub(repository, {branch})
 	}
 
-	repositoryURL: string
-	branch:        string
-
-	// JIM: De onderstaande methodes moeten aangepast worden aan de nieuwe structuur,
-	// zoals ze al staan op hackyourfuture/rover-levels.
-
-	// Ik heb nu de repository URL en branch hier staan. Als dat lastig is, verplaats
-	// dat gerust naar github.js, maar ik heb het iig in ../config.js gezet.
+	gitHub: GitHub
 
 	async fetchChapters() {
-		const {data: chapterDescriptors} = await this.fetchLevel('chapters')
-		const levels = await this.fetchLevels(chapterDescriptors)
+		const chaptersYAML = await this.fetchYAML('chapters.yml')
 
-		const chapters = []
-		for (const [i, config] of chapterDescriptors.entries()) {
-			const { id, name, description } = config
-
-			const chapter = {
-				id,
-				number: i + 1,
-				name,
-				description,
-				levels: []
-			}
-
-			chapter.levels = config.levels.map(id => {
-				return Level.deserialize(chapter, id, levels[id])
-			})
-
-			chapters.push(chapter)
+		const promises = []
+		for (const [i, id] of chaptersYAML.chapters.entries()) {
+			promises.push(this.fetchChapter(i + 1, id))
 		}
-		return chapters
+
+		return Promise.all(promises)
 	}
 
-	async fetchLevels(chapterDescriptors) {
-		const levelNames = chapterDescriptors.reduce((prev, descriptor) => {
-			prev = [...prev, ...descriptor.levels]
-			return prev
-		}, [])
+	async fetchChapter(number: number, id: string) {
+		const chapterYAML = await this.fetchYAML(`${id}/chapter.yml`)
+		const {name, description} = chapterYAML
 
-		const promises = levelNames.map(levelName => this.fetchLevel(levelName))
-		const results = await Promise.all(promises)
-		return results.reduce((acc, result) => {
-			acc[result.name] = result.data
-			return acc
-		}, {})
+		const chapter = {
+			id,
+			number,
+			name,
+			description,
+			levels: []
+		}
+
+		chapter.levels = await this.fetchLevelsForChapter(chapter)
+		return chapter
 	}
 
-	async fetchLevel(levelName) {
-		const fileList = await github.fetchFileList()
-		const fileInfo = fileList[levelName]
-		if (!fileInfo) {
-			throw new Error(`File for level '${levelName}' not found`)
+	async fetchLevelsForChapter(chapter: Chapter) {
+		const files = await this.gitHub.fetchDirectory(chapter.id)
+		files.sort((a, b) => a.name.localeCompare(b.name))
+
+		const promises = []
+		for (const file of files) {
+			if (file.name === 'chapter.yml') { continue }
+
+			const id = file.name.replace(/\.yml$/, '')
+			promises.push(this.fetchLevel(chapter, id))
 		}
 
-		let levelCache = JSON.parse(window.localStorage.getItem('levelCache')) || {}
-		let levelNode = levelCache[levelName]
-		const haveValidData = levelNode && levelNode.sha === fileInfo.sha
+		return Promise.all(promises)
+	}
 
-		if (!haveValidData) {
-			const yamlString = await github.fetchLevel(fileInfo.url)
-			levelNode = {
-				sha:  fileInfo.sha,
-				data: yaml.safeLoad(yamlString)
-			}
-			levelCache = JSON.parse(window.localStorage.getItem('levelCache')) || {}
-			levelCache[levelName] = levelNode
-			window.localStorage.setItem('levelCache', JSON.stringify(levelCache))
-		}
+	async fetchLevel(chapter: Chapter, id: string) {
+		const levelYAML = await this.fetchYAML(`${chapter.id}/${id}.yml`)
+		return Level.deserialize(chapter, id, levelYAML)
+	}
 
-		return {
-			name: levelName,
-			data: levelNode.data
-		}
+	async fetchYAML(path: string): ?Object {
+		const file = await this.gitHub.fetchFile(path)
+		const content = atob(file.content)
+		return YAML.safeLoad(content)
 	}
 
 }

@@ -26,7 +26,7 @@ export default {
 	},
 
 	levels: {
-		repository: 'https://github.com/HackYourFuture/rover-levels',
+		repository: 'HackYourFuture/rover-levels',
 		branch:     is('live') ? 'live' : 'test'
 	}
 

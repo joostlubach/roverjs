@@ -1,9 +1,11 @@
 // @flow
-import { observable, computed, action } from 'mobx'
-import { Level } from '../program'
-import { programStore, viewStateStore } from '.'
+
+import {observable, computed, action} from 'mobx'
+import {Level} from '../program'
+import {programStore, viewStateStore} from '.'
 import URL from 'url'
 import GitHubLevelFetcher from '../services/GitHubLevelFetcher'
+import config from '../config'
 
 const levelFetcher = new GitHubLevelFetcher(config.levels.repository, config.levels.branch)
 
@@ -22,6 +24,9 @@ export default class LevelStore {
 
 	@observable
 	loading: boolean = true
+
+	@observable
+	loadError: ?Error = null
 
 	@observable
 	chapters: Chapter[] = []
@@ -71,7 +76,7 @@ export default class LevelStore {
 
 	@action
 	loadLevel(id: string) {
-		for (const chapter of this._chapters) {
+		for (const chapter of this.chapters) {
 			const index = chapter.levels.findIndex(level => level.id === id)
 			if (index === -1) { continue }
 
@@ -134,10 +139,11 @@ export default class LevelStore {
 	load() {
 		this.loading = true
 
-		levelFetcher.fetchChapters()
+		return levelFetcher.fetchChapters()
 			.then(action(chapters => {
 				this.initialize(chapters)
-				this.loading = false
+			}), action(error => {
+				this.loadError = error
 			}))
 			.finally(action(() => {
 				this.loading = false
