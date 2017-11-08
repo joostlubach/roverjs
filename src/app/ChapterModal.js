@@ -28,7 +28,7 @@ export default class ChapterModal extends React.Component<*, Props, *> {
 	selectCurrentChapter() {
 		let chapter = levelStore.currentChapter
 		const chapters = levelStore.chapters
-		if (levelStore.chapterComplete(chapter)) {
+		if (levelStore.isChapterComplete(chapter)) {
 			const index = chapters.findIndex(c => c.id === chapter.id)
 			chapter = chapters[index + 1] || chapter
 		}

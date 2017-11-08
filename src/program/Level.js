@@ -5,6 +5,21 @@ import type {Chapter} from '../stores'
 import {Item, Apple, Key} from './items'
 import {cartesian} from '../util'
 import sample from 'lodash/sample'
+import pick from 'lodash/pick'
+
+const serializableProps = [
+	'id',
+	'name',
+	'instructions',
+	'style',
+	'stateInspector',
+	'rows',
+	'columns',
+	'coordinates',
+	'goalApples',
+	'dark',
+	'initialCode'
+]
 
 export type Scoring = {
 	score:     number,
@@ -16,44 +31,31 @@ export type LevelStyle  = 'basic' | 'callback'
 
 export default class Level {
 
-	constructor(chapter: Chapter, id: string) {
+	constructor(chapter: Chapter, serialized: Object) {
 		this.chapter = chapter
-		this.id = id
+		this.serialized = serialized
+		this.deserialize()
 	}
 
-	static deserialize(chapter: Chapter, id: string, raw: Object) {
-		const level = new Level(chapter, id)
+	deserialize() {
+		Object.assign(this, pick(this.serialized, ...serializableProps))
 
-		level.name = raw.name
-		level.instructions = raw.instructions
-		level.style = raw.style || 'basic'
-		level.stateInspector = raw.stateInspector
+		this.startPosition  = {x: this.serialized.start[0], y: this.serialized.start[1]}
+		this.startDirection = this.serialized.start[2]
 
-		level.rows = raw.rows
-		level.columns = raw.columns
-		level.coordinates = raw.coordinates
-
-		level.startPosition  = {x: raw.start[0], y: raw.start[1]}
-		level.startDirection = raw.start[2]
-
-		if (raw.goal != null) {
-			level.goalPosition = {x: raw.goal[0], y: raw.goal[1]}
+		if (this.serialized.goal != null) {
+			this.goalPosition = {x: this.serialized.goal[0], y: this.serialized.goal[1]}
 		}
-		level.goalApples = raw.goalApples
 
-		level.dark = raw.dark
-		if (raw.items != null) {
-			level.items = raw.items.map(([x, y, type, props]) => {
+		if (this.serialized.items != null) {
+			this.items = this.serialized.items.map(([x, y, type, props]) => {
 				return Item.create(type, {x, y}, props)
 			})
 		}
 
-		level.initialCode = raw.initialCode
-		if (raw.scoring != null) {
-			level.scoring = parseScoring(raw.scoring)
+		if (this.serialized.scoring != null) {
+			this.scoring = parseScoring(this.serialized.scoring)
 		}
-
-		return level
 	}
 
 	id:             string
@@ -61,6 +63,8 @@ export default class Level {
 	instructions:   ?string
 	style:          LevelStyle
 	stateInspector: boolean
+
+	serialized: Object
 
 	rows:        number
 	columns:     number

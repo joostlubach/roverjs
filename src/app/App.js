@@ -113,10 +113,11 @@ export default class App extends React.Component<*, Props, *> {
 
 	render() {
 		const {loading, loadError} = levelStore
+		const hasChapters = levelStore.chapters.length > 0
 
 		return (
 			<div className={$.app}>
-				{!loading && loadError == null &&
+				{!loading && hasChapters &&
 					<Panels
 						horizontal
 						initialSizes={viewStateStore.panelSizes}
@@ -131,7 +132,7 @@ export default class App extends React.Component<*, Props, *> {
 				}
 
 				{loading && this.renderLoading()}
-				{!loading && loadError && this.renderLoadError(loadError)}
+				{!loading && loadError != null && !hasChapters && this.renderLoadError(loadError)}
 
 				<ChapterModal
 					isOpen={levelStore.selectingChapter}

@@ -54,15 +54,36 @@ export default class LevelStore {
 		return this.levels[this.currentLevelNumber]
 	}
 
+	//------
+	// Level completion
+
 	@observable
 	levelScores: Map<string, number> = new Map()
 
-	chapterComplete(chapter: Chapter) {
+	@action
+	completeLevel(score: number) {
+		const { currentLevel } = this
+		if (currentLevel == null) { return }
+
+		const existingScore = this.levelScores.get(currentLevel.id)
+		if (existingScore == null || existingScore < score) {
+			this.levelScores.set(currentLevel.id, score)
+			this.save()
+		}
+	}
+
+	isChapterComplete(chapter: Chapter) {
 		for (const level of chapter.levels) {
 			if (!this.levelScores.has(level.id)) { return false }
 		}
 		return true
 	}
+
+	//------
+	// Chapter selection dialog
+
+	@observable
+	selectingChapter: boolean = false
 
 	@action
 	selectChapter() {
@@ -89,18 +110,6 @@ export default class LevelStore {
 
 		this.selectingChapter = false
 		this.save()
-	}
-
-	@action
-	completeLevel(score: number) {
-		const { currentLevel } = this
-		if (currentLevel == null) { return }
-
-		const existingScore = this.levelScores.get(currentLevel.id)
-		if (existingScore == null || existingScore < score) {
-			this.levelScores.set(currentLevel.id, score)
-			this.save()
-		}
 	}
 
 	isLevelSelectable(level: Level) {
@@ -139,23 +148,22 @@ export default class LevelStore {
 	load() {
 		this.loading = true
 
+		this.levelScores = new Map(JSON.parse(window.localStorage.levelScores || '[]'))
+		this.chapters = loadChapters()
+
+		const currentLevelID = JSON.parse(window.localStorage.currentLevelID || '"intro1"')
+		this.loadLevel(currentLevelID)
+
 		return levelFetcher.fetchChapters()
 			.then(action(chapters => {
-				this.initialize(chapters)
+				this.chapters = chapters
+				saveChapters(this.chapters)
 			}), action(error => {
 				this.loadError = error
 			}))
 			.finally(action(() => {
 				this.loading = false
 			}))
-	}
-
-	initialize(chapters: Chapter[]) {
-		this.chapters = chapters
-		this.levelScores = new Map(JSON.parse(window.localStorage.levelScores || '[]'))
-
-		const currentLevelID = JSON.parse(window.localStorage.currentLevelID || '"intro"')
-		this.loadLevel(currentLevelID)
 	}
 
 	save() {
@@ -167,4 +175,28 @@ export default class LevelStore {
 		window.localStorage.levelScores = JSON.stringify(Array.from(this.levelScores))
 	}
 
+}
+
+function loadChapters() {
+	const serialized = JSON.parse(localStorage.levelCache || '[]')
+
+	return serialized.map(serialized => {
+		const chapter = {
+			...serialized
+		}
+
+		chapter.levels = serialized.levels.map(level => new Level(chapter, level))
+		return chapter
+	})
+}
+
+function saveChapters(chapters: Chapter[]) {
+	const serialized = chapters.map(chapter => {
+		return {
+			...chapter,
+			levels: chapter.levels.map(level => level.serialized)
+		}
+	})
+
+	localStorage.levelCache = JSON.stringify(serialized)
 }

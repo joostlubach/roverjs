@@ -57,7 +57,7 @@ export default class GitHubLevelFetcher {
 
 	async fetchLevel(chapter: Chapter, id: string) {
 		const levelYAML = await this.fetchYAML(`${chapter.id}/${id}.yml`)
-		return Level.deserialize(chapter, id, levelYAML)
+		return new Level(chapter, {id, ...levelYAML})
 	}
 
 	async fetchYAML(path: string): ?Object {
