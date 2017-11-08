@@ -149,20 +149,20 @@ export default class LevelStore {
 		this.loading = true
 
 		this.levelScores = new Map(JSON.parse(window.localStorage.levelScores || '[]'))
-		this.chapters = loadChapters()
-
-		const currentLevelID = JSON.parse(window.localStorage.currentLevelID || '"intro1"')
-		this.loadLevel(currentLevelID)
+		this.chapters = loadChapterCache()
 
 		return levelFetcher.fetchChapters()
 			.then(action(chapters => {
 				this.chapters = chapters
-				saveChapters(this.chapters)
+				saveChapterCache(this.chapters)
 			}), action(error => {
 				this.loadError = error
 			}))
 			.finally(action(() => {
 				this.loading = false
+
+				const currentLevelID = JSON.parse(window.localStorage.currentLevelID || '"intro1"')
+				this.loadLevel(currentLevelID)
 			}))
 	}
 
@@ -177,7 +177,7 @@ export default class LevelStore {
 
 }
 
-function loadChapters() {
+function loadChapterCache() {
 	const serialized = JSON.parse(localStorage.chapterCache || '[]')
 
 	return serialized.map(serialized => {
@@ -190,7 +190,7 @@ function loadChapters() {
 	})
 }
 
-function saveChapters(chapters: Chapter[]) {
+function saveChapterCache(chapters: Chapter[]) {
 	const serialized = chapters.map(chapter => {
 		return {
 			...chapter,
