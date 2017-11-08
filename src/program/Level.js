@@ -61,7 +61,7 @@ export default class Level {
 	id:             string
 	name:           string
 	instructions:   ?string
-	style:          LevelStyle
+	style:          LevelStyle = 'basic'
 	stateInspector: boolean
 
 	serialized: Object
