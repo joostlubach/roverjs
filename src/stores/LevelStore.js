@@ -1,12 +1,15 @@
 // @flow
-
-import {observable, computed, action} from 'mobx'
-import {chapters, levels} from '../levels'
-import type {Level} from '../program'
-import {programStore, viewStateStore} from '.'
+import { observable, computed, action } from 'mobx'
+import { Level } from '../program'
+import { programStore, viewStateStore } from '.'
 import URL from 'url'
+import GitHubLevelFetcher from '../services/GitHubLevelFetcher'
+
+const levelFetcher = new GitHubLevelFetcher(config.levels.repository, config.levels.branch)
 
 export type Chapter = {
+	id:          string,
+	number:      number,
 	name:        string,
 	description: string,
 	levels:      Level[]
@@ -14,11 +17,17 @@ export type Chapter = {
 
 export default class LevelStore {
 
-	@observable
-	currentChapter: ?Chapter = null
+	//------
+	// Chapters & levels
 
 	@observable
-	selectingChapter: boolean = false
+	loading: boolean = true
+
+	@observable
+	chapters: Chapter[] = []
+
+	@observable
+	currentChapter: ?Chapter = null
 
 	@computed
 	get levels(): Level[] {
@@ -62,7 +71,7 @@ export default class LevelStore {
 
 	@action
 	loadLevel(id: string) {
-		for (const chapter of chapters) {
+		for (const chapter of this._chapters) {
 			const index = chapter.levels.findIndex(level => level.id === id)
 			if (index === -1) { continue }
 
@@ -79,7 +88,7 @@ export default class LevelStore {
 
 	@action
 	completeLevel(score: number) {
-		const {currentLevel} = this
+		const { currentLevel } = this
 		if (currentLevel == null) { return }
 
 		const existingScore = this.levelScores.get(currentLevel.id)
@@ -89,9 +98,21 @@ export default class LevelStore {
 		}
 	}
 
+	isLevelSelectable(level: Level) {
+		const url = URL.parse(document.location.href, true)
+		if (url.query.dbg != null) { return true }
+
+		const { chapter } = level
+		const index = chapter.levels.indexOf(level)
+		if (index <= 0) { return true }
+
+		const previousLevel = chapter.levels[index - 1]
+		return this.levelScores.has(previousLevel.id)
+	}
+
 	@action
 	next() {
-		const {nextLevel} = this
+		const { nextLevel } = this
 		if (nextLevel == null) { return }
 
 		this.loadLevel(nextLevel.id)
@@ -106,20 +127,25 @@ export default class LevelStore {
 		this.save()
 	}
 
-	isLevelSelectable(level: Level) {
-		const url = URL.parse(document.location.href, true)
-		if (url.query.dbg != null) { return true }
-
-		const {chapter} = level
-		const index = chapter.levels.indexOf(level)
-		if (index <= 0) { return true }
-
-		const previousLevel = chapter.levels[index - 1]
-		return this.levelScores.has(previousLevel.id)
-	}
+	//------
+	// Loading & saving
 
 	@action
 	load() {
+		this.loading = true
+
+		levelFetcher.fetchChapters()
+			.then(action(chapters => {
+				this.initialize(chapters)
+				this.loading = false
+			}))
+			.finally(action(() => {
+				this.loading = false
+			}))
+	}
+
+	initialize(chapters: Chapter[]) {
+		this.chapters = chapters
 		this.levelScores = new Map(JSON.parse(window.localStorage.levelScores || '[]'))
 
 		const currentLevelID = JSON.parse(window.localStorage.currentLevelID || '"intro"')
@@ -127,7 +153,7 @@ export default class LevelStore {
 	}
 
 	save() {
-		const {currentLevel} = this
+		const { currentLevel } = this
 		if (currentLevel != null) {
 			window.localStorage.currentLevelID = JSON.stringify(currentLevel.id)
 		}
