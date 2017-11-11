@@ -3,10 +3,12 @@
   "description": "Generic Draggable component for React",
   "author": "Joost Lubach",
   "dependencies": {
+    "@types/prop-types": "^15.5.2",
     "prop-types": "^15.6.0"
   },
   "peerDependencies": {
     "react": "^16.0.0",
     "react-dom": "^16.0.0"
-  }
+  },
+  "main": "lib/index.js"
 }
