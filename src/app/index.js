@@ -1,4 +1,3 @@
-// @flow
 // @index
 
 export {default as App} from './App'

@@ -1,8 +1,8 @@
 {
-	"name": "js-eval",
-	"description": "General purpose JavaScript AST evaluation engine",
-	"author": "Joost Lubach",
-	"dependencies": {
-		"lodash": "^4.17.4"
-	}
+  "name": "js-eval",
+  "description": "General purpose JavaScript AST evaluation engine",
+  "author": "Joost Lubach",
+  "dependencies": {
+    "lodash": "^4.17.4"
+  }
 }

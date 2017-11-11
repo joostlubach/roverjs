@@ -1,9 +1,9 @@
-import Gulp from 'gulp'
-import sketch from 'gulp-sketch'
-import cheerio from 'gulp-cheerio'
-import svgStore from 'gulp-svgstore'
-import rename from 'gulp-rename'
-import config from './config'
+const Gulp = require('gulp')
+const sketch = require('gulp-sketch')
+const cheerio = require('gulp-cheerio')
+const svgStore = require('gulp-svgstore')
+const rename = require('gulp-rename')
+const config = require('./config')
 
 function stripFill($) {
 	$('[fill]:not([id^="!"])').each(function () {
@@ -17,7 +17,7 @@ function stripFill($) {
 	})
 }
 
-export default function svg(_, modifyStream) {
+function svg(_, modifyStream) {
 	let stream = Gulp
 		.src(config.svg.sketch)
 		.pipe(sketch({
@@ -30,7 +30,7 @@ export default function svg(_, modifyStream) {
 		}))
 		.pipe(svgStore())
 		.pipe(rename(config.svg.filename))
-		.pipe(Gulp.dest(`${config.buildDir}/${config.svg.destination}`))
+		.pipe(Gulp.dest(config.svg.destination))
 
 	if (modifyStream != null) {
 		stream = modifyStream(stream)
@@ -39,8 +39,9 @@ export default function svg(_, modifyStream) {
 	return stream
 }
 
-export function watch(modifyStream) {
+function watch(modifyStream) {
 	Gulp.watch(config.svg.sketch, svg.bind(null, null, modifyStream))
 }
 
+module.exports = svg
 svg.watch = watch

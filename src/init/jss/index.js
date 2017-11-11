@@ -1,3 +1,5 @@
+/// <reference path="../../types/jss.d.ts"/>
+
 import JSS from 'jss'
 import colors from './colors'
 

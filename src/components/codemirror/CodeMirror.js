@@ -1,189 +1,193 @@
 // @flow
 
-import React from 'react'
+import * as React from 'react'
 import PropTypes from 'prop-types'
 import CodeMirrorEl from 'codemirror'
 import Gutter from './Gutter'
 import {jss} from '../../styles'
 import {lineHeight} from './layout'
 
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/theme/monokai.css'
+import 'codemirror/theme/zenburn.css'
+
 export type Props = {
-	theme:      string,
-	options:    Object,
-	autoFocus:  boolean,
+  theme:      string,
+  options:    Object,
+  autoFocus:  boolean,
 
-	value:      string,
-	onChange:   (value: string) => void,
+  value:      string,
+  onChange:   (value: string) => void,
 
-	onCodeMirrorSetUp?: (codeMirror: CodeMirrorEl) => void,
-	onValueSet?: (value: string, codeMirror: CodeMirrorEl) => void,
+  onCodeMirrorSetUp?: (codeMirror: CodeMirrorEl) => void,
+  onValueSet?: (value: string, codeMirror: CodeMirrorEl) => void,
 
-	children?:  any,
-	className?: ClassNameProp
+  children?:  any,
+  className?: ClassNameProp
 }
 
 export const defaultProps = {
-	theme:     'monokai',
-	autoFocus: true,
-	value:     '',
+  theme:     'monokai',
+  autoFocus: true,
+  value:     '',
 
-	onChange:  (value: string) => void 0
+  onChange:  (value: string) => void 0
 }
 
 export const defaultOptions = {
-	lineNumbers: true
+  lineNumbers: true
 }
 
 type State = {
-	codeMirror:   ?CodeMirrorEl
+  codeMirror:   ?CodeMirrorEl
 }
 
 export default class CodeMirror extends React.Component<*, Props, *> {
 
-	//------
-	// Properties
+  //------
+  // Properties
 
-	props: Props
-	static defaultProps = defaultProps
+  props: Props
+  static defaultProps = defaultProps
 
-	currentValue: string = ''
+  currentValue: string = ''
 
-	state: State = {
-		codeMirror:   null
-	}
+  state: State = {
+    codeMirror:   null
+  }
 
-	textArea: ?HTMLTextAreaElement = null
+  textArea: ?HTMLTextAreaElement = null
 
-	static childContextTypes = {
-		codeMirror: PropTypes.instanceOf(CodeMirrorEl)
-	}
+  static childContextTypes = {
+    codeMirror: PropTypes.instanceOf(CodeMirrorEl)
+  }
 
-	getCodeMirror() {
-		return this.state.codeMirror
-	}
+  getCodeMirror() {
+    return this.state.codeMirror
+  }
 
-	getChildContext() {
-		return {
-			codeMirror: this.state.codeMirror
-		}
-	}
+  getChildContext() {
+    return {
+      codeMirror: this.state.codeMirror
+    }
+  }
 
-	get options(): Object {
-		const {options, theme} = this.props
+  get options(): Object {
+    const {options, theme} = this.props
 
-		return {
-			...defaultOptions,
-			...options,
-			theme,
-			gutters: this.gutters
-		}
-	}
+    return {
+      ...defaultOptions,
+      ...options,
+      theme,
+      gutters: this.gutters
+    }
+  }
 
-	get gutters(): string[] {
-		const gutters = []
-		React.Children.forEach(this.props.children, child => {
-			if (child == null) { return }
-			if (child.type !== Gutter) { return }
-			gutters.push(child.props.name)
-		})
-		return gutters
-	}
+  get gutters(): string[] {
+    const gutters = []
+    React.Children.forEach(this.props.children, child => {
+      if (child == null) { return }
+      if (child.type !== Gutter) { return }
+      gutters.push(child.props.name)
+    })
+    return gutters
+  }
 
-	//------
-	// Loading
+  //------
+  // Loading
 
-	load(value: string) {
-		const {codeMirror} = this.state
-		if (codeMirror == null) { return }
+  load(value: string) {
+    const {codeMirror} = this.state
+    if (codeMirror == null) { return }
 
-		codeMirror.setValue(value)
-	}
+    codeMirror.setValue(value)
+  }
 
-	//------
-	// Set up & destroy
+  //------
+  // Set up & destroy
 
-	setupCodeMirror() {
-		const codeMirror = CodeMirrorEl.fromTextArea(this.textArea, this.options)
-		codeMirror.on('change', this.onChange.bind(this))
-		this.setState({codeMirror: codeMirror})
+  setupCodeMirror() {
+    const codeMirror = CodeMirrorEl.fromTextArea(this.textArea, this.options)
+    codeMirror.on('change', this.onChange.bind(this))
+    this.setState({codeMirror: codeMirror})
 
-		if (this.props.onCodeMirrorSetUp) {
-			this.props.onCodeMirrorSetUp(codeMirror)
-		}
-		return codeMirror
-	}
+    if (this.props.onCodeMirrorSetUp) {
+      this.props.onCodeMirrorSetUp(codeMirror)
+    }
+    return codeMirror
+  }
 
-	destroyCodeMirror() {
-		if (this.codeMirror == null) { return }
+  destroyCodeMirror() {
+    if (this.codeMirror == null) { return }
 
-		this.codeMirror.toTextArea()
-	}
+    this.codeMirror.toTextArea()
+  }
 
-	updateValue(value: string) {
-		if (value === this.currentValue) { return }
-		this.setValue(value)
-	}
+  updateValue(value: string) {
+    if (value === this.currentValue) { return }
+    this.setValue(value)
+  }
 
-	setValue(value: string, codeMirror: ?CodeMirrorEl = this.state.codeMirror) {
-		if (codeMirror == null) { return }
+  setValue(value: string, codeMirror: ?CodeMirrorEl = this.state.codeMirror) {
+    if (codeMirror == null) { return }
 
-		codeMirror.setValue(value)
-		this.currentValue = value
+    codeMirror.setValue(value)
+    this.currentValue = value
 
-		if (this.props.onValueSet) {
-			this.props.onValueSet(value, codeMirror)
-		}
-	}
+    if (this.props.onValueSet) {
+      this.props.onValueSet(value, codeMirror)
+    }
+  }
 
-	//------
-	// Component lifecycle
+  //------
+  // Component lifecycle
 
-	componentDidMount() {
-		const codeMirror = this.setupCodeMirror()
-		this.setValue(this.props.value, codeMirror)
-	}
+  componentDidMount() {
+    const codeMirror = this.setupCodeMirror()
+    this.setValue(this.props.value, codeMirror)
+  }
 
-	componentWillUnmount() {
-		this.destroyCodeMirror()
-	}
+  componentWillUnmount() {
+    this.destroyCodeMirror()
+  }
 
-	componentWillReceiveProps(props: Props) {
-		this.updateValue(props.value)
-	}
+  componentWillReceiveProps(props: Props) {
+    this.updateValue(props.value)
+  }
 
-	//------
-	// Rendering
+  //------
+  // Rendering
 
-	render() {
-		const {className, children} = this.props
-		const {codeMirror} = this.state
+  render() {
+    const {className, children} = this.props
+    const {codeMirror} = this.state
 
-		return (
-			<div className={[$.editor, className]}>
-				<textarea ref={el => { this.textArea = el }}/>
-				{codeMirror != null && children}
-			</div>
-		)
-	}
+    return (
+      <div className={[$.editor, className]}>
+        <textarea ref={el => { this.textArea = el }}/>
+        {codeMirror != null && children}
+      </div>
+    )
+  }
 
-	//------
-	// Events
+  //------
+  // Events
 
-	onChange(doc: any, change: any) {
-		if (change.origin === 'setValue') { return }
+  onChange(doc: any, change: any) {
+    if (change.origin === 'setValue') { return }
 
-		this.currentValue = doc.getValue()
-		this.props.onChange(this.currentValue, change)
-	}
+    this.currentValue = doc.getValue()
+    this.props.onChange(this.currentValue, change)
+  }
 
 }
 
 const $ = jss({
-	editor: {
-		'& .CodeMirror': {
-			flex:       [1, 0, 0],
-			fontSize:   '16px',
-			lineHeight: `${lineHeight}px`
-		}
-	}
+  editor: {
+    '& .CodeMirror': {
+      flex:       [1, 0, 0],
+      fontSize:   '16px',
+      lineHeight: `${lineHeight}px`
+    }
+  }
 })

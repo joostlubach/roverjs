@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react'
+import * as React from 'react'
 import classNames from 'classnames'
 import {unstable_renderSubtreeIntoContainer as renderSubtreeIntoContainer, unmountComponentAtNode} from 'react-dom'
 import CodeMirror from 'codemirror'
@@ -10,107 +10,107 @@ import {jss, layout} from '../../styles'
 import {lineHeight} from './layout'
 
 export type Props = {
-	line:  number,
-	onTap: ?(() => void),
+  line:  number,
+  onTap: ?(() => void),
 
-	className?: ClassNameProp,
-	children?:  any
+  className?: ClassNameProp,
+  children?:  any
 }
 
 export default class GutterMarker extends React.Component<*, Props, *> {
 
-	props: Props & {gutter: string}
+  props: Props & {gutter: string}
 
-	element: ?HTMLElement = null
+  element: ?HTMLElement = null
 
-	static contextTypes = {
-		codeMirror: PropTypes.instanceOf(CodeMirror)
-	}
+  static contextTypes = {
+    codeMirror: PropTypes.instanceOf(CodeMirror)
+  }
 
-	//------
-	// Element
+  //------
+  // Element
 
-	create() {
-		const {codeMirror} = this.context
-		const {line, gutter} = this.props
+  create() {
+    const {codeMirror} = this.context
+    const {line, gutter} = this.props
 
-		this.element = document.createElement('div')
-		codeMirror.setGutterMarker(line, gutter, this.element)
+    this.element = document.createElement('div')
+    codeMirror.setGutterMarker(line, gutter, this.element)
 
-		this.rerender()
-	}
+    this.rerender()
+  }
 
-	destroy() {
-		const {codeMirror} = this.context
-		const {element, props: {line, gutter}} = this
-		if (element == null) { return }
+  destroy() {
+    const {codeMirror} = this.context
+    const {element, props: {line, gutter}} = this
+    if (element == null) { return }
 
-		codeMirror.setGutterMarker(line, gutter, null)
-		unmountComponentAtNode(this.element)
-	}
+    codeMirror.setGutterMarker(line, gutter, null)
+    unmountComponentAtNode(this.element)
+  }
 
-	//------
-	// Component lifecycle
+  //------
+  // Component lifecycle
 
-	componentDidMount() {
-		this.create()
-	}
+  componentDidMount() {
+    this.create()
+  }
 
-	componentWillUnmount() {
-		this.destroy()
-	}
+  componentWillUnmount() {
+    this.destroy()
+  }
 
-	componentWillReceiveProps(props: Props) {
-		if (props.line !== this.props.line || props.gutter !== this.props.gutter) {
-			this.destroy()
-			this.create()
-		} else {
-			this.rerender(props)
-		}
-	}
+  componentWillReceiveProps(props: Props) {
+    if (props.line !== this.props.line || props.gutter !== this.props.gutter) {
+      this.destroy()
+      this.create()
+    } else {
+      this.rerender(props)
+    }
+  }
 
-	shouldComponentUpdate(props: Props) {
-		if (props.line !== this.props.line) { return true }
-		if (props.onTap !== this.props.onTap) { return true }
-		if (props.children !== this.props.children) { return true }
-		if (classNames(props.className) !== classNames(this.props.className)) { return true }
+  shouldComponentUpdate(props: Props) {
+    if (props.line !== this.props.line) { return true }
+    if (props.onTap !== this.props.onTap) { return true }
+    if (props.children !== this.props.children) { return true }
+    if (classNames(props.className) !== classNames(this.props.className)) { return true }
 
-		return false
-	}
+    return false
+  }
 
-	rerender(props: Props = this.props) {
-		const {element} = this
-		if (element == null) { return }
+  rerender(props: Props = this.props) {
+    const {element} = this
+    if (element == null) { return }
 
-		renderSubtreeIntoContainer(this, this.renderMarker(props), element)
-	}
+    renderSubtreeIntoContainer(this, this.renderMarker(props), element)
+  }
 
-	//------
-	// Rendering
+  //------
+  // Rendering
 
-	render() {
-		return null
-	}
+  render() {
+    return null
+  }
 
-	renderMarker(props: Props) {
-		const {className, onTap, children} = props
-		const Component = onTap != null ? Tappable : 'div'
-		const tapProps = onTap != null ? {onTap} : {}
+  renderMarker(props: Props) {
+    const {className, onTap, children} = props
+    const Component = onTap != null ? Tappable : 'div'
+    const tapProps = onTap != null ? {onTap} : {}
 
-		return (
-			<div className={$.gutterMarkerContainer}>
-				<Component className={className} {...tapProps}>
-					{children}
-				</Component>
-			</div>
-		)
-	}
+    return (
+      <div className={$.gutterMarkerContainer}>
+        <Component className={className} {...tapProps}>
+          {children}
+        </Component>
+      </div>
+    )
+  }
 
 }
 
 const $ = jss({
-	gutterMarkerContainer: {
-		height: lineHeight,
-		...layout.flex.center
-	}
+  gutterMarkerContainer: {
+    height: lineHeight,
+    ...layout.flex.center
+  }
 })
