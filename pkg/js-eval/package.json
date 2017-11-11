@@ -4,5 +4,6 @@
   "author": "Joost Lubach",
   "dependencies": {
     "lodash": "^4.17.4"
-  }
+  },
+  "main": "src/index.js"
 }
