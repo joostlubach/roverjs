@@ -7,16 +7,16 @@ import PropTypes from 'prop-types'
 import {Tappable} from '..'
 import isEqual from 'lodash/isEqual'
 
-export type Props = {
+export interface Props {
   line:     number,
   onTap:    ?(() => void),
   options?: Object,
 
-  className?: ClassNameProp,
+  classNames?: React.ClassNamesProp,
   children?:  any
 }
 
-export default class LineWidget extends React.Component<*, Props, *> {
+export default class LineWidget extends React.Component<Props> {
 
   props: Props
 
@@ -72,7 +72,7 @@ export default class LineWidget extends React.Component<*, Props, *> {
     if (props.line !== this.props.line) { return true }
     if (props.onTap !== this.props.onTap) { return true }
     if (props.children !== this.props.children) { return true }
-    if (classNames(props.className) !== classNames(this.props.className)) { return true }
+    if (classNames(props.classNames) !== classNames(this.props.classNames)) { return true }
     if (!isEqual(props.options, this.props.options)) { return true }
 
     return false
@@ -99,12 +99,12 @@ export default class LineWidget extends React.Component<*, Props, *> {
   }
 
   renderWidget(props: Props) {
-    const {className, onTap, children} = props
+    const {classNames, onTap, children} = props
     const Component = onTap != null ? Tappable : 'div'
     const tapProps = onTap != null ? {onTap} : {}
 
     return (
-      <Component className={className} {...tapProps}>
+      <Component classNames={classNames} {...tapProps}>
         {children}
       </Component>
     )

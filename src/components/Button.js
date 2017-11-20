@@ -6,11 +6,11 @@ import {Tappable, SVG} from '.'
 import {TappableState} from './Tappable'
 import Color from 'color'
 
-export type Props = {
+export interface Props {
   icon:       string,
   label:      string,
   children?:  any,
-  className?: ClassNameProp,
+  classNames?: React.ClassNamesProp,
   style:      Object,
 
   color:    Color,
@@ -24,11 +24,11 @@ export const defaultProps = {
   color: colors.blue
 }
 
-type State = {
+interface State {
   tappableState: TappableState
 }
 
-export default class Button extends React.Component<*, Props, *> {
+export default class Button extends React.Component<Props> {
 
   props: Props
   static defaultProps = defaultProps
@@ -38,7 +38,7 @@ export default class Button extends React.Component<*, Props, *> {
   }
 
   render() {
-    const {icon, label, children, className, small, tiny, disabled, color, onTap} = this.props
+    const {icon, label, children, classNames, small, tiny, disabled, color, onTap} = this.props
 
     const {tappableState} = this.state
     const style = {
@@ -54,18 +54,18 @@ export default class Button extends React.Component<*, Props, *> {
 
     return (
       <Tappable
-        className={[$.button, disabled && $.buttonDisabled, small && $.buttonSmall, tiny && $.buttonTiny, className]}
+        classNames={[$.button, disabled && $.buttonDisabled, small && $.buttonSmall, tiny && $.buttonTiny, classNames]}
         style={style}
 
         focusable={!disabled}
         onTap={disabled ? null : onTap}
         onStateChange={state => { this.setState({tappableState: state}) }}
       >
-        <div className={[$.content, small && $.contentSmall, tiny && $.contentTiny]}>
-          {icon && <SVG className={[$.icon, small && $.iconSmall, tiny && $.iconTiny]} name={icon}/>}
-          <div className={[$.label, small && $.labelSmall, tiny && $.labelTiny]}>{label}</div>
+        <div classNames={[$.content, small && $.contentSmall, tiny && $.contentTiny]}>
+          {icon && <SVG classNames={[$.icon, small && $.iconSmall, tiny && $.iconTiny]} name={icon}/>}
+          <div classNames={[$.label, small && $.labelSmall, tiny && $.labelTiny]}>{label}</div>
         </div>
-        {children && <div className={$.body}>{children}</div>}
+        {children && <div classNames={$.body}>{children}</div>}
       </Tappable>
     )
   }

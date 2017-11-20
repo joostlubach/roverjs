@@ -2,7 +2,7 @@
 
 import * as React from 'react' // eslint-disable-line
 
-export type Props = {
+export interface Props {
   source: string,
   sizes:  string[],
   alt?:   string

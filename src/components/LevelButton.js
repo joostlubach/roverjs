@@ -8,7 +8,7 @@ import {levelStore} from '../stores'
 import {Level} from '../stores'
 import Color from 'color'
 
-export type Props = {
+export interface Props {
   level:    Level,
   number:   number,
   small?:   boolean,
@@ -20,7 +20,7 @@ export const defaultProps = {
 }
 
 @observer
-export default class LevelButton extends React.Component<*, Props, *> {
+export default class LevelButton extends React.Component<Props> {
 
   props: Props
   static defaultProps = defaultProps

@@ -6,10 +6,10 @@ import {jss, colors, layout, fonts} from '../styles'
 import {SVG} from '../components'
 import {levelStore, simulatorStore} from '../stores'
 
-export type Props = {}
+export interface Props {}
 
 @observer
-export default class Inventory extends React.Component<*, Props, *> {
+export default class Inventory extends React.Component<Props> {
 
   props: Props
 
@@ -22,7 +22,7 @@ export default class Inventory extends React.Component<*, Props, *> {
     if (apples == null && keys == null) { return null }
 
     return (
-      <div className={$.inventory}>
+      <div classNames={$.inventory}>
         {apples}
         {keys}
       </div>
@@ -37,9 +37,9 @@ export default class Inventory extends React.Component<*, Props, *> {
     const apples = state == null ? 0 : state.apples
 
     return (
-      <div className={$.inventoryItem}>
-        <SVG className={$.inventoryIcon} name='apple'/>
-        <div className={$.inventoryLabel}>
+      <div classNames={$.inventoryItem}>
+        <SVG classNames={$.inventoryIcon} name='apple'/>
+        <div classNames={$.inventoryLabel}>
           x {apples}
         </div>
       </div>
@@ -60,11 +60,11 @@ export default class Inventory extends React.Component<*, Props, *> {
           const value = keys[color]
 
           return (
-            <div key={color} className={[$.inventoryItem, !hasValue && $.inventoryItemUnavailable]}>
-              <SVG className={$.inventoryIcon} name='key' fill={colors.keys[color]}/>
+            <div key={color} classNames={[$.inventoryItem, !hasValue && $.inventoryItemUnavailable]}>
+              <SVG classNames={$.inventoryIcon} name='key' fill={colors.keys[color]}/>
               {hasValue &&
-                <div className={$.inventoryLabel}>
-                  = <span className={$.keyValue}>{JSON.stringify(value)}</span>
+                <div classNames={$.inventoryLabel}>
+                  = <span classNames={$.keyValue}>{JSON.stringify(value)}</span>
                 </div>
               }
             </div>

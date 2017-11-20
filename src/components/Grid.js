@@ -5,21 +5,21 @@ import PropTypes from 'prop-types'
 import {jss, colors, layout, fonts, shadows} from '../styles'
 import times from 'lodash/times'
 
-export type Props = {
+export interface Props {
   rows:    number,
   columns: number,
 
   showCoordinates: boolean,
   dark:            boolean,
 
-  className?: ClassNameProp,
+  classNames?: React.ClassNamesProp,
   children?:  any
 }
 export const defaultProps = {
   dark: false
 }
 
-export default class Grid extends React.Component<*, Props, *> {
+export default class Grid extends React.Component<Props> {
 
   props: Props
   static defaultProps = defaultProps
@@ -46,12 +46,12 @@ export default class Grid extends React.Component<*, Props, *> {
   }
 
   render() {
-    const {showCoordinates, className} = this.props
+    const {showCoordinates, classNames} = this.props
 
     return (
-      <div className={[$.gridContainer, className]}>
+      <div classNames={[$.gridContainer, classNames]}>
         {showCoordinates && this.renderRowCoordinates()}
-        <div className={$.gridBody}>
+        <div classNames={$.gridBody}>
           {showCoordinates && this.renderColumnCoordinates()}
           {this.renderGrid()}
         </div>
@@ -63,11 +63,11 @@ export default class Grid extends React.Component<*, Props, *> {
     const {columns} = this.props
 
     return (
-      <div className={$.columnCoordinates}>
+      <div classNames={$.columnCoordinates}>
         {times(columns, coord =>
           <div
             key={coord}
-            className={[$.coordinate, $.columnCoordinate]}
+            classNames={[$.coordinate, $.columnCoordinate]}
             style={{width: layout.gridCell.width}}
           >
             <div>{coord}</div>
@@ -81,11 +81,11 @@ export default class Grid extends React.Component<*, Props, *> {
     const {rows} = this.props
 
     return (
-      <div className={$.rowCoordinates}>
+      <div classNames={$.rowCoordinates}>
         {times(rows, coord =>
           <div
             key={coord}
-            className={[$.coordinate, $.rowCoordinate]}
+            classNames={[$.coordinate, $.rowCoordinate]}
             style={{height: layout.gridCell.height}}
           >
             <div>{coord}</div>
@@ -103,7 +103,7 @@ export default class Grid extends React.Component<*, Props, *> {
     }
 
     return (
-      <div className={[$.grid, dark && $.gridDark]} style={size}>
+      <div classNames={[$.grid, dark && $.gridDark]} style={size}>
         {this.renderCells()}
         {this.renderContents()}
       </div>
@@ -114,7 +114,7 @@ export default class Grid extends React.Component<*, Props, *> {
     const {rows} = this.props
 
     return (
-      <div className={$.cells}>
+      <div classNames={$.cells}>
         {times(rows, r => this.renderRow(r))}
       </div>
     )
@@ -124,7 +124,7 @@ export default class Grid extends React.Component<*, Props, *> {
     const {children} = this.props
 
     return (
-      <div className={$.contents}>
+      <div classNames={$.contents}>
         {children}
       </div>
     )
@@ -134,7 +134,7 @@ export default class Grid extends React.Component<*, Props, *> {
     const {columns} = this.props
 
     return (
-      <div key={row} className={$.row}>
+      <div key={row} classNames={$.row}>
         {times(columns, c => this.renderCell(row, c))}
       </div>
     )
@@ -142,7 +142,7 @@ export default class Grid extends React.Component<*, Props, *> {
 
   renderCell(row: number, column: number) {
     return (
-      <div key={`${row}-${column}`} className={$.cell}>
+      <div key={`${row}-${column}`} classNames={$.cell}>
       </div>
     )
   }

@@ -10,11 +10,11 @@ import CodeMirrorEl from 'codemirror'
 
 import 'codemirror/mode/javascript/javascript'
 
-export type Props = {
-  className?: ClassNameProp
+export interface Props {
+  classNames?: React.ClassNamesProp
 }
 
-type State = {
+interface State {
   focusedErrorLine: ?number,
   readOnlyRanges:   Array<{fromLine: number, toLine: number}>,
   hiddenRanges:     Array<Range>,
@@ -27,7 +27,7 @@ type Range = {
 }
 
 @observer
-export default class CodeEditor extends React.Component<*, Props, *> {
+export default class CodeEditor extends React.Component<Props> {
 
   props: Props
 
@@ -116,13 +116,13 @@ export default class CodeEditor extends React.Component<*, Props, *> {
   // Rendering
 
   render() {
-    const {className} = this.props
+    const {classNames} = this.props
     const hasErrors = programStore.errors.length > 0
 
     return (
       <CodeMirror
         ref={el => { this.editor = el }}
-        className={[$.codeEditor, hasErrors && $.withErrors, className]}
+        classNames={[$.codeEditor, hasErrors && $.withErrors, classNames]}
         mode='javascript'
         value={programStore.code}
         onChange={this.onEditorChange.bind(this)}
@@ -160,7 +160,7 @@ export default class CodeEditor extends React.Component<*, Props, *> {
       <Marker
         from={locationToCodeMirrorLocation(codeLocation.start)}
         to={locationToCodeMirrorLocation(codeLocation.end)}
-        className={stepFailed ? $.currentStepFailure : $.currentStepSuccess}
+        classNames={stepFailed ? $.currentStepFailure : $.currentStepSuccess}
       />
     )
   }
@@ -185,7 +185,7 @@ export default class CodeEditor extends React.Component<*, Props, *> {
       <LineClass
         key={`readonly-${line}`}
         line={line}
-        className={$.readOnlyLine}
+        classNames={$.readOnlyLine}
       />
     )))
     classes.push(...this.readOnlyLines.map(line => (
@@ -193,7 +193,7 @@ export default class CodeEditor extends React.Component<*, Props, *> {
         key={`readonly-gutter-${line}`}
         line={line}
         where='gutter'
-        className={$.readOnlyLine}
+        classNames={$.readOnlyLine}
       />
     )))
     return classes
@@ -231,7 +231,7 @@ export default class CodeEditor extends React.Component<*, Props, *> {
         key={index}
         from={from}
         to={to}
-        className={[$.errorMarker, empty && $.emptyErrorMarker]}
+        classNames={[$.errorMarker, empty && $.emptyErrorMarker]}
       />
     )
   }
@@ -252,7 +252,7 @@ export default class CodeEditor extends React.Component<*, Props, *> {
         <GutterMarker
           key={line}
           line={line}
-          className={$.errorGutterMarker}
+          classNames={$.errorGutterMarker}
           onTap={this.onErrorGutterMarkerTap.bind(this, line)}
         />
       )
@@ -271,7 +271,7 @@ export default class CodeEditor extends React.Component<*, Props, *> {
     })
     return errors.map((error, index) => {
       return (
-        <LineWidget key={`${line}-${index}`} line={line} className={$.errorLineWidget}>
+        <LineWidget key={`${line}-${index}`} line={line} classNames={$.errorLineWidget}>
           <div>{error.message}</div>
         </LineWidget>
       )

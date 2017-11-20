@@ -7,16 +7,16 @@ import {SVG, Markdown, Button} from '../components'
 import {Level} from '../program'
 import {viewStateStore} from '../stores'
 
-export type Props = {
+export interface Props {
   level: Level
 }
 
-type State = {
+interface State {
   collapsible: boolean,
 }
 
 @observer
-export default class LevelInstructions extends React.Component<*, Props, *> {
+export default class LevelInstructions extends React.Component<Props> {
 
   props: Props
 
@@ -69,12 +69,12 @@ export default class LevelInstructions extends React.Component<*, Props, *> {
     ]
 
     return (
-      <div className={$.instructions}>
-        <div className={$.left}>
-          <SVG className={$.rover} name='rover-instructions' size={{width: 60, height: 42}}/>
+      <div classNames={$.instructions}>
+        <div classNames={$.left}>
+          <SVG classNames={$.rover} name='rover-instructions' size={{width: 60, height: 42}}/>
           {collapsible && collapsed &&
             <Button
-              className={$.toggleButton}
+              classNames={$.toggleButton}
               label="expand"
               color={colors.purple.lighten(0.2)}
               tiny
@@ -83,7 +83,7 @@ export default class LevelInstructions extends React.Component<*, Props, *> {
           }
           {collapsible && !collapsed &&
             <Button
-              className={$.toggleButton}
+              classNames={$.toggleButton}
               label="collapse"
               color={colors.purple.lighten(0.2)}
               tiny
@@ -91,7 +91,7 @@ export default class LevelInstructions extends React.Component<*, Props, *> {
             />						
           }
         </div>
-        <div ref={el => { this.bubble = el }} className={bubbleClassName}>
+        <div ref={el => { this.bubble = el }} classNames={bubbleClassName}>
           <Markdown key={level.id}>{level.instructions}</Markdown>
         </div>
       </div>

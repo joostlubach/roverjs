@@ -6,18 +6,18 @@ import {jss, layout, presets} from '../styles'
 import {CodeMirror} from '../components/codemirror'
 import {ProgramState} from '../program'
 
-export type Props = {
+export interface Props {
   state: ProgramState
 }
 
 @observer
-export default class StateInspector extends React.Component<*, Props, *> {
+export default class StateInspector extends React.Component<Props> {
 
   props: Props
 
   render() {
     return (
-      <div className={$.stateInspector}>
+      <div classNames={$.stateInspector}>
         {this.renderHeader()}
         {this.renderCodeMirror()}
       </div>
@@ -26,7 +26,7 @@ export default class StateInspector extends React.Component<*, Props, *> {
 
   renderHeader() {
     return (
-      <div className={$.header}>
+      <div classNames={$.header}>
         State
       </div>
     )
@@ -42,7 +42,7 @@ export default class StateInspector extends React.Component<*, Props, *> {
 
     return (
       <CodeMirror
-        className={$.codeMirror}
+        classNames={$.codeMirror}
         mode={{name: 'javascript', json: true}}
         value={JSON.stringify(out, null, 2)}
         theme='zenburn'

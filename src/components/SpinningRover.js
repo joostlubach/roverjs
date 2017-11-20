@@ -5,7 +5,7 @@ import {jss, jssKeyframes, colors} from '../styles'
 import {SVG} from '.'
 
 export default function SpinningRover() {
-  return <SVG className={$.spinningRover} name='robot'/>
+  return <SVG classNames={$.spinningRover} name='robot'/>
 }
 
 const spin = jssKeyframes('spin', {

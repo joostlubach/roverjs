@@ -6,10 +6,10 @@ import {jss, layout, colors, fonts, shadows} from '../styles'
 import {ToolbarButton, Switch, Slider, SpinningRover, MessageBox, Markdown, SVG} from '../components'
 import {programStore, simulatorStore} from '../stores'
 
-export type Props = {}
+export interface Props {}
 
 @observer
-export default class SimulatorToolbar extends React.Component<*, Props, *> {
+export default class SimulatorToolbar extends React.Component<Props> {
 
   props: Props
 
@@ -17,8 +17,8 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
     const {running, active} = simulatorStore
 
     return (
-      <div className={$.toolbar}>
-        <div className={$.buttons}>
+      <div classNames={$.toolbar}>
+        <div classNames={$.buttons}>
           {!running && this.renderPlayButton()}
           {running && this.renderPauseButton()}
           {!simulatorStore.done && this.renderBackwardButton()}
@@ -84,7 +84,7 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 
   renderControls() {
     return (
-      <div className={$.controls}>
+      <div classNames={$.controls}>
         {this.renderFPSSlider()}
         {this.renderVerboseSwitch()}
       </div>
@@ -93,9 +93,9 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 
   renderFPSSlider() {
     return (
-      <div className={$.fpsSliderContainer}>
+      <div classNames={$.fpsSliderContainer}>
         <Slider
-          className={$.fpsSlider}
+          classNames={$.fpsSlider}
           values={[1, 2, 3, 5, 8, 13]}
           value={simulatorStore.fps}
           onChange={value => { simulatorStore.fps = value }}
@@ -108,9 +108,9 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
 
   renderVerboseSwitch() {
     return (
-      <div className={$.verboseSwitchContainer}>
+      <div classNames={$.verboseSwitchContainer}>
         <Switch
-          className={$.verboseSwitch}
+          classNames={$.verboseSwitch}
           isOn={simulatorStore.verbose}
           onChange={on => { simulatorStore.verbose = on }}
         />
@@ -126,7 +126,7 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
       MessageBox.show({
         title:   "Program empty",
         message: "Your program did not perform any action.",
-        body:    <SVG name='robot-lame' width={64} height={64} className={$.roverLame}/>,
+        body:    <SVG name='robot-lame' width={64} height={64} classNames={$.roverLame}/>,
         buttons: [{label: "Oops!"}]
       })
     }
@@ -137,7 +137,7 @@ export default class SimulatorToolbar extends React.Component<*, Props, *> {
         message: "Your program probably contains an infinite loop.",
 
         body: (
-          <div className={$.infiniteLoop}>
+          <div classNames={$.infiniteLoop}>
             <SpinningRover/>,
             <Markdown>{infiniteLoopExplanation}</Markdown>
           </div>

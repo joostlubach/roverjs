@@ -29,7 +29,7 @@ import {levelStore, viewStateStore, programStore, simulatorStore} from '../store
 import {Program, ProgramState} from '../program'
 import {Item, ProgramScoring, Lock} from '../program'
 
-export type Props = {}
+export interface Props {}
 
 @observer
 export default class App extends React.Component {
@@ -43,7 +43,7 @@ export default class App extends React.Component {
     const title = "Level completed"
     const body = (
       <Scoring
-        className={$.scoring}
+        classNames={$.scoring}
         score={score}
         message={message || "**Excellent!**"}
       />
@@ -116,7 +116,7 @@ export default class App extends React.Component {
     const showSplash = loading || !hasChapters
 
     return (
-      <div className={$.app}>
+      <div classNames={$.app}>
         {!loading && hasChapters &&
           <Panels
             horizontal
@@ -127,7 +127,7 @@ export default class App extends React.Component {
             main={this.renderMain()}
             left={this.renderCodePanel()}
             bottom={this.renderBottomPanel()}
-            splitter={side => <div className={[$.splitter, $[`splitter_${side}`]]}/>}
+            splitter={side => <div classNames={[$.splitter, $[`splitter_${side}`]]}/>}
           />
         }
 
@@ -155,9 +155,9 @@ export default class App extends React.Component {
 
   renderMain() {
     return (
-      <div className={$.main}>
+      <div classNames={$.main}>
         <SimulatorToolbar/>
-        <div className={$.gridContainer}>
+        <div classNames={$.gridContainer}>
           {this.renderGrid()}
           <Inventory/>
         </div>
@@ -170,10 +170,10 @@ export default class App extends React.Component {
     if (currentLevel == null) { return }
 
     return (
-      <div className={$.codePanel}>
+      <div classNames={$.codePanel}>
         <CodeToolbar/>
         <LevelInstructions level={currentLevel}/>
-        <CodeEditor className={$.codeEditor}/>
+        <CodeEditor classNames={$.codeEditor}/>
       </div>
     )
   }

@@ -4,24 +4,24 @@ import * as React from 'react'
 import {jss, layout} from '../styles'
 import {ScoreStars, Markdown} from '.'
 
-export type Props = {
+export interface Props {
   score:   number,
   message: ?string,
 
-  className?: ClassNameProp
+  classNames?: React.ClassNamesProp
 }
 
-export default class Scoring extends React.Component<*, Props, *> {
+export default class Scoring extends React.Component<Props> {
 
   props: Props
 
   render() {
-    const {score, message, className} = this.props
+    const {score, message, classNames} = this.props
 
     return (
-      <div className={[$.scoring, className]}>
+      <div classNames={[$.scoring, classNames]}>
         <ScoreStars score={score}/>
-        {message && <Markdown className={$.message}>{message}</Markdown>}
+        {message && <Markdown classNames={$.message}>{message}</Markdown>}
       </div>
     )
   }

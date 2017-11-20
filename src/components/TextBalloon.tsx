@@ -2,32 +2,38 @@
 
 import * as React from 'react'
 import {jss, layout, colors, fonts} from '../styles'
-import CSSTransitionGroup from 'react-addons-css-transition-group'
+import * as CSSTransitionGroup from 'react-addons-css-transition-group'
 import {SVG} from '.'
 import {TextBalloon as TextBalloonType} from '../program'
 
-export type Props = {
-  balloon:    TextBalloonType,
-  className?: ClassNameProp
+export interface Props {
+  balloon:     TextBalloonType,
+  classNames?: React.ClassNamesProp
 }
 
-export default class TextBalloon extends React.Component<*, Props, *> {
-
-  props: Props
+export default class TextBalloon extends React.Component<Props> {
 
   render() {
-    const {balloon: {text, color, style}, className} = this.props
+    const {balloon: {text, color = colors.blue, style}, classNames} = this.props
 
     return (
-      <CSSTransitionGroup component='div' className={[$.balloon, className]} transitionName={$.anim} transitionAppear transitionAppearTimeout={animDuration} transitionEnter={false} transitionLeave={false}>
-        <div className={$.content}>
-          <div className={$.background}>
-            <SVG className={$.balloonLeft} style={{fill: color.string()}} name='balloon-left'/>
-            <SVG className={$.balloonRight} style={{fill: color.string()}} name='balloon-right'/>
-            <div className={$.balloonCenter} style={{background: color.string()}}/>
+      <CSSTransitionGroup
+        component='div'
+        classNames={[$.balloon, classNames]}
+        transitionName={$.anim}
+        transitionAppear
+        transitionAppearTimeout={animDuration}
+        transitionEnter={false}
+        transitionLeave={false}
+      >
+        <div classNames={$.content}>
+          <div classNames={$.background}>
+            <SVG classNames={$.balloonLeft} style={{fill: color.string()}} name='balloon-left'/>
+            <SVG classNames={$.balloonRight} style={{fill: color.string()}} name='balloon-right'/>
+            <div classNames={$.balloonCenter} style={{background: color.string()}}/>
           </div>
-          <div className={$.text}>
-            <span style={{color: colors.contrast(color).string()}} className={style && $[`text_${style}`]}>
+          <div classNames={$.text}>
+            <span style={{color: colors.contrast(color).string()}} classNames={style && $[`text_${style}`]}>
               {text}
             </span>
           </div>

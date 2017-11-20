@@ -1,17 +1,15 @@
-// @flow
-
-import * as React from 'react' // eslint-disable-line no-unused-vars
+import * as React from 'react' // ts:disable-line no-unused
 import {jss, shadows} from '../styles'
 
-export type TappableState = ?('hover' | 'active')
+export type TappableState = 'hover' | 'active' | null
 
-export type Props = {
-  tag?:          string,
-  disabled:      boolean,
-  onTap:         () => void,
-  onStateChange: (state: TappableState) => void,
+export interface Props {
+  tag?:           string,
+  disabled?:      boolean,
+  onTap?:         (event: React.SyntheticEvent<any>) => void,
+  onStateChange?: (state: TappableState) => void,
 
-  className?:    ClassNameProp,
+  classNames?:   React.ClassNamesProp,
   style?:        Object,
   focusable?:    boolean,
   children?:     any
@@ -25,7 +23,7 @@ export default function Tappable(props: Props) {
     onStateChange = () => void 0,
     focusable     = true,
 
-    className,
+    classNames,
     style,
     children
   } = props
@@ -38,9 +36,11 @@ export default function Tappable(props: Props) {
     onStateChange(state)
   }
 
+  console.log('Tappable', props)
+
   return (
     <Component
-      className={[$.tappable, focusable && $.focusable, disabled && $.disabled, className]}
+      classNames={[$.tappable, focusable && $.focusable, disabled && $.disabled, classNames]}
       style={style}
       role="button"
       tabIndex={disabled ? -1 : 0}
@@ -53,33 +53,33 @@ export default function Tappable(props: Props) {
       onMouseEnter={() => { setState('hover'); inside = true }}
       onMouseLeave={() => { setState(null); inside = false }}
       onTouchStart={() => { setState('active') }}
-      onTouchEnd={() => { setState(null) }}
       onTouchCancel={() => { setState(null) }}
 
       children={children}
     />
   )
 
-  function onMouseDown(e: Event) {
+  function onMouseDown(e: React.MouseEvent<any>) {
     if (e.target !== e.currentTarget && isInteractiveElement(e.target)) { return }
 
     setState('active')
     e.stopPropagation()
   }
 
-  function onMouseUp(e: Event) {
+  function onMouseUp(e: React.MouseEvent<any>) {
     if (e.target !== e.currentTarget && isInteractiveElement(e.target)) { return }
 
     setState(inside ? 'hover' : null)
     e.stopPropagation()
   }
 
-  function onTouchEnd(e: Event) {
-    onClick(e)
+  function onTouchEnd(e: React.TouchEvent<any>) {
+    onTap(e)
+    setState(null)
     e.preventDefault()
   }
 
-  function onClick(e: Event) {
+  function onClick(e: React.MouseEvent<any>) {
     if (disabled) { return }
     if (e.target !== e.currentTarget && isInteractiveElement(e.target)) { return }
 
@@ -87,7 +87,7 @@ export default function Tappable(props: Props) {
     if (onTap) { onTap(e) }
   }
 
-  function onKeyDown(e: Event) {
+  function onKeyDown(e: React.KeyboardEvent<any>) {
     if (disabled) { return }
 
     if (e.which === 0x20 || e.which === 0x0D) {
@@ -97,10 +97,10 @@ export default function Tappable(props: Props) {
   }
 }
 
-function isInteractiveElement(element: HTMLElement) {
-  const tag = element.tagName.toLowerCase()
+function isInteractiveElement(element: HTMLElement | EventTarget) {
+  const tag = (element as HTMLElement).tagName.toLowerCase()
   if (tag === 'input' || tag === 'select' || tag === 'textarea' || tag === 'button') { return true }
-  if (tag === 'a' && element.hasAttribute('href')) { return true }
+  if (tag === 'a' && (element as HTMLElement).hasAttribute('href')) { return true }
 
   return false
 }

@@ -5,13 +5,14 @@ import {jss, jssKeyframes, colors, layout} from '../styles'
 import {Sprite, SVG, TextBalloon} from '.'
 import {Props as SpriteProps} from './Sprite'
 import {Position, Direction} from '../program'
+import {TextBalloon as TextBalloonType} from '../program'
 
-export type Props = SpriteProps & {
-  failedPosition:     ?Position,
+export interface Props extends SpriteProps {
+  failedPosition:     Position | null,
   direction:          Direction,
   transitionDuration: number,
 
-  textBalloon: TextBalloon,
+  textBalloon: TextBalloonType,
   jumpForJoy:  boolean,
   shame:       boolean
 }
@@ -22,12 +23,12 @@ export const defaultProps = {
   shame:              false
 }
 
-type State = {
-  failedPosition: ?Position,
+interface State {
+  failedPosition: Position | null,
   degrees:        number
 }
 
-export default class Rover extends React.Component<*, Props, *> {
+export default class Rover extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props)
@@ -38,15 +39,10 @@ export default class Rover extends React.Component<*, Props, *> {
     }
   }
 
-  props: Props
-  static defaultProps = defaultProps
-
-  state: State
-
   //------
   // Failed simulation
 
-  failedTimeout: ?number = null
+  failedTimeout: number | null = null
 
   simulateFailed(props: Props) {
     if (this.failedTimeout != null) { return }
@@ -64,7 +60,10 @@ export default class Rover extends React.Component<*, Props, *> {
   }
 
   stopFailedSimulation() {
-    clearTimeout(this.failedTimeout)
+    if (this.failedTimeout != null) {
+      clearTimeout(this.failedTimeout)
+    }
+
     this.failedTimeout = null
     this.setState({failedPosition: null})
   }
@@ -97,9 +96,9 @@ export default class Rover extends React.Component<*, Props, *> {
     }
 
     return (
-      <Sprite className={[$.robot]} position={position} style={spriteStyle}>
-        <div className={[$.svgContainer, jumpForJoy && $.jumpingForJoy1]} style={svgContainerStyle}>
-          <SVG className={[$.svg, shame && $.shaming, jumpForJoy && $.jumpingForJoy2]} name='robot'/>
+      <Sprite classNames={[$.robot]} position={position} style={spriteStyle}>
+        <div classNames={[$.svgContainer, jumpForJoy && $.jumpingForJoy1]} style={svgContainerStyle}>
+          <SVG classNames={[$.svg, shame && $.shaming, jumpForJoy && $.jumpingForJoy2]} name='robot'/>
         </div>
         {textBalloon && <TextBalloon balloon={textBalloon}/>}
       </Sprite>
@@ -108,16 +107,21 @@ export default class Rover extends React.Component<*, Props, *> {
 
 }
 
-function degreesForDirection(direction: Direction, existing: Direction = 'up', existingDegrees: number = 0): string {
+function degreesForDirection(
+  direction: Direction,
+  existing: Direction = Direction.up,
+  existingDegrees: number = 0
+): number {
   return existingDegrees + directionDiff(existing, direction)
 }
 
-function directionDiff(from: Direction, to: Direction) {
+function directionDiff(from: Direction, to: Direction): number {
   switch (`${from}-${to}`) {
   case 'up-up': case 'right-right': case 'down-down': case 'left-left': return 0
   case 'up-right': case 'right-down': case 'down-left': case 'left-up': return 90
   case 'up-down': case 'right-left': case 'down-up': case 'left-right': return 180
   case 'up-left': case 'right-up': case 'down-right': case 'left-down': return -90
+  default: return 0
   }
 }
 

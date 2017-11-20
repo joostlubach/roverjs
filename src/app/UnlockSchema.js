@@ -6,13 +6,13 @@ import {SVG, Button} from '../components'
 import {disabledLock} from '../program'
 import {Lock, KeyColor} from '../program'
 
-export type Props = {
+export interface Props {
   lock:       Lock,
   level:      Level,
   onCloseTap: () => void
 }
 
-export default class UnlockSchema extends React.Component<*, Props, *> {
+export default class UnlockSchema extends React.Component<Props> {
 
   props: Props
 
@@ -24,7 +24,7 @@ export default class UnlockSchema extends React.Component<*, Props, *> {
 
   render() {
     return (
-      <div className={$.lockAcceptTable}>
+      <div classNames={$.lockAcceptTable}>
         {this.renderHeader()}
         {this.renderTable()}
       </div>
@@ -35,17 +35,17 @@ export default class UnlockSchema extends React.Component<*, Props, *> {
     const {lock} = this.props
 
     return (
-      <div className={$.header}>
-        <SVG name='lock' className={$.headerIcon} style={{fill: colors.keys[lock.color]}}/>
+      <div classNames={$.header}>
+        <SVG name='lock' classNames={$.headerIcon} style={{fill: colors.keys[lock.color]}}/>
         <span>Lock</span>
-        <Button className={$.closeButton} color={colors.purple.darken(0.1)} icon='cross' onTap={this.props.onCloseTap}/>
+        <Button classNames={$.closeButton} color={colors.purple.darken(0.1)} icon='cross' onTap={this.props.onCloseTap}/>
       </div>
     )
   }
 
   renderTable() {
     return (
-      <div className={$.table}>
+      <div classNames={$.table}>
         {this.renderHeaderRow()}
         {this.values.map(this.renderRow.bind(this))}
       </div>
@@ -60,15 +60,15 @@ export default class UnlockSchema extends React.Component<*, Props, *> {
     const {lock} = this.props
 
     return (
-      <div className={$.headerRow}>
+      <div classNames={$.headerRow}>
         {acceptedColors.map(color => (
-          <div key={color} className={[$.headerCell, $.keyValueHeader]}>
-            <SVG name='key' className={$.headerIcon} style={{fill: colors.keys[color]}}/>
+          <div key={color} classNames={[$.headerCell, $.keyValueHeader]}>
+            <SVG name='key' classNames={$.headerIcon} style={{fill: colors.keys[color]}}/>
             <span>If this key has this value:</span>
           </div>
         ))}
-        <div className={[$.headerCell, $.expectedValueHeader]}>
-          <SVG name='lock' className={$.headerIcon} style={{fill: colors.keys[lock.color]}}/>
+        <div classNames={[$.headerCell, $.expectedValueHeader]}>
+          <SVG name='lock' classNames={$.headerIcon} style={{fill: colors.keys[lock.color]}}/>
           <span>You should unlock with this value:</span>
         </div>
       </div>
@@ -80,15 +80,15 @@ export default class UnlockSchema extends React.Component<*, Props, *> {
     const expectedValue = lock.acceptFunction(values)
 
     return (
-      <div key={index} className={$.row}>
+      <div key={index} classNames={$.row}>
         {Object.keys(values).map(color => (
-          <div key={color} className={[$.cell, $.keyValueCell]}>
+          <div key={color} classNames={[$.cell, $.keyValueCell]}>
             {JSON.stringify(values[color])}
           </div>
         ))}
-        <div className={[$.cell, $.expectedValueCell]}>
+        <div classNames={[$.cell, $.expectedValueCell]}>
           {expectedValue === disabledLock
-            ? <SVG className={$.disabledLock} name='cross'/>
+            ? <SVG classNames={$.disabledLock} name='cross'/>
             : JSON.stringify(expectedValue)}
         </div>
       </div>

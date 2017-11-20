@@ -1,9 +1,8 @@
 import './init'
 
-import * as React from 'react'
+import * as React from 'react' // tslint:disable-line no-unused
 import {render} from 'react-dom'
 import {App} from './app'
-import registerServiceWorker from './registerServiceWorker'
 import {jss, layout, fonts} from './styles'
 import './fonts.css'
 
@@ -34,5 +33,3 @@ jss({
     }
   }
 })
-
-registerServiceWorker()

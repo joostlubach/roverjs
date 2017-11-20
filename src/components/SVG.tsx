@@ -1,7 +1,6 @@
-/// <reference path="../types/svg.d.ts"/>
-
 import * as React from 'react'
 import images from '../assets/images.svg'
+import {omit} from 'lodash'
 
 export interface Size {
   width:  number
@@ -52,9 +51,8 @@ export default class SVG extends React.Component {
   }
 
   render() {
-    // eslint-disable-next-line no-unused-vars
-    const {name, size, ...other} = this.props
-    const props = {...other, ...size}
+    const {size, ...other} = this.props
+    const props = {...omit(other, 'name'), ...size}
 
     return (
       <svg

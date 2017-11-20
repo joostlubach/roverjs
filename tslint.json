@@ -1,10 +1,10 @@
 {
   "extends": ["tslint-react"],
+  "rulesDirectory": ["tslint-consistent-codestyle"],
   "rules": {
     "align": [
       true,
       "parameters",
-      "arguments",
       "statements"
     ],
     "ban": false,
@@ -18,10 +18,10 @@
     "jsdoc-format": true,
     "jsx-no-lambda": false,
     "jsx-no-multiline-js": false,
+    "jsx-boolean-value": false,
     "label-position": true,
-    "max-line-length": [ true, 120 ],
+    "max-line-length": [ true, 160 ],
     "member-ordering": false,
-    "no-any": true,
     "no-arg": true,
     "no-bitwise": true,
     "no-console": [
@@ -45,7 +45,10 @@
     "no-switch-case-fall-through": true,
     "no-trailing-whitespace": false,
     "no-unused-expression": true,
-    "no-use-before-declare": true,
+    "no-unused": [
+      true,
+      "ignore-parameters"
+    ],
     "one-line": [
       true,
       "check-catch",

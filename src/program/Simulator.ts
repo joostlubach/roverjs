@@ -1,4 +1,4 @@
-import * as EventEmitter from 'events'
+import EventEmitter from 'events'
 import {Program, Step} from '.'
 
 export type Options = {
@@ -21,7 +21,7 @@ export default class Simulator extends EventEmitter {
   verbose: boolean = false
   fps:     number  = 2
 
-  callbackTimeout: NodeJS.Timer
+  callbackTimeout: number
 
   get frameDuration(): number {
     return 1000 / this.fps
@@ -36,7 +36,7 @@ export default class Simulator extends EventEmitter {
   }
 
   pause() {
-    global.clearTimeout(this.callbackTimeout)
+    clearTimeout(this.callbackTimeout)
   }
 
   resume() {
@@ -76,9 +76,9 @@ export default class Simulator extends EventEmitter {
         this.emitDoneSoon()
       } else if (callback) {
         if (this.callbackTimeout != null) {
-          global.clearTimeout(this.callbackTimeout)
+          clearTimeout(this.callbackTimeout)
         }
-        this.callbackTimeout = global.setTimeout(callback, this.frameDuration)
+        this.callbackTimeout = setTimeout(callback, this.frameDuration)
       }
     }
   }
@@ -88,7 +88,7 @@ export default class Simulator extends EventEmitter {
   }
 
   emitDoneSoon() {
-    global.setTimeout(
+    setTimeout(
       () => { this.emitDone() },
       this.frameDuration
     )

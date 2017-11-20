@@ -12,14 +12,14 @@ export type Props<T> = {
 
   showValues: boolean,
 
-  className?: ClassNameProp
+  classNames?: React.ClassNamesProp
 }
 export const defaultProps = {
   onChange:   (value: any) => void 0,
   showValues: true
 }
 
-export default class Slider<T> extends React.Component<*, Props, *> {
+export default class Slider<T> extends React.Component<Props> {
 
   props: Props
   static defaultProps = defaultProps
@@ -41,11 +41,11 @@ export default class Slider<T> extends React.Component<*, Props, *> {
   }
 
   render() {
-    const {className, showValues} = this.props
+    const {classNames, showValues} = this.props
 
     return (
-      <div className={[$.slider, className]} onClick={this.onClick}>
-        <div className={$.container} ref={el => { this.container = el }}>
+      <div classNames={[$.slider, classNames]} onClick={this.onClick}>
+        <div classNames={$.container} ref={el => { this.container = el }}>
           {this.renderRail()}
           {this.renderThumb()}
         </div>
@@ -56,7 +56,7 @@ export default class Slider<T> extends React.Component<*, Props, *> {
 
   renderRail() {
     return (
-      <div className={$.rail}/>
+      <div classNames={$.rail}/>
     )
   }
 
@@ -69,7 +69,7 @@ export default class Slider<T> extends React.Component<*, Props, *> {
 
     return (
       <DragHandle
-        className={$.thumb}
+        classNames={$.thumb}
         style={style}
         onDrag={this.onThumbDrag}
       />
@@ -81,9 +81,9 @@ export default class Slider<T> extends React.Component<*, Props, *> {
     const stepPerc = 100 / (values.length - 1)
 
     return (
-      <div className={$.values}>
+      <div classNames={$.values}>
         {values.map((value, i) =>
-          <div key={i} className={$.value} style={{left: `${i * stepPerc}%`}}>
+          <div key={i} classNames={$.value} style={{left: `${i * stepPerc}%`}}>
             {value}
           </div>
         )}

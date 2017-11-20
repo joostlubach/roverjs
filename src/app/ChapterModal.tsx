@@ -1,32 +1,30 @@
-// @flow
-
 import * as React from 'react'
 import {observer} from 'mobx-react'
 import {jss, colors, layout, fonts} from '../styles'
 import {Modal, Tappable, LevelButton, Markdown} from '../components'
-// import {chapters} from '../levels'
 import {levelStore} from '../stores'
-import {Chapter, Level} from '../stores'
+import {Chapter, Level} from '../program'
 
-export type Props = {
+export interface Props {
   isOpen:         boolean,
   onRequestClose: () => void
 }
 
-type State = {
-  selectedChapter: ?Chapter
+interface State {
+  selectedChapter: Chapter | null
 }
 
 @observer
-export default class ChapterModal extends React.Component<*, Props, *> {
+export default class ChapterModal extends React.Component<Props, State> {
 
-  props: Props
   state: State = {
     selectedChapter: null
   }
 
   selectCurrentChapter() {
-    let chapter = levelStore.currentChapter
+    let chapter = levelStore.currentChapter as Chapter
+    if (chapter == null) { return }
+
     const chapters = levelStore.chapters
     if (levelStore.isChapterComplete(chapter)) {
       const index = chapters.findIndex(c => c.id === chapter.id)
@@ -40,7 +38,13 @@ export default class ChapterModal extends React.Component<*, Props, *> {
     const {isOpen, onRequestClose} = this.props
 
     return (
-      <Modal className={$.modal} isOpen={isOpen} onRequestClose={onRequestClose} onAfterOpen={this.onAfterOpen}>
+      <Modal
+        classNames={$.modal}
+        isOpen={isOpen}
+        onRequestClose={onRequestClose}
+        onAfterOpen={this.onAfterOpen}
+        contentLabel="Chapters"
+      >
         {this.renderHeader()}
         {this.renderBody()}
       </Modal>
@@ -49,7 +53,7 @@ export default class ChapterModal extends React.Component<*, Props, *> {
 
   renderHeader() {
     return (
-      <div className={$.header}>
+      <div classNames={$.header}>
         <h1>Chapters</h1>
       </div>
     )
@@ -57,7 +61,7 @@ export default class ChapterModal extends React.Component<*, Props, *> {
 
   renderBody() {
     return (
-      <div className={$.body}>
+      <div classNames={$.body}>
         {this.renderChapterList()}
         {this.renderChapter()}
       </div>
@@ -66,16 +70,17 @@ export default class ChapterModal extends React.Component<*, Props, *> {
 
   renderChapterList() {
     const {selectedChapter} = this.state
-    const isSelectedChapter = chapter => {
-      return selectedChapter != null && chapter.id === selectedChapter.id
+    const isSelectedChapter = (chapter: Chapter) => {
+      if (selectedChapter == null) { return false }
+      return chapter.id === selectedChapter.id
     }
 
     return (
-      <div className={$.chapterList}>
+      <div classNames={$.chapterList}>
         {levelStore.chapters.map((chapter, i) => (
           <Tappable
             key={chapter.id}
-            className={[$.chapterButton, isSelectedChapter(chapter) && $.selectedChapterButton]}
+            classNames={[$.chapterButton, isSelectedChapter(chapter) && $.selectedChapterButton]}
             onTap={this.onChapterTap.bind(this, chapter)}
           >
             {i + 1}. {chapter.name}
@@ -90,7 +95,7 @@ export default class ChapterModal extends React.Component<*, Props, *> {
     if (selectedChapter == null) { return null }
 
     return (
-      <div className={$.chapter}>
+      <div classNames={$.chapter}>
         {this.renderChapterHeader(selectedChapter)}
         {this.renderLevelSelector(selectedChapter.levels)}
       </div>
@@ -99,11 +104,11 @@ export default class ChapterModal extends React.Component<*, Props, *> {
 
   renderChapterHeader(chapter: Chapter) {
     return (
-      <div className={$.chapterHeader}>
-        <div className={$.chapterName}>
+      <div classNames={$.chapterHeader}>
+        <div classNames={$.chapterName}>
           {chapter.name}
         </div>
-        <Markdown key={chapter.id} className={$.chapterDescription}>
+        <Markdown key={chapter.id} classNames={$.chapterDescription}>
           {chapter.description}
         </Markdown>
       </div>
@@ -112,7 +117,7 @@ export default class ChapterModal extends React.Component<*, Props, *> {
 
   renderLevelSelector(levels: Level[]) {
     return (
-      <div className={$.levelSelector}>
+      <div classNames={$.levelSelector}>
         {levels.map((level, i) => <LevelButton key={level.id} level={level} number={i + 1} color={colors.blue}/>)}
       </div>
     )

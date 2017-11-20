@@ -21,7 +21,7 @@ export type Props<T> = {
   body?:     any,
   buttons:   MessageBoxButton<T>[],
 
-  className?: ClassNameProp
+  classNames?: React.ClassNamesProp
 }
 type InjectedProps<T> = {
   resolve: (result: T) => void
@@ -45,9 +45,9 @@ export default class MessageBox<T> extends React.Component<void, Props<T>, void>
   }
 
   render() {
-    const {className} = this.props
+    const {classNames} = this.props
     return (
-      <div className={[$.messageBox, className]}>
+      <div classNames={[$.messageBox, classNames]}>
         {this.renderHeader()}
         {this.renderBody()}
         {this.renderButtons()}
@@ -60,8 +60,8 @@ export default class MessageBox<T> extends React.Component<void, Props<T>, void>
     if (title == null) { return }
 
     return (
-      <div className={$.header}>
-        <h1 className={$.title}>{title}</h1>
+      <div classNames={$.header}>
+        <h1 classNames={$.title}>{title}</h1>
       </div>
     )
   }
@@ -70,8 +70,8 @@ export default class MessageBox<T> extends React.Component<void, Props<T>, void>
     const {body, message} = this.props
 
     return (
-      <div className={$.body}>
-        {message && <Markdown className={$.message}>{message}</Markdown>}
+      <div classNames={$.body}>
+        {message && <Markdown classNames={$.message}>{message}</Markdown>}
         {body && <div>{body}</div>}
       </div>
     )
@@ -81,18 +81,18 @@ export default class MessageBox<T> extends React.Component<void, Props<T>, void>
     const {buttons} = this.props
 
     return (
-      <div className={$.buttons}>
+      <div classNames={$.buttons}>
         {buttons.map(this.renderButton.bind(this))}
       </div>
     )
   }
 
   renderButton(button: MessageBoxButton<T>, index: number) {
-    const {result, className, ...props} = button
+    const {result, classNames, ...props} = button
     return (
       <Button
         key={index}
-        className={[$.button, className]}
+        classNames={[$.button, classNames]}
         {...props}
         onTap={this.onButtonTap.bind(this, result)}
       />
@@ -108,7 +108,7 @@ export default class MessageBox<T> extends React.Component<void, Props<T>, void>
 
 }
 
-type MessageBoxClass = Class<React.Component<*, Props, *>>
+type MessageBoxClass = Class<React.Component<Props>>
 type HostState = {
   messageBoxes: Array<{Component: MessageBoxClass, props: Props}>
 }
@@ -145,9 +145,9 @@ export class Host extends React.Component<void, {}, HostState> {
     const {messageBoxes} = this.state
 
     return (
-      <div className={$.host}>
-        {messageBoxes.length > 0 && <div className={$.shim}/>}
-        <ReactCSSTransitionGroup className={$.messageBoxes} component="div" transitionName={$.anim} transitionEnterTimeout={animDuration} transitionLeaveTimeout={animDuration}>
+      <div classNames={$.host}>
+        {messageBoxes.length > 0 && <div classNames={$.shim}/>}
+        <ReactCSSTransitionGroup classNames={$.messageBoxes} component="div" transitionName={$.anim} transitionEnterTimeout={animDuration} transitionLeaveTimeout={animDuration}>
           {messageBoxes.map(({Component, props}, index) => (
             <Component key={index} {...props}/>
           ))}

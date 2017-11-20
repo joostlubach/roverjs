@@ -9,13 +9,13 @@ import {isFunction} from 'lodash'
 type DragHandleState = any // tslint:disable-line no-any
 
 export interface Props {
-  left?:   JSX.Element,
-  right?:  JSX.Element,
-  top?:    JSX.Element,
-  bottom?: JSX.Element,
+  left?:   React.ReactNode,
+  right?:  React.ReactNode,
+  top?:    React.ReactNode,
+  bottom?: React.ReactNode,
 
-  main:      JSX.Element,
-  splitter?: JSX.Element,
+  main:      React.ReactNode,
+  splitter?: React.ReactNode,
 
   splitterSize:    number,
   initialSizes?:   Sizes,
@@ -33,7 +33,7 @@ export const defaultProps = {
 export enum Side {left = 'left', right = 'right', top = 'top', bottom = 'bottom'}
 export type Sizes = {[side in Side]: number}
 
-type State = {
+interface State {
   sizes: Sizes
 }
 
@@ -64,7 +64,7 @@ export default class Panels extends React.Component {
     const {left, right, top, bottom, main} = this.props
 
     return (
-      <div className={$.panels}>
+      <div classNames={$.panels}>
         {this.renderMain(main)}
         {left && this.renderPanel('left', left)}
         {right && this.renderPanel('right', right)}
@@ -74,7 +74,7 @@ export default class Panels extends React.Component {
     )
   }
 
-  renderMain(element: JSX.Element) {
+  renderMain(element: React.ReactNode) {
     const style = {}
     for (const side of ['left', 'right', 'top', 'bottom']) {
       if (this.props[side] != null) {
@@ -83,13 +83,13 @@ export default class Panels extends React.Component {
     }
 
     return (
-      <div className={$.main} style={style}>
+      <div classNames={$.main} style={style}>
         {element}
       </div>
     )
   }
 
-  renderPanel(side: string, element: JSX.Element) {
+  renderPanel(side: string, element: React.ReactNode) {
     const {splitterSize, horizontalFirst} = this.props
 
     const style: React.CSSProperties = {}
@@ -110,7 +110,7 @@ export default class Panels extends React.Component {
     return (
       <div
         ref={el => { this.panels.set(side, el) }}
-        className={cn($.panel, $[`panel_${side}`])}
+        classNames={cn($.panel, $[`panel_${side}`])}
         style={style}
       >
         {element}

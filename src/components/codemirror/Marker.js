@@ -6,16 +6,16 @@ import CodeMirror from 'codemirror'
 import classNames from 'classnames'
 import isEqual from 'lodash/isEqual'
 
-export type Props = {
+export interface Props {
   from:            CodeMirror.Position,
   to:              CodeMirror.Position,
-  className?:      ClassNameProp,
-  startClassName?: ClassNameProp,
-  endClassName?:   ClassNameProp,
+  classNames?:      React.ClassNamesProp,
+  startClassName?: React.ClassNamesProp,
+  endClassName?:   React.ClassNamesProp,
   options?:        CodeMirror.TextMarkerOptions
 }
 
-export default class Marker extends React.Component<*, Props, *> {
+export default class Marker extends React.Component<Props> {
 
   props: Props
 
@@ -26,11 +26,11 @@ export default class Marker extends React.Component<*, Props, *> {
   marker: ?CodeMirror.TextMarker = null
 
   addMarker(props: Props = this.props) {
-    const {from, to, className, startClassName, endClassName, options} = props
+    const {from, to, classNames, startClassName, endClassName, options} = props
     const {codeMirror} = this.context
 
     this.marker = codeMirror.markText(from, to, {
-      className:  classNames(className),
+      classNames:  classNames(classNames),
       startStyle: startClassName == null ? null : classNames(startClassName),
       endStyle:   endClassName == null ? null : classNames(endClassName),
       ...options
@@ -61,7 +61,7 @@ export default class Marker extends React.Component<*, Props, *> {
     if (props.to.line !== this.props.to.line) { return true }
     if (props.to.ch !== this.props.to.ch) { return true }
     if (props.type !== this.props.type) { return true }
-    if (classNames(props.className) !== classNames(this.props.className)) { return true }
+    if (classNames(props.classNames) !== classNames(this.props.classNames)) { return true }
     if (!isEqual(props.options, this.props.options)) { return true }
 
     return false

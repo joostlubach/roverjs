@@ -2,12 +2,12 @@ import * as React from 'react'
 import SimpleMarkdown from 'simple-markdown'
 import {jss, layout, markdown} from '../styles'
 
-export default function Markdown({className, children, ...props}) {
+export default function Markdown({classNames, children, ...props}) {
   const content = React.Children.toArray(children).join('\n\n')
   const syntaxTree = parser(`${content}\n\n`)
 
   return (
-    <div className={[$.container, className]} {...props}>
+    <div classNames={[$.container, classNames]} {...props}>
       {output(syntaxTree)}
     </div>
   )

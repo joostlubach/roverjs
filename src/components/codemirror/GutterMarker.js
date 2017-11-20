@@ -9,15 +9,15 @@ import {Tappable} from '..'
 import {jss, layout} from '../../styles'
 import {lineHeight} from './layout'
 
-export type Props = {
+export interface Props {
   line:  number,
   onTap: ?(() => void),
 
-  className?: ClassNameProp,
+  classNames?: React.ClassNamesProp,
   children?:  any
 }
 
-export default class GutterMarker extends React.Component<*, Props, *> {
+export default class GutterMarker extends React.Component<Props> {
 
   props: Props & {gutter: string}
 
@@ -73,7 +73,7 @@ export default class GutterMarker extends React.Component<*, Props, *> {
     if (props.line !== this.props.line) { return true }
     if (props.onTap !== this.props.onTap) { return true }
     if (props.children !== this.props.children) { return true }
-    if (classNames(props.className) !== classNames(this.props.className)) { return true }
+    if (classNames(props.classNames) !== classNames(this.props.classNames)) { return true }
 
     return false
   }
@@ -93,13 +93,13 @@ export default class GutterMarker extends React.Component<*, Props, *> {
   }
 
   renderMarker(props: Props) {
-    const {className, onTap, children} = props
+    const {classNames, onTap, children} = props
     const Component = onTap != null ? Tappable : 'div'
     const tapProps = onTap != null ? {onTap} : {}
 
     return (
-      <div className={$.gutterMarkerContainer}>
-        <Component className={className} {...tapProps}>
+      <div classNames={$.gutterMarkerContainer}>
+        <Component classNames={classNames} {...tapProps}>
           {children}
         </Component>
       </div>

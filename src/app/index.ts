@@ -1,5 +1,3 @@
-// @index
-
 export {default as App} from './App'
 export {default as ChapterModal} from './ChapterModal'
 export {default as CodeEditor} from './CodeEditor'

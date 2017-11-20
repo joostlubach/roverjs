@@ -11,7 +11,7 @@ import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/monokai.css'
 import 'codemirror/theme/zenburn.css'
 
-export type Props = {
+export interface Props {
   theme:      string,
   options:    Object,
   autoFocus:  boolean,
@@ -23,7 +23,7 @@ export type Props = {
   onValueSet?: (value: string, codeMirror: CodeMirrorEl) => void,
 
   children?:  any,
-  className?: ClassNameProp
+  classNames?: React.ClassNamesProp
 }
 
 export const defaultProps = {
@@ -38,11 +38,11 @@ export const defaultOptions = {
   lineNumbers: true
 }
 
-type State = {
+interface State {
   codeMirror:   ?CodeMirrorEl
 }
 
-export default class CodeMirror extends React.Component<*, Props, *> {
+export default class CodeMirror extends React.Component<Props> {
 
   //------
   // Properties
@@ -159,11 +159,11 @@ export default class CodeMirror extends React.Component<*, Props, *> {
   // Rendering
 
   render() {
-    const {className, children} = this.props
+    const {classNames, children} = this.props
     const {codeMirror} = this.state
 
     return (
-      <div className={[$.editor, className]}>
+      <div classNames={[$.editor, classNames]}>
         <textarea ref={el => { this.textArea = el }}/>
         {codeMirror != null && children}
       </div>

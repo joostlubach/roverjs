@@ -4,7 +4,7 @@ import * as React from 'react'
 import {jss, colors, fonts, layout} from '../styles'
 import {Spinner, SVG} from '../components'
 
-export type Props = {
+export interface Props {
   loading: boolean,
   error:   ?Error
 }
@@ -13,7 +13,7 @@ export const defaultProps = {
   error: null
 }
 
-export default class SplashScreen extends React.Component<*, Props, *> {
+export default class SplashScreen extends React.Component<Props> {
 
   props: Props
   static defaultProps = defaultProps
@@ -22,7 +22,7 @@ export default class SplashScreen extends React.Component<*, Props, *> {
     const {loading, error} = this.props
 
     return (
-      <div className={$.splashScreen}>
+      <div classNames={$.splashScreen}>
         {loading && this.renderLoading()}
         {!loading && error != null && this.renderError(error)}
       </div>
@@ -31,10 +31,10 @@ export default class SplashScreen extends React.Component<*, Props, *> {
 
   renderLoading() {
     return (
-      <div className={$.content}>
+      <div classNames={$.content}>
         <SVG name='logo' style={{fill: colors.green}}/>
         <Spinner size={32} color={colors.fg.inverted}/>
-        <div className={$.loadingLabel}>
+        <div classNames={$.loadingLabel}>
           Loading...
         </div>
       </div>
@@ -53,12 +53,12 @@ export default class SplashScreen extends React.Component<*, Props, *> {
     }
 
     return (
-      <div className={$.content}>
+      <div classNames={$.content}>
         <SVG name='robot-lame' style={{fill: colors.purple}}/>
-        <div className={$.errorTitle}>
+        <div classNames={$.errorTitle}>
           Error while loading
         </div>
-        <div className={$.errorDetail}>
+        <div classNames={$.errorDetail}>
           {message}
         </div>
       </div>

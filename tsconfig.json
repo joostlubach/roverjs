@@ -19,11 +19,17 @@
     "experimentalDecorators": true,
     "baseUrl": ".",
     "paths": {
+      "@src/*": ["src/*"],
       "*": [
         "pkg/*"
       ]
     }
   },
+  "include": [
+    "src/types/*.d.ts",
+    "src/**/*",
+    "pkg/**/*"
+  ],
   "exclude": [
     "node_modules",
     "build",

@@ -1,24 +1,19 @@
-// @flow
-
 import * as React from 'react' // eslint-disable-line no-unused-vars
-import classNames from 'classnames'
-import Modal from 'react-modal'
+import * as cn from 'classnames'
+import * as ReactModal from 'react-modal'
+import {Props as ModalProps} from 'react-modal'
 import {jss, colors, layout} from '../styles'
 
-export type Props = {
-  isOpen:         boolean,
-  onRequestClose: () => void,
-  contentLabel:   string,
-
-  className?:        ClassNameProp,
-  overlayClassName?: ClassNameProp
+export interface Props extends ModalProps {
+  classNames?:        React.ClassNamesProp,
+  overlayClassNames?: React.ClassNamesProp
 }
 
-export default function ({className, overlayClassName, ...props}: Props) {
+export default function Modal({classNames, overlayClassNames, ...props}: Props) {
   return (
-    <Modal
-      className={[$.modal, className]}
-      overlayClassName={classNames($.overlay, overlayClassName)}
+    <ReactModal
+      className={cn($.modal, classNames)}
+      overlayClassName={cn($.overlay, overlayClassNames)}
       {...props}
     />
   )

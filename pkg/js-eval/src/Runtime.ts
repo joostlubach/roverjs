@@ -493,7 +493,7 @@ export default class Runtime {
     )
 
     // Wrap this function into a native JS function.
-    const createNative = new global.Function('fn', `
+    const createNative = new (window as any).Function('fn', `
       return function ${fn.name || ''}() {
         return fn.apply(this, arguments)
       }`

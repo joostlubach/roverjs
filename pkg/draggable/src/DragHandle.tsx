@@ -10,7 +10,7 @@ export interface Props {
 
   style?: React.CSSProperties
 
-  children?: JSX.Element
+  children?: React.ReactNode,
 
   /**
    * Whether the drag handle is enabled.

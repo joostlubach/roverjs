@@ -8,7 +8,7 @@ import 'react-activity/dist/react-activity.css'
 export default function Spinner({shown = true, size = 16, color = null, ...props}: Object) {
   return (
     <activity.Spinner
-      className={!shown && $.hidden}
+      classNames={!shown && $.hidden}
       size={size}
       color={color == null ? null : color.toString()}
       {...props}

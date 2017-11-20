@@ -6,10 +6,10 @@ import {jss, layout, colors, fonts, shadows} from '../styles'
 import {SVG, Markdown, ToolbarButton, Button, MessageBox, LevelButton} from '../components'
 import {levelStore, programStore} from '../stores'
 
-export type Props = {}
+export interface Props {}
 
 @observer
-export default class CodeToolbar extends React.Component<*, Props, *> {
+export default class CodeToolbar extends React.Component<Props> {
 
   props: Props
 
@@ -30,21 +30,21 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
 
   render() {
     return (
-      <div className={$.toolbar}>
-        <div className={$.left}>
-          <SVG name='logo' className={$.logo}/>
+      <div classNames={$.toolbar}>
+        <div classNames={$.left}>
+          <SVG name='logo' classNames={$.logo}/>
           <Button
-            className={$.aboutButton}
+            classNames={$.aboutButton}
             label="about"
             tiny
             onTap={this.onAboutTap}
           />
         </div>
-        <div className={$.main}>
+        <div classNames={$.main}>
           {this.renderLevelName()}
           {this.renderLevelSelector()}
         </div>
-        <div className={$.buttons}>
+        <div classNames={$.buttons}>
           {this.renderResetButton()}
           {this.renderChaptersButton()}
         </div>
@@ -57,7 +57,7 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
     if (currentChapter == null) { return null }
 
     return (
-      <div className={$.chapterName}>
+      <div classNames={$.chapterName}>
         {currentChapter.name}
       </div>
     )
@@ -65,7 +65,7 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
 
   renderLevelSelector() {
     return (
-      <div className={$.levelSelector}>
+      <div classNames={$.levelSelector}>
         {levelStore.levels.map((level, i) =>
           <LevelButton
             key={level.id}
@@ -81,7 +81,7 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
   renderResetButton() {
     return (
       <ToolbarButton
-        className={$.resetButton}
+        classNames={$.resetButton}
         icon='reset'
         label="RESET"
         onTap={this.onResetTap}
@@ -92,7 +92,7 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
   renderChaptersButton() {
     return (
       <ToolbarButton
-        className={$.chaptersButton}
+        classNames={$.chaptersButton}
         icon='book'
         label="CHAPTERS"
         onTap={this.onChaptersTap}
@@ -102,7 +102,7 @@ export default class CodeToolbar extends React.Component<*, Props, *> {
 
   renderAboutBody() {
     return (
-      <Markdown className={$.about}>{about}</Markdown>
+      <Markdown classNames={$.about}>{about}</Markdown>
     )
   }
 

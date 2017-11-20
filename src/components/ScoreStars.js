@@ -6,14 +6,14 @@ import {jss, layout, colors} from '../styles'
 import {SVG} from '.'
 import times from 'lodash/times'
 
-export type Props = {
+export interface Props {
   score:      number,
   maxScore:   number,
   starSize:   number,
   padding:    number,
   animated:   boolean,
   showGray:   boolean,
-  className?: ClassNameProp
+  classNames?: React.ClassNamesProp
 }
 export const defaultProps = {
   maxScore: 3,
@@ -23,11 +23,11 @@ export const defaultProps = {
   showGray: false
 }
 
-type State = {
+interface State {
   currentScore: number
 }
 
-export default class Scoring extends React.Component<*, Props, *> {
+export default class Scoring extends React.Component<Props> {
 
   props: Props
   static defaultProps = defaultProps
@@ -72,12 +72,12 @@ export default class Scoring extends React.Component<*, Props, *> {
   }
 
   render() {
-    const {maxScore, score, showGray, starSize, padding, className} = this.props
+    const {maxScore, score, showGray, starSize, padding, classNames} = this.props
     const width = starSize * (showGray ? maxScore : score) + padding * (maxScore - 1)
     const height = starSize
 
     return (
-      <div className={[$.scoreStars, className]} style={{width, height}}>
+      <div classNames={[$.scoreStars, classNames]} style={{width, height}}>
         {showGray && this.renderGrayStars()}
         {this.renderStars()}
       </div>
@@ -88,12 +88,12 @@ export default class Scoring extends React.Component<*, Props, *> {
     const {starSize, maxScore, padding} = this.props
 
     return (
-      <div className={$.grayStars}>
+      <div classNames={$.grayStars}>
         {times(maxScore, i => (
           <SVG
             key={i}
             name='star-gray'
-            className={$.grayStar}
+            classNames={$.grayStar}
             size={{width: starSize, height: starSize}}
             style={{marginLeft: i === 0 ? 0 : padding}}
           />
@@ -107,12 +107,12 @@ export default class Scoring extends React.Component<*, Props, *> {
     const currentScore = animated ? this.state.currentScore : score
 
     return (
-      <CSSTransitionGroup component="div" className={$.goldStars} transitionName={$.anim} transitionEnterTimeout={animDuration} transitionLeaveTimeout={animDuration}>
+      <CSSTransitionGroup component="div" classNames={$.goldStars} transitionName={$.anim} transitionEnterTimeout={animDuration} transitionLeaveTimeout={animDuration}>
         {times(currentScore, i => (
           <SVG
             key={i}
             name='star'
-            className={$.scoreStar}
+            classNames={$.scoreStar}
             size={{width: starSize, height: starSize}}
             style={{marginLeft: i === 0 ? 0 : padding}}
           />

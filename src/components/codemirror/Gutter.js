@@ -2,12 +2,12 @@
 
 import * as React from 'react'
 
-export type Props = {
+export interface Props {
   name:      string,
   children?: any
 }
 
-export default class Gutter extends React.Component<*, Props, *> {
+export default class Gutter extends React.Component<Props> {
 
   get markers() {
     const {children} = this.props

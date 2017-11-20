@@ -1,21 +1,17 @@
-// @flow
-
 import * as React from 'react'
 import {jss, layout} from '../styles'
 import {Sprite, SVG} from '.'
 import {Props as SpriteProps} from './Sprite'
 
-export type Props = SpriteProps & {}
+export interface Props extends SpriteProps {}
 
-export default class Goal extends React.Component<*, Props, *> {
-
-  props: Props
+export default class Goal extends React.Component<Props> {
 
   render() {
     const {position} = this.props
     return (
-      <Sprite className={$.goal} position={position}>
-        <SVG className={$.svg} name='goal'/>
+      <Sprite classNames={$.goal} position={position}>
+        <SVG classNames={$.svg} name='goal'/>
       </Sprite>
     )
   }

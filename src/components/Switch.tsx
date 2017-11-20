@@ -1,34 +1,27 @@
-// @flow
-
 import * as React from 'react'
 import {Tappable} from '.'
 import {jss, colors, layout, shadows} from '../styles'
 
-export type Props = {
+export interface Props {
   isOn:     boolean,
   onChange: (on: boolean) => void,
 
-  onLabel:  ?string,
-  offLabel: ?string,
+  onLabel?:  string,
+  offLabel?: string,
 
-  className?: ClassNameProp
-}
-const defaultProps = {
-  onLabel:  null,
-  offLabel: null,
-  onChange: () => void 0
+  classNames?: React.ClassNamesProp
 }
 
-export default class Switch extends React.Component<typeof defaultProps, Props, void> {
+export default class Switch extends React.Component<Props> {
 
   render() {
-    const {isOn, className, onLabel, offLabel} = this.props
+    const {isOn, classNames, onLabel, offLabel} = this.props
 
     return (
-      <Tappable className={[$.switch, isOn ? $.switchOn : $.switchOff, className]} onTap={this.onTap} focusable={false}>
-        {onLabel && <div className={$.onLabel}>{onLabel}</div>}
-        {offLabel && <div className={$.offLabel}>{offLabel}</div>}
-        <div className={[$.thumb, isOn ? $.thumbOn : $.thumbOff]}/>
+      <Tappable classNames={[$.switch, isOn ? $.switchOn : $.switchOff, classNames]} onTap={this.onTap} focusable={false}>
+        {onLabel && <div classNames={$.onLabel}>{onLabel}</div>}
+        {offLabel && <div classNames={$.offLabel}>{offLabel}</div>}
+        <div classNames={[$.thumb, isOn ? $.thumbOn : $.thumbOff]}/>
       </Tappable>
     )
   }
@@ -69,7 +62,6 @@ const $ = jss({
   },
 
   switchOff: {
-    background: colors.bg.medium,
     color:      colors.fg.dim
   },
 
