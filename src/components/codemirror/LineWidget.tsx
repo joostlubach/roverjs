@@ -1,27 +1,26 @@
-// @flow
-
 import * as React from 'react'
+import * as cn from 'classnames'
 import {unstable_renderSubtreeIntoContainer as renderSubtreeIntoContainer, unmountComponentAtNode} from 'react-dom'
-import CodeMirror from 'codemirror'
-import PropTypes from 'prop-types'
+import * as CodeMirror from 'codemirror'
+import * as PropTypes from 'prop-types'
 import {Tappable} from '..'
-import isEqual from 'lodash/isEqual'
+import {isEqual} from 'lodash'
 
 export interface Props {
   line:     number,
-  onTap:    ?(() => void),
-  options?: Object,
+  onTap?:   () => any,
+  options?: AnyObject,
 
   classNames?: React.ClassNamesProp,
-  children?:  any
+  children?:  React.ReactNode
 }
 
 export default class LineWidget extends React.Component<Props> {
 
   props: Props
 
-  element: ?HTMLElement = null
-  widget:  ?CodeMirror.LineWidget = null
+  element: HTMLElement | null = null
+  widget:  CodeMirror.LineWidget | null = null
 
   static contextTypes = {
     codeMirror: PropTypes.instanceOf(CodeMirror)
@@ -35,16 +34,16 @@ export default class LineWidget extends React.Component<Props> {
     const {line, options} = props
 
     this.element = document.createElement('div')
-    this.lineWidget = codeMirror.addLineWidget(line, this.element, options)
+    this.widget = codeMirror.addLineWidget(line, this.element, options)
 
     this.rerender(props)
   }
 
   destroy() {
-    const {element, lineWidget} = this
-    if (element == null || lineWidget == null) { return }
+    const {element, widget} = this
+    if (element == null || widget == null) { return }
 
-    lineWidget.clear()
+    widget.clear()
     unmountComponentAtNode(this.element)
   }
 
@@ -72,19 +71,19 @@ export default class LineWidget extends React.Component<Props> {
     if (props.line !== this.props.line) { return true }
     if (props.onTap !== this.props.onTap) { return true }
     if (props.children !== this.props.children) { return true }
-    if (classNames(props.classNames) !== classNames(this.props.classNames)) { return true }
+    if (cn(props.classNames) !== cn(this.props.classNames)) { return true }
     if (!isEqual(props.options, this.props.options)) { return true }
 
     return false
   }
 
   rerender(props: Props) {
-    const {element, lineWidget} = this
-    if (element == null || lineWidget == null) { return }
+    const {element, widget} = this
+    if (element == null || widget == null) { return }
 
     renderSubtreeIntoContainer(this, this.renderWidget(props), element)
     try {
-      lineWidget.changed()
+      widget.changed()
     } catch (_) {
       // If the line does not exist anymore, an error is thrown. This is ok as the line widget is
       // destroyed soon anyway.

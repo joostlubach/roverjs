@@ -6,7 +6,7 @@ import {Position} from '../program'
 export interface Props {
   position: Position,
 
-  children?:   any,
+  children?:   React.ReactNode,
   classNames?: React.ClassNamesProp,
   style?:      Object
 }

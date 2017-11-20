@@ -1,27 +1,29 @@
-// @flow
-
 import * as React from 'react'
-import classNames from 'classnames'
+import * as cn from 'classnames'
 import {unstable_renderSubtreeIntoContainer as renderSubtreeIntoContainer, unmountComponentAtNode} from 'react-dom'
-import CodeMirror from 'codemirror'
-import PropTypes from 'prop-types'
+import * as CodeMirror from 'codemirror'
+import * as PropTypes from 'prop-types'
 import {Tappable} from '..'
 import {jss, layout} from '../../styles'
 import {lineHeight} from './layout'
 
 export interface Props {
-  line:  number,
-  onTap: ?(() => void),
+  line:   number,
+  onTap?: () => any,
 
   classNames?: React.ClassNamesProp,
-  children?:  any
+  children?:   React.ReactNode
+}
+
+interface AllProps extends Props {
+  gutter: string
 }
 
 export default class GutterMarker extends React.Component<Props> {
 
-  props: Props & {gutter: string}
+  props: Props
 
-  element: ?HTMLElement = null
+  element: HTMLElement | null = null
 
   static contextTypes = {
     codeMirror: PropTypes.instanceOf(CodeMirror)
@@ -32,7 +34,7 @@ export default class GutterMarker extends React.Component<Props> {
 
   create() {
     const {codeMirror} = this.context
-    const {line, gutter} = this.props
+    const {line, gutter} = this.props as AllProps
 
     this.element = document.createElement('div')
     codeMirror.setGutterMarker(line, gutter, this.element)
@@ -42,9 +44,10 @@ export default class GutterMarker extends React.Component<Props> {
 
   destroy() {
     const {codeMirror} = this.context
-    const {element, props: {line, gutter}} = this
+    const {element} = this
     if (element == null) { return }
 
+    const {line, gutter} = this.props as AllProps
     codeMirror.setGutterMarker(line, gutter, null)
     unmountComponentAtNode(this.element)
   }
@@ -61,7 +64,10 @@ export default class GutterMarker extends React.Component<Props> {
   }
 
   componentWillReceiveProps(props: Props) {
-    if (props.line !== this.props.line || props.gutter !== this.props.gutter) {
+    const prevProps = this.props as AllProps
+    const nextProps = props as AllProps
+
+    if (prevProps.line !== nextProps.line || prevProps.gutter !== nextProps.gutter) {
       this.destroy()
       this.create()
     } else {
@@ -69,11 +75,11 @@ export default class GutterMarker extends React.Component<Props> {
     }
   }
 
-  shouldComponentUpdate(props: Props) {
+  shouldComponentUpdate(props: AllProps) {
     if (props.line !== this.props.line) { return true }
     if (props.onTap !== this.props.onTap) { return true }
     if (props.children !== this.props.children) { return true }
-    if (classNames(props.classNames) !== classNames(this.props.classNames)) { return true }
+    if (cn(props.classNames) !== cn(this.props.classNames)) { return true }
 
     return false
   }

@@ -1,10 +1,8 @@
-// @flow
-
 import * as React from 'react'
 
 export interface Props {
   name:      string,
-  children?: any
+  children?: React.ReactNode
 }
 
 export default class Gutter extends React.Component<Props> {
@@ -15,8 +13,9 @@ export default class Gutter extends React.Component<Props> {
 
     return React.Children.map(children, child => {
       if (child == null) { return null }
+      if (!React.isValidElement(child)) { return null }
 
-      return React.cloneElement(child, {
+      return React.cloneElement(child as React.ReactElement<{gutter: string}>, {
         gutter: this.props.name
       })
     })

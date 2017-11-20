@@ -9,7 +9,7 @@ import Color from 'color'
 export interface Props {
   icon:       string,
   label:      string,
-  children?:  any,
+  children?:  React.ReactNode,
   classNames?: React.ClassNamesProp,
   style:      Object,
 

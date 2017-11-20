@@ -1,15 +1,13 @@
-// @flow
-
 import * as React from 'react'
-import PropTypes from 'prop-types'
-import CodeMirror from 'codemirror'
-import classNames from 'classnames'
-import isEqual from 'lodash/isEqual'
+import * as PropTypes from 'prop-types'
+import * as CodeMirror from 'codemirror'
+import * as cn from 'classnames'
+import {isEqual} from 'lodash'
 
 export interface Props {
   from:            CodeMirror.Position,
   to:              CodeMirror.Position,
-  classNames?:      React.ClassNamesProp,
+  classNames?:     React.ClassNamesProp,
   startClassName?: React.ClassNamesProp,
   endClassName?:   React.ClassNamesProp,
   options?:        CodeMirror.TextMarkerOptions
@@ -17,22 +15,20 @@ export interface Props {
 
 export default class Marker extends React.Component<Props> {
 
-  props: Props
-
   static contextTypes = {
     codeMirror: PropTypes.instanceOf(CodeMirror),
   }
 
-  marker: ?CodeMirror.TextMarker = null
+  marker: CodeMirror.TextMarker | null = null
 
   addMarker(props: Props = this.props) {
     const {from, to, classNames, startClassName, endClassName, options} = props
     const {codeMirror} = this.context
 
     this.marker = codeMirror.markText(from, to, {
-      classNames:  classNames(classNames),
-      startStyle: startClassName == null ? null : classNames(startClassName),
-      endStyle:   endClassName == null ? null : classNames(endClassName),
+      classNames: cn(classNames),
+      startStyle: startClassName == null ? null : cn(startClassName),
+      endStyle:   endClassName == null ? null : cn(endClassName),
       ...options
     })
   }
@@ -60,8 +56,7 @@ export default class Marker extends React.Component<Props> {
     if (props.from.ch !== this.props.from.ch) { return true }
     if (props.to.line !== this.props.to.line) { return true }
     if (props.to.ch !== this.props.to.ch) { return true }
-    if (props.type !== this.props.type) { return true }
-    if (classNames(props.classNames) !== classNames(this.props.classNames)) { return true }
+    if (cn(props.classNames) !== cn(this.props.classNames)) { return true }
     if (!isEqual(props.options, this.props.options)) { return true }
 
     return false

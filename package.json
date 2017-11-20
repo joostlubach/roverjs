@@ -57,6 +57,7 @@
     "whatwg-fetch": "2.0.3"
   },
   "devDependencies": {
+    "@types/codemirror": "^0.0.51",
     "@types/jest": "^21.1.5",
     "@types/prop-types": "^15.5.2",
     "@types/react": "^16.0.21",

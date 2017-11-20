@@ -13,7 +13,7 @@ export interface Props {
   dark:            boolean,
 
   classNames?: React.ClassNamesProp,
-  children?:  any
+  children?:  React.ReactNode
 }
 export const defaultProps = {
   dark: false

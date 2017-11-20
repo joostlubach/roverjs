@@ -12,7 +12,7 @@ export interface Props {
   classNames?:   React.ClassNamesProp,
   style?:        Object,
   focusable?:    boolean,
-  children?:     any
+  children?:     React.ReactNode
 }
 
 export default function Tappable(props: Props) {
@@ -35,8 +35,6 @@ export default function Tappable(props: Props) {
 
     onStateChange(state)
   }
-
-  console.log('Tappable', props)
 
   return (
     <Component

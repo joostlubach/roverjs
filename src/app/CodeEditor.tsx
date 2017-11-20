@@ -1,12 +1,10 @@
-// @flow
-
 import * as React from 'react'
 import {observer} from 'mobx-react'
 import {CodeMirror, Marker, Gutter, GutterMarker, LineWidget, LineClass} from '../components/codemirror'
 import {jss, jssKeyframes, colors, layout, fonts} from '../styles'
-import {programStore, simulatorStore} from '../stores'
-import {ASTNodeLocation} from '../program'
-import CodeMirrorEl from 'codemirror'
+import {programStore, simulatorStore, CodeError} from '../stores'
+import {Position} from 'estree'
+import {Editor as CMEditor, EditorChange, Doc as CMDoc, Position as CMPosition} from 'codemirror'
 
 import 'codemirror/mode/javascript/javascript'
 
@@ -15,10 +13,10 @@ export interface Props {
 }
 
 interface State {
-  focusedErrorLine: ?number,
+  focusedErrorLine: number | null,
   readOnlyRanges:   Array<{fromLine: number, toLine: number}>,
   hiddenRanges:     Array<Range>,
-  codeMirror:       ?CodeMirrorEl,
+  codeMirror:       CMEditor | null,
 }
 
 type Range = {
@@ -27,9 +25,7 @@ type Range = {
 }
 
 @observer
-export default class CodeEditor extends React.Component<Props> {
-
-  props: Props
+export default class CodeEditor extends React.Component<Props, State> {
 
   state: State = {
     focusedErrorLine: null,
@@ -37,8 +33,6 @@ export default class CodeEditor extends React.Component<Props> {
     hiddenRanges:     [],
     codeMirror:       null
   }
-
-  editor: ?Editor
 
   //------
   // Methods
@@ -54,11 +48,11 @@ export default class CodeEditor extends React.Component<Props> {
   //------
   // Read only
 
-  updateReadOnlyRanges(code: string, codeMirror: CodeMirrorEl) {
-    this.setState({readOnlyRanges: this.calculateReadOnlyRanges(code, codeMirror)})
+  updateReadOnlyRanges(code: string, document: CMDoc) {
+    this.setState({readOnlyRanges: this.calculateReadOnlyRanges(code, document)})
   }
 
-  calculateReadOnlyRanges(code: string, codeMirror: CodeMirrorEl): Array<{start: number, end: number}> {
+  calculateReadOnlyRanges(code: string, document: CMDoc): Array<{fromLine: number, toLine: number}> {
     const ranges = []
 
     let start = 0
@@ -66,8 +60,8 @@ export default class CodeEditor extends React.Component<Props> {
       let end = code.indexOf('++++', start)
       if (end === -1) { end = code.length }
 
-      const fromLine = codeMirror.posFromIndex(start).line
-      const toLine   = codeMirror.posFromIndex(end).line
+      const fromLine = document.posFromIndex(start).line
+      const toLine   = document.posFromIndex(end).line
       ranges.push({fromLine, toLine})
 
       start = end + 1
@@ -89,11 +83,11 @@ export default class CodeEditor extends React.Component<Props> {
   //------
   // Read only
 
-  updateHiddenRanges(code: string, codeMirror: CodeMirrorEl) {
-    this.setState({hiddenRanges: this.calculateHiddenRanges(code, codeMirror)})
+  updateHiddenRanges(code: string, document: CMDoc) {
+    this.setState({hiddenRanges: this.calculateHiddenRanges(code, document)})
   }
 
-  calculateHiddenRanges(code: string, codeMirror: CodeMirrorEl): Array<Range> {
+  calculateHiddenRanges(code: string, document: CMDoc): Array<Range> {
     const ranges = []
 
     let start = 0
@@ -102,8 +96,8 @@ export default class CodeEditor extends React.Component<Props> {
       if (end === -1) { end = code.length }
 
       ranges.push({
-        from: codeMirror.posFromIndex(start),
-        to:   codeMirror.posFromIndex(end + 5)
+        from: document.posFromIndex(start),
+        to:   document.posFromIndex(end + 5)
       })
 
       start = end + 1
@@ -121,11 +115,10 @@ export default class CodeEditor extends React.Component<Props> {
 
     return (
       <CodeMirror
-        ref={el => { this.editor = el }}
         classNames={[$.codeEditor, hasErrors && $.withErrors, classNames]}
         mode='javascript'
         value={programStore.code}
-        onChange={this.onEditorChange.bind(this)}
+        onChange={this.onEditorChange}
 
         onCodeMirrorSetUp={cm => { this.setState({codeMirror: cm}) }}
         onValueSet={this.onValueSet}
@@ -158,8 +151,8 @@ export default class CodeEditor extends React.Component<Props> {
     const {codeLocation, endState: {stepFailed}} = currentStep
     return (
       <Marker
-        from={locationToCodeMirrorLocation(codeLocation.start)}
-        to={locationToCodeMirrorLocation(codeLocation.end)}
+        from={positionToCodeMirrorLocation(codeLocation.start)}
+        to={positionToCodeMirrorLocation(codeLocation.end)}
         classNames={stepFailed ? $.currentStepFailure : $.currentStepSuccess}
       />
     )
@@ -223,15 +216,15 @@ export default class CodeEditor extends React.Component<Props> {
   }
 
   renderErrorMarker(error: CodeError, index: number) {
-    const {from, to, empty} = getErrorLocation(error)
-    if (from == null) { return null }
+    const loc = getErrorLocation(error)
+    if (loc == null) { return null }
 
     return (
       <Marker
         key={index}
-        from={from}
-        to={to}
-        classNames={[$.errorMarker, empty && $.emptyErrorMarker]}
+        from={loc.from}
+        to={loc.to}
+        classNames={[$.errorMarker, loc.empty && $.emptyErrorMarker]}
       />
     )
   }
@@ -239,10 +232,10 @@ export default class CodeEditor extends React.Component<Props> {
   renderErrorGutterMarkers() {
     const lines = new Set()
     for (const error of programStore.errors) {
-      const {from, to} = getErrorLocation(error)
-      if (from == null) { continue }
+      const loc = getErrorLocation(error)
+      if (loc == null) { continue }
 
-      for (let ln = from.line; ln <= to.line; ln++) {
+      for (let ln = loc.from.line; ln <= loc.to.line; ln++) {
         lines.add(ln)
       }
     }
@@ -264,10 +257,10 @@ export default class CodeEditor extends React.Component<Props> {
     if (line == null) { return null }
 
     const errors = programStore.errors.filter(err => {
-      const {from, to} = getErrorLocation(err)
-      if (from == null) { return false }
+      const loc = getErrorLocation(err)
+      if (loc == null) { return false }
 
-      return from.line <= line && to.line >= line
+      return loc.from.line <= line && loc.to.line >= line
     })
     return errors.map((error, index) => {
       return (
@@ -281,21 +274,19 @@ export default class CodeEditor extends React.Component<Props> {
   //------
   // Events
 
-  onEditorChange = (value: string) => {
+  onEditorChange = (value: string, change: EditorChange, doc: CMDoc) => {
     programStore.code = value
     programStore.errors = []
 
-    if (this.state.codeMirror != null) {
-      this.updateReadOnlyRanges(value, this.state.codeMirror)
-      this.updateHiddenRanges(value, this.state.codeMirror)
-    }
+    this.updateReadOnlyRanges(value, doc)
+    this.updateHiddenRanges(value, doc)
 
     simulatorStore.reset()
   }
 
-  onValueSet = (value: string, codeMirror: ?CodeMirrorEl) => {
-    this.updateReadOnlyRanges(value, codeMirror)
-    this.updateHiddenRanges(value, codeMirror)
+  onValueSet = (value: string, document: CMDoc) => {
+    this.updateReadOnlyRanges(value, document)
+    this.updateHiddenRanges(value, document)
   }
 
   onErrorGutterMarkerTap = (line: number) => {
@@ -304,16 +295,16 @@ export default class CodeEditor extends React.Component<Props> {
 
 }
 
-function locationToCodeMirrorLocation(location: ASTNodeLocation) {
-  return {line: location.line - 1, ch: location.column}
+function positionToCodeMirrorLocation(position: Position) {
+  return {line: position.line - 1, ch: position.column}
 }
 
-function getErrorLocation(error: CodeError): {from: ASTNodeLocation, to: ASTNodeLocation, empty: boolean} {
+function getErrorLocation(error: CodeError): {from: CMPosition, to: CMPosition, empty: boolean} | null {
   const {loc} = error
-  if (loc == null) { return {start: null, end: null} }
+  if (loc == null) { return null }
 
-  let start: ASTNodeLocation
-  let end: ASTNodeLocation
+  let start: Position
+  let end: Position
   if (loc.start != null) {
     start = loc.start
     end   = loc.end

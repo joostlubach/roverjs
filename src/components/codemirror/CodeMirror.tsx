@@ -1,28 +1,29 @@
-// @flow
-
 import * as React from 'react'
-import PropTypes from 'prop-types'
-import CodeMirrorEl from 'codemirror'
+import * as PropTypes from 'prop-types'
+import * as CodeMirrorClass from 'codemirror'
+import {EditorFromTextArea as CMEditor, EditorChange, Doc as CMDoc} from 'codemirror'
 import Gutter from './Gutter'
 import {jss} from '../../styles'
 import {lineHeight} from './layout'
+import {withDefaults} from '../../hoc'
 
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/monokai.css'
 import 'codemirror/theme/zenburn.css'
 
 export interface Props {
+  mode:       string,
   theme:      string,
   options:    Object,
   autoFocus:  boolean,
 
   value:      string,
-  onChange:   (value: string) => void,
+  onChange:   (value: string, change: EditorChange, document: CMDoc) => any,
 
-  onCodeMirrorSetUp?: (codeMirror: CodeMirrorEl) => void,
-  onValueSet?: (value: string, codeMirror: CodeMirrorEl) => void,
+  onCodeMirrorSetUp?: (codeMirror: CMEditor) => any,
+  onValueSet?:        (value: string, document: CMDoc) => any,
 
-  children?:  any,
+  children?:   React.ReactNode,
   classNames?: React.ClassNamesProp
 }
 
@@ -31,7 +32,7 @@ export const defaultProps = {
   autoFocus: true,
   value:     '',
 
-  onChange:  (value: string) => void 0
+  onChange:  () => undefined
 }
 
 export const defaultOptions = {
@@ -39,27 +40,26 @@ export const defaultOptions = {
 }
 
 interface State {
-  codeMirror:   ?CodeMirrorEl
+  codeMirror: CMEditor | null
 }
 
-export default class CodeMirror extends React.Component<Props> {
+class CodeMirror extends React.Component<Props, State> {
 
   //------
   // Properties
 
   props: Props
-  static defaultProps = defaultProps
 
   currentValue: string = ''
 
   state: State = {
-    codeMirror:   null
+    codeMirror: null
   }
 
-  textArea: ?HTMLTextAreaElement = null
+  textArea: HTMLTextAreaElement | null = null
 
   static childContextTypes = {
-    codeMirror: PropTypes.instanceOf(CodeMirrorEl)
+    codeMirror: PropTypes.instanceOf(CodeMirrorClass)
   }
 
   getCodeMirror() {
@@ -84,11 +84,13 @@ export default class CodeMirror extends React.Component<Props> {
   }
 
   get gutters(): string[] {
-    const gutters = []
+    const gutters: string[] = []
     React.Children.forEach(this.props.children, child => {
-      if (child == null) { return }
+      if (!React.isValidElement(child)) { return }
       if (child.type !== Gutter) { return }
-      gutters.push(child.props.name)
+
+      const gutterProps = child.props as Gutter['props']
+      gutters.push(gutterProps.name)
     })
     return gutters
   }
@@ -107,8 +109,12 @@ export default class CodeMirror extends React.Component<Props> {
   // Set up & destroy
 
   setupCodeMirror() {
-    const codeMirror = CodeMirrorEl.fromTextArea(this.textArea, this.options)
-    codeMirror.on('change', this.onChange.bind(this))
+    if (this.textArea == null) {
+      throw new Error('setupCodeMirror called before mount')
+    }
+
+    const codeMirror = CodeMirrorClass.fromTextArea(this.textArea, this.options)
+    codeMirror.on('change', this.onChange)
     this.setState({codeMirror: codeMirror})
 
     if (this.props.onCodeMirrorSetUp) {
@@ -118,9 +124,9 @@ export default class CodeMirror extends React.Component<Props> {
   }
 
   destroyCodeMirror() {
-    if (this.codeMirror == null) { return }
+    if (this.state.codeMirror == null) { return }
 
-    this.codeMirror.toTextArea()
+    this.state.codeMirror.toTextArea()
   }
 
   updateValue(value: string) {
@@ -128,14 +134,14 @@ export default class CodeMirror extends React.Component<Props> {
     this.setValue(value)
   }
 
-  setValue(value: string, codeMirror: ?CodeMirrorEl = this.state.codeMirror) {
+  setValue(value: string, codeMirror: CMEditor | null = this.state.codeMirror) {
     if (codeMirror == null) { return }
 
     codeMirror.setValue(value)
     this.currentValue = value
 
     if (this.props.onValueSet) {
-      this.props.onValueSet(value, codeMirror)
+      this.props.onValueSet(value, codeMirror.getDoc())
     }
   }
 
@@ -173,14 +179,17 @@ export default class CodeMirror extends React.Component<Props> {
   //------
   // Events
 
-  onChange(doc: any, change: any) {
+  onChange = (editor: CMEditor, change: EditorChange) => {
     if (change.origin === 'setValue') { return }
 
-    this.currentValue = doc.getValue()
-    this.props.onChange(this.currentValue, change)
+    const document = editor.getDoc()
+    this.currentValue = document.getValue()
+    this.props.onChange(this.currentValue, change, document)
   }
 
 }
+
+export default withDefaults(defaultProps)(CodeMirror)
 
 const $ = jss({
   editor: {
