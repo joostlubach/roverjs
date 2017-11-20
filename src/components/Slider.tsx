@@ -1,28 +1,25 @@
+// @flow
+
 import * as React from 'react'
 import {jss, colors, layout, fonts, shadows} from '../styles'
 import {DragHandle} from 'draggable'
 import {DragHandleState} from 'draggable'
 
-export type Props<T> = {
-  values: T[],
-  value:  T,
+export interface Props<T> {
+  values:   T[],
+  value:    T,
   onChange: (value: T) => void,
 
-  showValues: boolean,
-
+  showValues?: boolean,
   classNames?: React.ClassNamesProp
 }
 export const defaultProps = {
-  onChange:   (value: any) => void 0,
   showValues: true
 }
 
-export default class Slider<T> extends React.Component<Props> {
+export default class Slider<T> extends React.Component<Props<T>> {
 
-  props: Props
-  static defaultProps = defaultProps
-
-  container: ?HTMLElement = null
+  container: HTMLElement | null = null
 
   setValueFromScreenX(x: number) {
     const {container} = this
@@ -42,12 +39,15 @@ export default class Slider<T> extends React.Component<Props> {
     const {classNames, showValues} = this.props
 
     return (
-      <div classNames={[$.slider, classNames]} onClick={this.onClick}>
+      <div
+        classNames={[$.slider, classNames]}
+        onClick={this.onClick}
+      >
         <div classNames={$.container} ref={el => { this.container = el }}>
           {this.renderRail()}
           {this.renderThumb()}
         </div>
-        {showValues && this.renderValues()}
+        {showValues !== false && this.renderValues()}
       </div>
     )
   }
@@ -67,7 +67,7 @@ export default class Slider<T> extends React.Component<Props> {
 
     return (
       <DragHandle
-        classNames={$.thumb}
+        className={$.thumb}
         style={style}
         onDrag={this.onThumbDrag}
       />
@@ -89,7 +89,7 @@ export default class Slider<T> extends React.Component<Props> {
     )
   }
 
-  onClick = (e: MouseEvent) => {
+  onClick = (e: React.MouseEvent<any>) => {
     this.setValueFromScreenX(e.pageX)
   }
 
