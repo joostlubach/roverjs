@@ -1,2 +1,1 @@
-require('babel-register');
-require('./gulp');
+require('./gulp')

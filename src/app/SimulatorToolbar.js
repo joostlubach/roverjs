@@ -1,194 +1,194 @@
 // @flow
 
-import React from 'react'
+import * as React from 'react'
 import {observer} from 'mobx-react'
 import {jss, layout, colors, fonts, shadows} from '../styles'
 import {ToolbarButton, Switch, Slider, SpinningRover, MessageBox, Markdown, SVG} from '../components'
 import {programStore, simulatorStore} from '../stores'
 
-export type Props = {}
+export interface Props {}
 
 @observer
-export default class SimulatorToolbar extends React.Component<*, Props, *> {
+export default class SimulatorToolbar extends React.Component<Props> {
 
-	props: Props
+  props: Props
 
-	render() {
-		const {running, active} = simulatorStore
+  render() {
+    const {running, active} = simulatorStore
 
-		return (
-			<div className={$.toolbar}>
-				<div className={$.buttons}>
-					{!running && this.renderPlayButton()}
-					{running && this.renderPauseButton()}
-					{!simulatorStore.done && this.renderBackwardButton()}
-					{!simulatorStore.done && this.renderForwardButton()}
-					{!running && active && this.renderRestartButton()}
-				</div>
-				{this.renderControls()}
-			</div>
-		)
-	}
+    return (
+      <div classNames={$.toolbar}>
+        <div classNames={$.buttons}>
+          {!running && this.renderPlayButton()}
+          {running && this.renderPauseButton()}
+          {!simulatorStore.done && this.renderBackwardButton()}
+          {!simulatorStore.done && this.renderForwardButton()}
+          {!running && active && this.renderRestartButton()}
+        </div>
+        {this.renderControls()}
+      </div>
+    )
+  }
 
-	renderPlayButton() {
-		return (
-			<ToolbarButton
-				icon='play'
-				label="PLAY"
-				onTap={this.onPlayTap}
-			/>
-		)
-	}
+  renderPlayButton() {
+    return (
+      <ToolbarButton
+        icon='play'
+        label="PLAY"
+        onTap={this.onPlayTap}
+      />
+    )
+  }
 
-	renderBackwardButton() {
-		return (
-			<ToolbarButton
-				icon='backward'
-				label="BACK"
-				disabled={!simulatorStore.active || simulatorStore.running || simulatorStore.atStart}
-				onTap={this.onBackwardTap}
-			/>
-		)
-	}
+  renderBackwardButton() {
+    return (
+      <ToolbarButton
+        icon='backward'
+        label="BACK"
+        disabled={!simulatorStore.active || simulatorStore.running || simulatorStore.atStart}
+        onTap={this.onBackwardTap}
+      />
+    )
+  }
 
-	renderForwardButton() {
-		return (
-			<ToolbarButton
-				icon='forward'
-				label="FWD"
-				disabled={simulatorStore.running || simulatorStore.atEnd}
-				onTap={this.onForwardTap}
-			/>
-		)
-	}
+  renderForwardButton() {
+    return (
+      <ToolbarButton
+        icon='forward'
+        label="FWD"
+        disabled={simulatorStore.running || simulatorStore.atEnd}
+        onTap={this.onForwardTap}
+      />
+    )
+  }
 
-	renderPauseButton() {
-		return (
-			<ToolbarButton
-				icon='pause'
-				label="PAUSE"
-				onTap={this.onPauseTap}
-			/>
-		)
-	}
+  renderPauseButton() {
+    return (
+      <ToolbarButton
+        icon='pause'
+        label="PAUSE"
+        onTap={this.onPauseTap}
+      />
+    )
+  }
 
-	renderRestartButton() {
-		return (
-			<ToolbarButton
-				icon='restart'
-				label="RESTART"
-				onTap={this.onRestartTap}
-			/>
-		)
-	}
+  renderRestartButton() {
+    return (
+      <ToolbarButton
+        icon='restart'
+        label="RESTART"
+        onTap={this.onRestartTap}
+      />
+    )
+  }
 
-	renderControls() {
-		return (
-			<div className={$.controls}>
-				{this.renderFPSSlider()}
-				{this.renderVerboseSwitch()}
-			</div>
-		)
-	}
+  renderControls() {
+    return (
+      <div classNames={$.controls}>
+        {this.renderFPSSlider()}
+        {this.renderVerboseSwitch()}
+      </div>
+    )
+  }
 
-	renderFPSSlider() {
-		return (
-			<div className={$.fpsSliderContainer}>
-				<Slider
-					className={$.fpsSlider}
-					values={[1, 2, 3, 5, 8, 13]}
-					value={simulatorStore.fps}
-					onChange={value => { simulatorStore.fps = value }}
-					showValues={false}
-				/>
-				<div>Speed</div>
-			</div>
-		)
-	}
+  renderFPSSlider() {
+    return (
+      <div classNames={$.fpsSliderContainer}>
+        <Slider
+          classNames={$.fpsSlider}
+          values={[1, 2, 3, 5, 8, 13]}
+          value={simulatorStore.fps}
+          onChange={value => { simulatorStore.fps = value }}
+          showValues={false}
+        />
+        <div>Speed</div>
+      </div>
+    )
+  }
 
-	renderVerboseSwitch() {
-		return (
-			<div className={$.verboseSwitchContainer}>
-				<Switch
-					className={$.verboseSwitch}
-					isOn={simulatorStore.verbose}
-					onChange={on => { simulatorStore.verbose = on }}
-				/>
-				<div>Verbose</div>
-			</div>
-		)
-	}
+  renderVerboseSwitch() {
+    return (
+      <div classNames={$.verboseSwitchContainer}>
+        <Switch
+          classNames={$.verboseSwitch}
+          isOn={simulatorStore.verbose}
+          onChange={on => { simulatorStore.verbose = on }}
+        />
+        <div>Verbose</div>
+      </div>
+    )
+  }
 
-	runAndSimulate(firstStepOnly: boolean) {
-		programStore.runAndSimulate(firstStepOnly)
+  runAndSimulate(firstStepOnly: boolean) {
+    programStore.runAndSimulate(firstStepOnly)
 
-		if (programStore.errors.length === 0 && programStore.program.isEmpty) {
-			MessageBox.show({
-				title:   "Program empty",
-				message: "Your program did not perform any action.",
-				body:    <SVG name='robot-lame' width={64} height={64} className={$.roverLame}/>,
-				buttons: [{label: "Oops!"}]
-			})
-		}
+    if (programStore.errors.length === 0 && programStore.program.isEmpty) {
+      MessageBox.show({
+        title:   "Program empty",
+        message: "Your program did not perform any action.",
+        body:    <SVG name='robot-lame' width={64} height={64} classNames={$.roverLame}/>,
+        buttons: [{label: "Oops!"}]
+      })
+    }
 
-		if (programStore.hasInfiniteLoop) {
-			MessageBox.show({
-				title:   "Infinite loop",
-				message: "Your program probably contains an infinite loop.",
+    if (programStore.hasInfiniteLoop) {
+      MessageBox.show({
+        title:   "Infinite loop",
+        message: "Your program probably contains an infinite loop.",
 
-				body: (
-					<div className={$.infiniteLoop}>
-						<SpinningRover/>,
-						<Markdown>{infiniteLoopExplanation}</Markdown>
-					</div>
-				),
-				buttons: [{label: "Oops!"}]
-			})
-		}
-	}
+        body: (
+          <div classNames={$.infiniteLoop}>
+            <SpinningRover/>,
+            <Markdown>{infiniteLoopExplanation}</Markdown>
+          </div>
+        ),
+        buttons: [{label: "Oops!"}]
+      })
+    }
+  }
 
-	//------
-	// Event handlers
+  //------
+  // Event handlers
 
-	onPlayTap = () => {
-		if (!simulatorStore.done && simulatorStore.active) {
-			simulatorStore.resume()
-		} else if (simulatorStore.done) {
-			// Reset everything, and wait a while to run, to allow everything to reset
-			// without animation.
-			simulatorStore.reset()
-			setTimeout(() => { this.runAndSimulate() }, 200)
-		} else {
-			// Run immediately.
-			this.runAndSimulate()
-		}
-	}
+  onPlayTap = () => {
+    if (!simulatorStore.done && simulatorStore.active) {
+      simulatorStore.resume()
+    } else if (simulatorStore.done) {
+      // Reset everything, and wait a while to run, to allow everything to reset
+      // without animation.
+      simulatorStore.reset()
+      setTimeout(() => { this.runAndSimulate() }, 200)
+    } else {
+      // Run immediately.
+      this.runAndSimulate()
+    }
+  }
 
-	onForwardTap = () => {
-		if (!simulatorStore.done && simulatorStore.active) {
-			simulatorStore.forward()
-		} else if (simulatorStore.done) {
-			// Reset everything, and wait a while to run, to allow everything to reset
-			// without animation.
-			simulatorStore.reset()
-			setTimeout(() => { this.runAndSimulate(true) }, 200)
-		} else {
-			// Run immediately.
-			this.runAndSimulate(true)
-		}
-	}
+  onForwardTap = () => {
+    if (!simulatorStore.done && simulatorStore.active) {
+      simulatorStore.forward()
+    } else if (simulatorStore.done) {
+      // Reset everything, and wait a while to run, to allow everything to reset
+      // without animation.
+      simulatorStore.reset()
+      setTimeout(() => { this.runAndSimulate(true) }, 200)
+    } else {
+      // Run immediately.
+      this.runAndSimulate(true)
+    }
+  }
 
-	onBackwardTap = () => {
-		simulatorStore.backward()
-	}
+  onBackwardTap = () => {
+    simulatorStore.backward()
+  }
 
-	onPauseTap = () => {
-		simulatorStore.pause()
-	}
+  onPauseTap = () => {
+    simulatorStore.pause()
+  }
 
-	onRestartTap = () => {
-		simulatorStore.reset()
-	}
+  onRestartTap = () => {
+    simulatorStore.reset()
+  }
 
 }
 
@@ -202,61 +202,61 @@ loop has a *stopping* condition, meaning that the \`condition\` in \`while (cond
 Another possibility is that you call some function which calls itself.`
 
 const $ = jss({
-	toolbar: {
-		position: 'relative',
-		height:   96,
+  toolbar: {
+    position: 'relative',
+    height:   96,
 
-		...layout.row(),
-		justifyContent: 'space-between',
-		padding:        layout.padding.s,
+    ...layout.row(),
+    justifyContent: 'space-between',
+    padding:        layout.padding.s,
 
-		borderBottom: [1, 'solid', colors.white.alpha(0.2)],
-		boxShadow:    shadows.toolbar,
+    borderBottom: [1, 'solid', colors.white.alpha(0.2)],
+    boxShadow:    shadows.toolbar,
 
-		background: colors.bg.toolbar,
-		color:      colors.fg.inverted,
-		'& svg':    {fill: colors.fg.inverted}
-	},
+    background: colors.bg.toolbar,
+    color:      colors.fg.inverted,
+    '& svg':    {fill: colors.fg.inverted}
+  },
 
-	buttons: {
-		...layout.row()
-	},
+  buttons: {
+    ...layout.row()
+  },
 
-	controls: {
-		...layout.row()
-	},
+  controls: {
+    ...layout.row()
+  },
 
-	fpsSliderContainer: {
-		...layout.flex.column,
-		alignItems: 'center',
+  fpsSliderContainer: {
+    ...layout.flex.column,
+    alignItems: 'center',
 
-		font:           fonts.tiny,
-		textTransform: 'uppercase'
-	},
+    font:           fonts.tiny,
+    textTransform: 'uppercase'
+  },
 
-	fpsSlider: {
-		marginBottom: layout.padding.xs,
-		width:        120
-	},
+  fpsSlider: {
+    marginBottom: layout.padding.xs,
+    width:        120
+  },
 
-	verboseSwitchContainer: {
-		...layout.flex.column,
-		alignItems: 'center',
+  verboseSwitchContainer: {
+    ...layout.flex.column,
+    alignItems: 'center',
 
-		font:           fonts.tiny,
-		textTransform: 'uppercase'
-	},
+    font:           fonts.tiny,
+    textTransform: 'uppercase'
+  },
 
-	verboseSwitch: {
-		marginBottom: layout.padding.xs
-	},
+  verboseSwitch: {
+    marginBottom: layout.padding.xs
+  },
 
-	infiniteLoop: {
-		...layout.flex.center,
-		textAlign: 'center'
-	},
+  infiniteLoop: {
+    ...layout.flex.center,
+    textAlign: 'center'
+  },
 
-	roverLame: {
-		fill: colors.purple
-	}
+  roverLame: {
+    fill: colors.purple
+  }
 })

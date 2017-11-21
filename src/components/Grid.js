@@ -1,151 +1,151 @@
 // @flow
 
-import React from 'react'
+import * as React from 'react'
 import PropTypes from 'prop-types'
 import {jss, colors, layout, fonts, shadows} from '../styles'
 import times from 'lodash/times'
 
-export type Props = {
-	rows:    number,
-	columns: number,
+export interface Props {
+  rows:    number,
+  columns: number,
 
-	showCoordinates: boolean,
-	dark:            boolean,
+  showCoordinates: boolean,
+  dark:            boolean,
 
-	className?: ClassNameProp,
-	children?:  any
+  classNames?: React.ClassNamesProp,
+  children?:  React.ReactNode
 }
 export const defaultProps = {
-	dark: false
+  dark: false
 }
 
-export default class Grid extends React.Component<*, Props, *> {
+export default class Grid extends React.Component<Props> {
 
-	props: Props
-	static defaultProps = defaultProps
+  props: Props
+  static defaultProps = defaultProps
 
-	static childContextTypes = {
-		spriteBounds: PropTypes.func
-	}
+  static childContextTypes = {
+    spriteBounds: PropTypes.func
+  }
 
-	getChildContext() {
-		return {
-			spriteBounds: this.spriteBounds.bind(this)
-		}
-	}
+  getChildContext() {
+    return {
+      spriteBounds: this.spriteBounds.bind(this)
+    }
+  }
 
-	spriteBounds(x: number, y: number) {
-		const {width, height} = layout.gridCell
+  spriteBounds(x: number, y: number) {
+    const {width, height} = layout.gridCell
 
-		return {
-			top:  y * height,
-			left: x * width,
-			height,
-			width
-		}
-	}
+    return {
+      top:  y * height,
+      left: x * width,
+      height,
+      width
+    }
+  }
 
-	render() {
-		const {showCoordinates, className} = this.props
+  render() {
+    const {showCoordinates, classNames} = this.props
 
-		return (
-			<div className={[$.gridContainer, className]}>
-				{showCoordinates && this.renderRowCoordinates()}
-				<div className={$.gridBody}>
-					{showCoordinates && this.renderColumnCoordinates()}
-					{this.renderGrid()}
-				</div>
-			</div>
-		)
-	}
+    return (
+      <div classNames={[$.gridContainer, classNames]}>
+        {showCoordinates && this.renderRowCoordinates()}
+        <div classNames={$.gridBody}>
+          {showCoordinates && this.renderColumnCoordinates()}
+          {this.renderGrid()}
+        </div>
+      </div>
+    )
+  }
 
-	renderColumnCoordinates() {
-		const {columns} = this.props
+  renderColumnCoordinates() {
+    const {columns} = this.props
 
-		return (
-			<div className={$.columnCoordinates}>
-				{times(columns, coord =>
-					<div
-						key={coord}
-						className={[$.coordinate, $.columnCoordinate]}
-						style={{width: layout.gridCell.width}}
-					>
-						<div>{coord}</div>
-					</div>
-				)}
-			</div>
-		)
-	}
+    return (
+      <div classNames={$.columnCoordinates}>
+        {times(columns, coord =>
+          <div
+            key={coord}
+            classNames={[$.coordinate, $.columnCoordinate]}
+            style={{width: layout.gridCell.width}}
+          >
+            <div>{coord}</div>
+          </div>
+        )}
+      </div>
+    )
+  }
 
-	renderRowCoordinates() {
-		const {rows} = this.props
+  renderRowCoordinates() {
+    const {rows} = this.props
 
-		return (
-			<div className={$.rowCoordinates}>
-				{times(rows, coord =>
-					<div
-						key={coord}
-						className={[$.coordinate, $.rowCoordinate]}
-						style={{height: layout.gridCell.height}}
-					>
-						<div>{coord}</div>
-					</div>
-				)}
-			</div>
-		)
-	}
+    return (
+      <div classNames={$.rowCoordinates}>
+        {times(rows, coord =>
+          <div
+            key={coord}
+            classNames={[$.coordinate, $.rowCoordinate]}
+            style={{height: layout.gridCell.height}}
+          >
+            <div>{coord}</div>
+          </div>
+        )}
+      </div>
+    )
+  }
 
-	renderGrid() {
-		const {rows, columns, dark} = this.props
-		const size = {
-			width:  columns * layout.gridCell.width,
-			height: rows * layout.gridCell.height
-		}
+  renderGrid() {
+    const {rows, columns, dark} = this.props
+    const size = {
+      width:  columns * layout.gridCell.width,
+      height: rows * layout.gridCell.height
+    }
 
-		return (
-			<div className={[$.grid, dark && $.gridDark]} style={size}>
-				{this.renderCells()}
-				{this.renderContents()}
-			</div>
-		)
-	}
+    return (
+      <div classNames={[$.grid, dark && $.gridDark]} style={size}>
+        {this.renderCells()}
+        {this.renderContents()}
+      </div>
+    )
+  }
 
-	renderCells() {
-		const {rows} = this.props
+  renderCells() {
+    const {rows} = this.props
 
-		return (
-			<div className={$.cells}>
-				{times(rows, r => this.renderRow(r))}
-			</div>
-		)
-	}
+    return (
+      <div classNames={$.cells}>
+        {times(rows, r => this.renderRow(r))}
+      </div>
+    )
+  }
 
-	renderContents() {
-		const {children} = this.props
+  renderContents() {
+    const {children} = this.props
 
-		return (
-			<div className={$.contents}>
-				{children}
-			</div>
-		)
-	}
+    return (
+      <div classNames={$.contents}>
+        {children}
+      </div>
+    )
+  }
 
-	renderRow(row: number) {
-		const {columns} = this.props
+  renderRow(row: number) {
+    const {columns} = this.props
 
-		return (
-			<div key={row} className={$.row}>
-				{times(columns, c => this.renderCell(row, c))}
-			</div>
-		)
-	}
+    return (
+      <div key={row} classNames={$.row}>
+        {times(columns, c => this.renderCell(row, c))}
+      </div>
+    )
+  }
 
-	renderCell(row: number, column: number) {
-		return (
-			<div key={`${row}-${column}`} className={$.cell}>
-			</div>
-		)
-	}
+  renderCell(row: number, column: number) {
+    return (
+      <div key={`${row}-${column}`} classNames={$.cell}>
+      </div>
+    )
+  }
 
 }
 
@@ -153,85 +153,85 @@ const borderWidth = 5
 const columnCoordinateHeight = fonts.tiny.size + 2 * borderWidth + 2 * layout.padding.xs
 
 const $ = jss({
-	gridContainer: {
-		...layout.flex.row
-	},
+  gridContainer: {
+    ...layout.flex.row
+  },
 
-	gridBody: {
-		...layout.flex.height
-	},
+  gridBody: {
+    ...layout.flex.height
+  },
 
-	columnCoordinates: {
-		...layout.flex.row,
-		padding: borderWidth
-	},
+  columnCoordinates: {
+    ...layout.flex.row,
+    padding: borderWidth
+  },
 
-	rowCoordinates: {
-		...layout.flex.column,
-		marginTop: columnCoordinateHeight,
-		padding:   borderWidth
-	},
+  rowCoordinates: {
+    ...layout.flex.column,
+    marginTop: columnCoordinateHeight,
+    padding:   borderWidth
+  },
 
-	coordinate: {
-		...layout.flex.center,
-		padding: layout.padding.xs,
+  coordinate: {
+    ...layout.flex.center,
+    padding: layout.padding.xs,
 
-		color:      colors.fg.inverted,
-		font:       fonts.tiny,
-		opacity:    0.8,
-		lineHeight: 1
-	},
+    color:      colors.fg.inverted,
+    font:       fonts.tiny,
+    opacity:    0.8,
+    lineHeight: 1
+  },
 
-	columnCoordinate: {
-		textAlign: 'center'
-	},
+  columnCoordinate: {
+    textAlign: 'center'
+  },
 
-	rowCoordinate: {
-		textAlign: 'right'
-	},
+  rowCoordinate: {
+    textAlign: 'right'
+  },
 
-	grid: {
-		position: 'relative',
-		...layout.flex.column,
+  grid: {
+    position: 'relative',
+    ...layout.flex.column,
 
-		boxSizing:  'content-box',
-		background: colors.bg.grid,
-		border:     [borderWidth, 'solid', colors.border.grid],
-		boxShadow:  shadows.float(5)
-	},
+    boxSizing:  'content-box',
+    background: colors.bg.grid,
+    border:     [borderWidth, 'solid', colors.border.grid],
+    boxShadow:  shadows.float(5)
+  },
 
-	gridDark: {
-		background:  colors.bg.gridDark,
-		borderColor: colors.border.gridDark
-	},
+  gridDark: {
+    background:  colors.bg.gridDark,
+    borderColor: colors.border.gridDark
+  },
 
-	cells: {
-		...layout.overlay,
-	},
+  cells: {
+    ...layout.overlay,
+  },
 
-	contents: {
-		...layout.overlay,
-	},
+  contents: {
+    ...layout.overlay,
+  },
 
-	row: {
-		...layout.flex.row,
+  row: {
+    ...layout.flex.row,
 
-		'& > :last-child': {
-			borderRight: 0
-		},
-		'&:last-child > *': {
-			borderBottom: 0
-		}
-	},
+    '& > :last-child': {
+      borderRight: 0
+    },
+    '&:last-child > *': {
+      borderBottom: 0
+    }
+  },
 
-	cell: {
-		width:  layout.gridCell.width,
-		height: layout.gridCell.height,
+  cell: {
+    width:  layout.gridCell.width,
+    height: layout.gridCell.height,
 
-		border:      [1, 'solid', colors.border.medium],
+    border:      [1, 'solid', colors.border.medium],
 
-		borderLeftWidth: 0,
-		borderTopWidth:  0,
-	}
+    borderLeftWidth: 0,
+    borderTopWidth:  0,
+  }
 
 })
