@@ -1,5 +1,3 @@
-// @flow
-
 import {default as LevelStore} from './LevelStore'
 import {default as ProgramStore} from './ProgramStore'
 import {default as SimulatorStore} from './SimulatorStore'
@@ -17,4 +15,6 @@ export const programStore = new ProgramStore()
 export const simulatorStore = new SimulatorStore()
 export const viewStateStore = new ViewStateStore()
 
-window.levelStore = levelStore
+if (process.env.NODE_ENV === 'development') {
+  (window as any).levelStore = levelStore
+}

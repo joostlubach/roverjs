@@ -1,9 +1,7 @@
-// @flow
-
 import EventEmitter from 'events'
 import {observable, computed, action, autorun} from 'mobx'
 import {Simulator} from '../program'
-import {Program, ProgramState, ProgramResult} from '../program'
+import {Program, ProgramState, ProgramScoring, Step} from '../program'
 
 export default class SimulatorStore extends EventEmitter {
 
@@ -27,15 +25,15 @@ export default class SimulatorStore extends EventEmitter {
 
   /** The currently active simulator. */
   @observable
-  simulator: ?Simulator = null
+  simulator: Simulator | null = null
 
   /** The index of the most recently (or currently) executed step. */
   @observable
-  currentStepIndex: ?number = null
+  currentStepIndex: number | null = null
 
   /** The most recently (or currently) executed step. */
   @observable
-  currentStep: ?Step = null
+  currentStep: Step | null = null
 
   @computed
   get atStart(): boolean {
@@ -50,11 +48,17 @@ export default class SimulatorStore extends EventEmitter {
   }
 
   @computed
-  get state(): ProgramState {
+  get state(): ProgramState | null {
     if (this.currentStep != null) {
       return this.currentStep.endState
-    } else if (this.simulator != null && this.currentStepIndex < 0 && this.simulator.program.steps.length > 0) {
+    } else if (
+      this.simulator != null &&
+      this.currentStepIndex != null && this.currentStepIndex < 0 &&
+      this.simulator.program.steps.length > 0
+    ) {
       return this.simulator.program.steps[0].startState
+    } else {
+      return null
     }
   }
 
@@ -82,7 +86,7 @@ export default class SimulatorStore extends EventEmitter {
   verbose: boolean = JSON.parse(localStorage.verbose || 'false')
 
   @observable
-  fps: boolean = JSON.parse(localStorage.fps || '2')
+  fps: number = JSON.parse(localStorage.fps || '2')
 
   /** Resets everything to default values. */
   @action
@@ -161,7 +165,7 @@ export default class SimulatorStore extends EventEmitter {
   }
 
   @action
-  onSimulatorStep = (index: number, step: ?Step) => {
+  onSimulatorStep = (index: number, step: Step | null) => {
     this.currentStepIndex = index
     this.currentStep = step
   }

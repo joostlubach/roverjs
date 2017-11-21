@@ -2,6 +2,7 @@
 
 import {parse} from 'acorn'
 import * as nodes from 'estree'
+import {SourceLocation} from 'estree'
 import * as walk from 'acorn/dist/walk'
 import {Runtime} from 'js-eval'
 import {Program} from '.'
@@ -12,6 +13,11 @@ type Recordable<N extends nodes.Node> = N & {
 }
 type RecordableNode = Recordable<nodes.Node>
 
+export interface CodeError extends Error {
+  node: nodes.Node
+  loc:  SourceLocation
+}
+
 export default class ProgramBuilder {
 
   constructor(program: Program) {
@@ -19,7 +25,7 @@ export default class ProgramBuilder {
   }
 
   program: Program
-  errors:  Error[]  = []
+  errors:  CodeError[]  = []
 
   runtime: Runtime | null = null
 
@@ -109,8 +115,10 @@ export default class ProgramBuilder {
       this.program.stopRecording()
       return true
     } catch (error) {
-      if (error.node != null) {
-        console.error(error) // tslint:disable-line no-console
+      if (isCodeError(error)) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error(error) // tslint:disable-line no-console
+        }
         this.errors.push(error)
       } else {
         throw error
@@ -120,6 +128,10 @@ export default class ProgramBuilder {
     }
   }
 
+}
+
+function isCodeError(error: Error): error is CodeError {
+  return (error as any).node != null && (error as any).loc != null
 }
 
 function markRecordableNodes(ast: nodes.Node) {

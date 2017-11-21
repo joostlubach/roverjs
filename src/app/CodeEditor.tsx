@@ -2,7 +2,8 @@ import * as React from 'react'
 import {observer} from 'mobx-react'
 import {CodeMirror, Marker, Gutter, GutterMarker, LineWidget, LineClass} from '../components/codemirror'
 import {jss, jssKeyframes, colors, layout, fonts} from '../styles'
-import {programStore, simulatorStore, CodeError} from '../stores'
+import {programStore, simulatorStore} from '../stores'
+import {CodeError} from '../program'
 import {Position} from 'estree'
 import {Editor as CMEditor, EditorChange, Doc as CMDoc, Position as CMPosition} from 'codemirror'
 
@@ -149,6 +150,8 @@ export default class CodeEditor extends React.Component<Props, State> {
     if (currentStep == null || done) { return null }
 
     const {codeLocation, endState: {stepFailed}} = currentStep
+    if (codeLocation == null) { return null }
+
     return (
       <Marker
         from={positionToCodeMirrorLocation(codeLocation.start)}
@@ -303,16 +306,7 @@ function getErrorLocation(error: CodeError): {from: CMPosition, to: CMPosition, 
   const {loc} = error
   if (loc == null) { return null }
 
-  let start: Position
-  let end: Position
-  if (loc.start != null) {
-    start = loc.start
-    end   = loc.end
-  } else {
-    start = loc
-    end   = loc
-  }
-
+  const {start, end} = loc
   const empty = start.line === end.line && start.column === end.column
 
   const from = {line: start.line - 1, ch: start.column}

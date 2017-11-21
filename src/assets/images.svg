@@ -29,16 +29,6 @@
             <rect id="Rectangle-3" transform="translate(26.000000, 50.000000) rotate(-180.000000) translate(-26.000000, -50.000000) " x="18" y="23" width="16" height="54" rx="3"/>
         </g>
     </g>
-</symbol><symbol id="balloon-left" viewBox="0 0 30 30">
-    <!-- Generator: sketchtool 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
-    <title>balloon-left</title>
-    <desc>Created with sketchtool.</desc>
-    
-    <g id="Page-1" stroke="none" stroke-width="1" fill-rule="evenodd">
-        <g id="balloon-left">
-            <path d="M10.8070724,25.0374068 C15.6574608,28.0844327 22.6835229,30 30.5,30 C45.1355459,30 57,23.2842712 57,15 C57,6.71572875 45.1355459,0 30.5,0 C15.8644541,0 4,6.71572875 4,15 C4,16.8177516 4.5712263,18.559984 5.6176139,20.172321 L0,29 L10.8070724,25.0374068 Z" id="Combined-Shape"/>
-        </g>
-    </g>
 </symbol><symbol id="balloon-right" viewBox="0 0 27 30">
     <!-- Generator: sketchtool 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
     <title>balloon-right</title>
@@ -47,6 +37,16 @@
     <g id="Page-1" stroke="none" stroke-width="1" fill-rule="evenodd">
         <g id="balloon-right">
             <path d="M-19.1929276,25.0374068 C-14.3425392,28.0844327 -7.31647712,30 0.5,30 C15.1355459,30 27,23.2842712 27,15 C27,6.71572875 15.1355459,0 0.5,0 C-14.1355459,0 -26,6.71572875 -26,15 C-26,16.8177516 -25.4287737,18.559984 -24.3823861,20.172321 L-30,29 L-19.1929276,25.0374068 Z" id="Combined-Shape"/>
+        </g>
+    </g>
+</symbol><symbol id="balloon-left" viewBox="0 0 30 30">
+    <!-- Generator: sketchtool 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
+    <title>balloon-left</title>
+    <desc>Created with sketchtool.</desc>
+    
+    <g id="Page-1" stroke="none" stroke-width="1" fill-rule="evenodd">
+        <g id="balloon-left">
+            <path d="M10.8070724,25.0374068 C15.6574608,28.0844327 22.6835229,30 30.5,30 C45.1355459,30 57,23.2842712 57,15 C57,6.71572875 45.1355459,0 30.5,0 C15.8644541,0 4,6.71572875 4,15 C4,16.8177516 4.5712263,18.559984 5.6176139,20.172321 L0,29 L10.8070724,25.0374068 Z" id="Combined-Shape"/>
         </g>
     </g>
 </symbol><symbol id="book" viewBox="0 0 100 100">

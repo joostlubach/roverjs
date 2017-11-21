@@ -13,17 +13,18 @@ export default class GitHubLevelFetcher {
 
   gitHub: GitHub
 
-  async fetchChapters() {
+  async fetchChapters(): Promise<Chapter[]> {
     const chaptersYAML = await this.fetchYAML('chapters.yml')
 
-    const promises = chaptersYAML.chapters.map((id: string, i: number) => {
-      return this.fetchChapter(i + 1, id)
-    })
+    const promises: Promise<Chapter>[] = chaptersYAML.chapters
+      .map((id: string, i: number) => {
+        return this.fetchChapter(i + 1, id)
+      })
 
     return Promise.all(promises)
   }
 
-  async fetchChapter(number: number, id: string) {
+  async fetchChapter(number: number, id: string): Promise<Chapter> {
     const chapterYAML = await this.fetchYAML(`${id}/chapter.yml`)
     const {name, description} = chapterYAML
 

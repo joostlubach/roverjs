@@ -4,7 +4,7 @@ import {observable, autorun} from 'mobx'
 import {Sizes as PanelSizes} from '../components/Panels'
 import {Lock} from '../program'
 
-export type {PanelSizes}
+export {PanelSizes}
 
 export default class ViewStateStore {
 
@@ -23,7 +23,7 @@ export default class ViewStateStore {
   instructionsCollapsed: boolean = false
 
   @observable
-  selectedLock: ?Lock = null
+  selectedLock: Lock | null = null
 
   load() {
     const json = window.localStorage.viewState || '{}'

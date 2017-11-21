@@ -1,15 +1,7 @@
-// @flow
-
 import EventEmitter from 'events'
 import {observable, autorun, action} from 'mobx'
-import {Program, ProgramBuilder, Level} from '../program'
-import {ASTNodeLocation} from '../program'
+import {Program, ProgramBuilder, Level, CodeError} from '../program'
 import {simulatorStore} from '.'
-
-export type CodeError = {
-  message: string,
-  loc:     ASTNodeLocation | {start: ASTNodeLocation, end:   ASTNodeLocation},
-}
 
 export default class ProgramStore extends EventEmitter {
 
@@ -19,13 +11,13 @@ export default class ProgramStore extends EventEmitter {
   }
 
   @observable
-  level: ?Level = null
+  level: Level | null = null
 
   @observable
   code: string = ''
 
   @observable
-  program: ?Program = null
+  program: Program | null = null
 
   @observable
   errors: CodeError[] = []
@@ -40,10 +32,13 @@ export default class ProgramStore extends EventEmitter {
   }
 
   loadCode() {
+    const {level} = this
+    if (level == null) { return }
+
     const codes = JSON.parse(window.localStorage.codes || '{}')
-    this.code = codes[this.level.id]
+    this.code = codes[level.id]
     if (this.code == null) {
-      this.code = this.level.initialCode
+      this.code = level.initialCode
     }
 
     simulatorStore.reset()
@@ -106,6 +101,7 @@ export default class ProgramStore extends EventEmitter {
     } catch (error) {
       if (error.name === 'InfiniteLoopException') {
         this.hasInfiniteLoop = true
+        return false
       } else {
         throw error
       }

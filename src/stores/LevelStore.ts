@@ -1,5 +1,3 @@
-// @flow
-
 import {observable, computed, action} from 'mobx'
 import {Chapter, Level} from '../program'
 import {programStore, viewStateStore} from '.'
@@ -130,7 +128,7 @@ export default class LevelStore {
 
   @action
   goTo(levelNumber: number) {
-    const level = levels[levelNumber - 1]
+    const level = this.levels[levelNumber - 1]
     if (level == null) { return }
 
     programStore.loadLevel(level)
@@ -148,10 +146,10 @@ export default class LevelStore {
     this.chapters = loadChapterCache()
 
     return levelFetcher.fetchChapters()
-      .then(action(chapters => {
+      .then(action((chapters: Chapter[]) => {
         this.chapters = chapters
         saveChapterCache(this.chapters)
-      }), action(error => {
+      }), action((error: Error) => {
         this.loadError = error
       }))
       .finally(action(() => {
@@ -176,12 +174,12 @@ export default class LevelStore {
 function loadChapterCache() {
   const serialized = JSON.parse(localStorage.chapterCache || '[]')
 
-  return serialized.map(serialized => {
+  return serialized.map((serialized: any) => {
     const chapter = {
       ...serialized
     }
 
-    chapter.levels = serialized.levels.map(level => new Level(chapter, level))
+    chapter.levels = serialized.levels.map((level: any) => new Level(chapter, level))
     return chapter
   })
 }
