@@ -1,8 +1,6 @@
-// @flow
-
 import * as React from 'react'
 import {observer} from 'mobx-react'
-import {jss, colors, layout, fonts} from '../styles'
+import {jss, colors, layout, fonts, shadows} from '../styles'
 import {SVG, Markdown, Button} from '../components'
 import {Level} from '../program'
 import {viewStateStore} from '../stores'
@@ -24,7 +22,7 @@ export default class LevelInstructions extends React.Component<Props> {
     collapsible: false
   }
 
-  bubble: ?HTMLElement = null
+  bubble: HTMLElement | null = null
   shouldUpdateCollapsible: boolean = true
 
   updateCollapsible() {
@@ -92,7 +90,9 @@ export default class LevelInstructions extends React.Component<Props> {
           }
         </div>
         <div ref={el => { this.bubble = el }} classNames={bubbleClassName}>
-          <Markdown key={level.id}>{level.instructions}</Markdown>
+          <Markdown key={level.id}>
+            {level.instructions}
+          </Markdown>
         </div>
       </div>
     )
@@ -137,12 +137,12 @@ const $ = jss({
   instructionsBubble: {
     flex: [1, 0, 0],
 
-    borderRadius: layout.radius.l,
     padding:      layout.padding.m,
 
     background: colors.bg.instructions,
     color:      colors.fg.instructions,
-    font:       fonts.small
+    font:       fonts.small,
+    boxShadow:  shadows
   },
 
   collapsedBubble: {

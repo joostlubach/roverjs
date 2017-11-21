@@ -121,7 +121,7 @@ export default class App extends React.Component {
           <Panels
             horizontal
             initialSizes={viewStateStore.panelSizes}
-            minimumSizes={{left: 100, bottom: 40}}
+            minimumSizes={{left: 480, bottom: 40}}
             onPanelResize={sizes => { viewStateStore.panelSizes = sizes }}
 
             main={this.renderMain()}

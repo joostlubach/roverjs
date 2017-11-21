@@ -2,10 +2,10 @@ import {observable, computed, action} from 'mobx'
 import {Chapter, Level} from '../program'
 import {programStore, viewStateStore} from '.'
 import * as URL from 'url'
-import GitHubLevelFetcher from '../services/GitHubLevelFetcher'
 import config from '../config'
 
-const levelFetcher = new GitHubLevelFetcher(config.levels.repository, config.levels.branch)
+const levelFetcher = config.levels.fetcher
+const firstLevelID = config.levels.firstLevelID
 
 export default class LevelStore {
 
@@ -87,6 +87,8 @@ export default class LevelStore {
 
   @action
   loadLevel(id: string) {
+    this.currentChapter = null
+    this.currentLevelNumber = 0
     for (const chapter of this.chapters) {
       const index = chapter.levels.findIndex(level => level.id === id)
       if (index === -1) { continue }
@@ -100,6 +102,12 @@ export default class LevelStore {
         programStore.loadLevel(currentLevel)
       }
       break
+    }
+
+    // If the level was deleted or something, default to the first level.
+    if (this.currentChapter == null && id !== firstLevelID) {
+      this.loadLevel(firstLevelID)
+      return
     }
 
     this.selectingChapter = false
@@ -155,7 +163,7 @@ export default class LevelStore {
       .finally(action(() => {
         this.loading = false
 
-        const currentLevelID = JSON.parse(window.localStorage.currentLevelID || '"intro1"')
+        const currentLevelID = JSON.parse(window.localStorage.currentLevelID || `"${firstLevelID}"`)
         this.loadLevel(currentLevelID)
       }))
   }

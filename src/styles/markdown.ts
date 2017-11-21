@@ -2,8 +2,12 @@ import * as fonts from './fonts'
 import * as colors from './colors'
 import * as layout from './layout'
 
-export const base = {
+export default {
   lineHeight: '1.4em',
+
+  '& > p': {
+    margin: 0
+  },
 
   '& > :not(:last-child)': {
     marginBottom: '1.2em'
@@ -62,18 +66,12 @@ export const base = {
       textAlign:  'center',
       padding:    layout.padding.m
     }
-  }
-}
+  },
 
-export const page = {
-  '& > *': {
-    padding: [0, layout.padding.m]
-  },
-  '& h1, & h2, & h3': {
-    padding: 0
-  },
-  '& .paragraph figure': {
-    display: 'block',
-    margin:  [0, -layout.padding.m]
+  '& pre': {
+    background:   '#444',
+    color:        colors.fg.inverted,
+    padding:      layout.padding.xs,
+    borderRadius: 2
   }
 }

@@ -31,7 +31,7 @@ export const bg = {
   dark:          new Color('#333'),
 
   toolbar:       new Color('#444').alpha(0.9),
-  instructions:  new Color('#E7E5D3'),
+  instructions:  white,
   app:           purple.darken(0.4),
   grid:          gray,
   gridDark:      darkGray,

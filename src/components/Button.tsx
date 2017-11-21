@@ -1,37 +1,37 @@
-// @flow
-
 import * as React from 'react'
 import {jss, colors, layout, fonts} from '../styles'
 import {Tappable, SVG} from '.'
 import {TappableState} from './Tappable'
-import Color from 'color'
+import * as Color from 'color'
+import {withDefaults} from '../hoc'
 
 export interface Props {
-  icon:       string,
-  label:      string,
-  children?:  React.ReactNode,
+  icon:        string | null,
+  label:       string | null,
+  children?:   React.ReactNode,
   classNames?: React.ClassNamesProp,
-  style:      Object,
+  style?:      React.CSSProperties,
 
-  color:    Color,
-  disabled: boolean,
-  small?:   boolean,
-  tiny?:    boolean,
+  color:     Color,
+  disabled?: boolean,
+  small?:    boolean,
+  tiny?:     boolean,
 
   onTap:    () => void
 }
 export const defaultProps = {
-  color: colors.blue
+  icon:  null,
+  label: null,
+  color: colors.blue,
 }
 
 interface State {
   tappableState: TappableState
 }
 
-export default class Button extends React.Component<Props> {
+class Button extends React.Component<Props> {
 
   props: Props
-  static defaultProps = defaultProps
 
   state: State = {
     tappableState: null
@@ -58,7 +58,7 @@ export default class Button extends React.Component<Props> {
         style={style}
 
         focusable={!disabled}
-        onTap={disabled ? null : onTap}
+        onTap={disabled ? undefined : onTap}
         onStateChange={state => { this.setState({tappableState: state}) }}
       >
         <div classNames={[$.content, small && $.contentSmall, tiny && $.contentTiny]}>
@@ -72,11 +72,15 @@ export default class Button extends React.Component<Props> {
 
 }
 
-function select<T, U>(key: T, map: {[key: T | 'default']: U}): ?U {
-  if (key in map) {
+export default withDefaults(defaultProps)(Button)
+
+function select<O extends {}, K extends keyof O>(key: string | null, map: O): O[K] | null {
+  if (key != null && key in map) {
     return map[key]
   } else if ('default' in map) {
-    return map.default
+    return (map as any).default
+  } else {
+    return null
   }
 }
 

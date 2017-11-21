@@ -1,4 +1,6 @@
 import * as URL from 'url'
+import GitHubLevelFetcher from './services/GitHubLevelFetcher'
+import HTTPLevelFetcher from './services/HTTPLevelFetcher'
 
 function environment() {
   const url = URL.parse(document.location.href)
@@ -14,6 +16,17 @@ function is(env: string) {
   return env === environment()
 }
 
+function localLevelFetcher() {
+  return new HTTPLevelFetcher('http://localhost:3012')
+}
+
+function gitHubLevelFetcher() {
+  return new GitHubLevelFetcher(
+    'HackYourFuture/rover-levels',
+    is('live') ? 'live' : 'test'
+  )
+}
+
 export default {
 
   environment: environment(),
@@ -23,8 +36,11 @@ export default {
   },
 
   levels: {
-    repository: 'HackYourFuture/rover-levels',
-    branch:     is('live') ? 'live' : 'test'
+    firstLevelID: 'intro1',
+
+    fetcher: is('dev')
+      ? localLevelFetcher()
+      : gitHubLevelFetcher()
   }
 
 }

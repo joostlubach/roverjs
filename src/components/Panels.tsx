@@ -155,9 +155,8 @@ export default class Panels extends React.Component {
     this.props.onPanelResize(this.state.sizes)
   }
 
-  onHandleDrag = (side: string, state: DragHandleState) => {
+  onHandleDrag = (side: Side, state: DragHandleState) => {
     const sizes = {...this.state.sizes}
-    const {left = 0, right = 0, top = 0, bottom = 0} = {...this.state.sizes}
     const delta = side === 'left' || side === 'right' ? state.mouseDelta.x : state.mouseDelta.y
     const multiplier = side === 'left' || side === 'top' ? 1 : -1
     
@@ -165,12 +164,20 @@ export default class Panels extends React.Component {
 
     const {minimumSizes} = this.props
     if (minimumSizes != null) {
-      sizes.left = minimumSizes.left == null ? left : Math.max(left, minimumSizes.left)
-      sizes.right = minimumSizes.right == null ? right : Math.max(right, minimumSizes.right)
-      sizes.top = minimumSizes.top == null ? top : Math.max(top, minimumSizes.top)
-      sizes.bottom = minimumSizes.bottom == null ? bottom : Math.max(bottom, minimumSizes.bottom)
+      if (sizes.left != null) {
+        sizes.left = minimumSizes.left == null ? sizes.left : Math.max(sizes.left, minimumSizes.left)
+      }
+      if (sizes.right != null) {
+        sizes.right = minimumSizes.right == null ? sizes.right : Math.max(sizes.right, minimumSizes.right)
+      }
+      if (sizes.top != null) {
+        sizes.top = minimumSizes.top == null ? sizes.top : Math.max(sizes.top, minimumSizes.top)
+      }
+      if (sizes.bottom != null) {
+        sizes.bottom = minimumSizes.bottom == null ? sizes.bottom : Math.max(sizes.bottom, minimumSizes.bottom)
+      }
     }
-
+    
     this.setState({sizes})
   }
 
