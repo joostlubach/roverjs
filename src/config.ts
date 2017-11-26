@@ -20,6 +20,10 @@ function localLevelFetcher() {
   return new HTTPLevelFetcher('http://localhost:3012')
 }
 
+function tmpFetcher() {
+  return new HTTPLevelFetcher('https://rover-levels-ytvaktpxqm.now.sh')
+}
+
 function gitHubLevelFetcher() {
   return new GitHubLevelFetcher(
     'HackYourFuture/rover-levels',
@@ -39,8 +43,9 @@ export default {
     firstLevelID: 'intro1',
 
     fetcher: is('dev')
-      ? localLevelFetcher()
-      : gitHubLevelFetcher()
+      ? tmpFetcher() //localLevelFetcher()
+      : tmpFetcher()
+      // : gitHubLevelFetcher()
   }
 
 }
