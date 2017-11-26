@@ -28,7 +28,6 @@
     "jss-preset-default": "^4.0.1",
     "lodash": "^4.17.4",
     "markdown-it": "^8.4.0",
-    "markdown-it-external-links": "^0.0.6",
     "mobx": "^3.3.1",
     "mobx-react": "^4.3.4",
     "object-assign": "4.1.1",

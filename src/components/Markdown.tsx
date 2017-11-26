@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as MarkdownIt from 'markdown-it'
-import * as externalLinks from 'markdown-it-external-links'
+import * as externalLinks from '../vendor/markdown-it-external-links'
 import {jss, layout} from '../styles'
 import * as highlightJS from 'highlight.js'
 import markdownStyles from '../styles/markdown'

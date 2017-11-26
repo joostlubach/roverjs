@@ -153,7 +153,13 @@ module.exports = {
           {
             test: /\.(ts|tsx)$/,
             include: [paths.appSrc, paths.appPkg],
-            loader: require.resolve('ts-loader')
+            loader: [require.resolve('babel-loader'), require.resolve('ts-loader')],
+          },
+          // Compile not yet migrated .js
+          {
+            test: /\.js$/,
+            include: [paths.appSrc, paths.appPkg],
+            loader: [require.resolve('babel-loader')],
           },
           // The notation here is somewhat confusing.
           // "postcss" loader applies autoprefixer to our CSS.
