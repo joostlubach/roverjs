@@ -26,7 +26,7 @@ export default class Marker extends React.Component<Props> {
     const {codeMirror} = this.context
 
     this.marker = codeMirror.markText(from, to, {
-      classNames: cn(classNames),
+      className:  cn(classNames),
       startStyle: startClassName == null ? null : cn(startClassName),
       endStyle:   endClassName == null ? null : cn(endClassName),
       ...options

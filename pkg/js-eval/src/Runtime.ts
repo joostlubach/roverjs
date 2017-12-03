@@ -1,7 +1,7 @@
 // tslint:disable camelcase no-useless-computed-key no-new-func no-any no-bitwise
 
 import {Scope, Context, Function} from '.'
-import {BaseNode, SourceLocation} from 'estree'
+import {SourceLocation} from 'estree'
 import * as nodes from 'estree'
 import {isFunction} from 'lodash'
 
@@ -11,11 +11,11 @@ export type Options = {
   source?:    string
 }
 export type Callbacks = {
-  node?: (node: BaseNode) => void,
+  node?: (node: nodes.Node) => void,
 }
 
 export interface RuntimeError extends Error {
-  node?: BaseNode,
+  node?: nodes.Node,
   loc?:  SourceLocation
 }
 type RuntimeErrorClass = {new(message: string): RuntimeError}
@@ -40,7 +40,7 @@ export default class Runtime {
   /** Set when a return or break has been called. */
   interruptType: InterruptType | null
 
-  evaluate(node: BaseNode) {
+  evaluate(node: nodes.Node) {
     this.runCallbacks(node)
 
     const {type} = node
@@ -53,7 +53,7 @@ export default class Runtime {
     }
   }
 
-  runCallbacks(node: BaseNode) {
+  runCallbacks(node: nodes.Node) {
     const {callbacks} = this
     if (callbacks == null) { return }
 
@@ -90,16 +90,16 @@ export default class Runtime {
   // Program & statements
 
   evaluate_Program(node: nodes.Program) {
-    for (const bodyBaseNode of hoist(node.body)) {
-      this.evaluate(bodyBaseNode)
+    for (const bodyNode of hoist(node.body)) {
+      this.evaluate(bodyNode)
     }
   }
 
   evaluate_BlockStatement(node: nodes.BlockStatement) {
     this.interruptType = null
 
-    for (const bodyBaseNode of hoist(node.body)) {
-      this.evaluate(bodyBaseNode)
+    for (const bodyNode of hoist(node.body)) {
+      this.evaluate(bodyNode)
       if (this.interruptType != null) { break }
     }
   }
@@ -441,7 +441,7 @@ export default class Runtime {
   //------
   // Variables & destructuring
 
-  declareVariable(id: nodes.Pattern, initValue: any, isConstant: boolean, node: BaseNode) {
+  declareVariable(id: nodes.Pattern, initValue: any, isConstant: boolean, node: nodes.Node) {
     try {
       const variables = {}
       this.destructure(variables, id, initValue)
@@ -513,7 +513,7 @@ export default class Runtime {
   //------
   // Values & operators
 
-  unary(operator: string, value: any, node: BaseNode): any {
+  unary(operator: string, value: any, node: nodes.Node): any {
     if (operator === 'typeof') {
       // For some inexplicable reason, adding a typeof entry in the unaryOperators object below
       // causes an infinite loop when checking objects. So we check this one like this.
@@ -528,7 +528,7 @@ export default class Runtime {
     return fn(value)
   }
 
-  binary(operator: string, left: any, right: any, node: BaseNode): any {
+  binary(operator: string, left: any, right: any, node: nodes.Node): any {
     const fn = binaryOperators[operator]
     if (fn == null) {
       this.throw(ReferenceError, `Invalid operator: ${operator}`, node)
@@ -581,16 +581,16 @@ export default class Runtime {
   //------
   // Errors & utility
 
-  nodeSource(node: BaseNode & {start?: number, end?: number}): string | null {
+  nodeSource(node: nodes.Node & {start?: number, end?: number}): string | null {
     if (this.source == null) { return null }
     return this.source.slice(node.start, node.end)
   }
 
-  throw(ErrorType: RuntimeErrorClass, message: string, node: BaseNode): never {
+  throw(ErrorType: RuntimeErrorClass, message: string, node: nodes.Node): never {
     return this.rethrow(new ErrorType(message), node)
   }
 
-  rethrow(error: RuntimeError, node: BaseNode): never {
+  rethrow(error: RuntimeError, node: nodes.Node): never {
     if (typeof node !== 'object' || node.type == null || node.loc == null) {
       throw error
     }
@@ -614,9 +614,9 @@ function functionID(node: nodes.BaseFunction): nodes.Identifier | null {
   }
 }
 
-function hoist(nodes: BaseNode[]) {
-  const hoisted = []
-  const rest = []
+function hoist(nodes: nodes.Node[]) {
+  const hoisted: nodes.Node[] = []
+  const rest: nodes.Node[] = []
 
   for (const node of nodes) {
     if (node.type === 'FunctionDeclaration') {

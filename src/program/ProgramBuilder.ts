@@ -14,7 +14,7 @@ type Recordable<N extends nodes.Node> = N & {
 type RecordableNode = Recordable<nodes.Node>
 
 export interface CodeError extends Error {
-  node: nodes.Node
+  node: nodes.Node | null
   loc:  SourceLocation
 }
 
@@ -70,7 +70,7 @@ export default class ProgramBuilder {
         throw error
       }
 
-      this.errors.push(error)
+      this.errors.push(CompileError.fromSyntaxError(error))
       return null
     }
   }
@@ -184,4 +184,19 @@ function markRecordableNodes(ast: nodes.Node) {
 
 export class InfiniteLoopException extends Error {
   message = "Your program contains an infinite loop"
+}
+
+export class CompileError extends Error implements CodeError {
+  constructor(message: string, node: nodes.Node | null, loc: SourceLocation) {
+    super(message)
+    this.node = node
+    this.loc = loc
+  }
+
+  static fromSyntaxError(error: any) {
+    return new this(error.message, null, {start: error.loc, end: error.loc})
+  }
+
+  node: nodes.Node | null
+  loc:  SourceLocation
 }
