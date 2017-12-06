@@ -1,6 +1,7 @@
 import {observable, computed, action} from 'mobx'
 import {Chapter, Level} from '../program'
 import {programStore, viewStateStore} from '.'
+import firebaseService from '../services/FirebaseService'
 import * as URL from 'url'
 import config from '../config'
 
@@ -96,7 +97,7 @@ export default class LevelStore {
       this.currentChapter = chapter
       this.currentLevelNumber = index + 1
       viewStateStore.selectedLock = null
-      
+
       const {currentLevel} = this
       if (currentLevel != null) {
         programStore.loadLevel(currentLevel)
@@ -174,7 +175,9 @@ export default class LevelStore {
       window.localStorage.currentLevelID = JSON.stringify(currentLevel.id)
     }
 
-    window.localStorage.levelScores = JSON.stringify(Array.from(this.levelScores))
+    const data = Array.from(this.levelScores)
+    window.localStorage.levelScores = JSON.stringify(data)
+    firebaseService.writeLevelScores(data)
   }
 
 }

@@ -46,6 +46,15 @@ export default {
       ? tmpFetcher() //localLevelFetcher()
       : tmpFetcher()
       // : gitHubLevelFetcher()
+  },
+
+  firebase: {
+    apiKey: "AIzaSyCnYg-NrgWdtssBUFfhIwRTmLL_TcW-ww4",
+    authDomain: "roverjs-dev-ddb3e.firebaseapp.com",
+    databaseURL: "https://roverjs-dev-ddb3e.firebaseio.com",
+    projectId: "roverjs-dev-ddb3e",
+    storageBucket: "",
+    messagingSenderId: "551204066720"
   }
 
 }

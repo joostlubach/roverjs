@@ -4,7 +4,7 @@ import * as React from 'react'
 import {observer} from 'mobx-react'
 import {jss, layout, colors, fonts, shadows} from '../styles'
 import {SVG, Markdown, ToolbarButton, Button, MessageBox, LevelButton} from '../components'
-import {levelStore, programStore} from '../stores'
+import {levelStore, programStore, userStore} from '../stores'
 
 export interface Props {}
 
@@ -38,6 +38,12 @@ export default class CodeToolbar extends React.Component<Props> {
             label="about"
             tiny
             onTap={this.onAboutTap}
+          />
+          <Button
+            classNames={$.signinButton}
+            label={userStore.user ? 'sign-out' : 'sign-in'}
+            tiny
+            onTap={() => userStore.toggleSignIn()}
           />
         </div>
         <div classNames={$.main}>
@@ -192,6 +198,10 @@ const $ = jss({
     '& > *': {
       marginBottom: layout.padding.xs
     }
+  },
+
+  signinButton: {
+    marginTop: layout.padding.xs
   },
 
   buttons: {

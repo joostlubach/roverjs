@@ -3,6 +3,7 @@ import './init'
 import * as React from 'react' // tslint:disable-line no-unused
 import {render} from 'react-dom'
 import {App} from './app'
+import './services/FirebaseService'
 import {jss, layout, fonts} from './styles'
 import './fonts.css'
 
