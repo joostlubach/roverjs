@@ -4,7 +4,7 @@ import 'firebase/auth'
 import 'firebase/firestore'
 import axios from 'axios'
 import config from '../config'
-import {Level} from '../program'
+import { Level } from '../program'
 import { firebaseStore, levelStore, programStore } from '../stores'
 import { User, LevelStats } from '../stores/FirebaseStore'
 
@@ -89,7 +89,7 @@ class FirebaseService {
 
   async writeLevelStats(stats: LevelStats) {
     const { user } = firebaseStore
-    const {currentChapter: chapter} = levelStore
+    const { currentChapter: chapter } = levelStore
     const { level } = programStore
 
     if (user && chapter && level) {
@@ -107,7 +107,9 @@ class FirebaseService {
         if (snapshot == null) {
           await this.db.collection('levels').add(data)
         } else {
-          await this.db.collection('levels').doc(snapshot.id).set(data)
+          await this.db.collection('levels')
+            .doc(snapshot.id)
+            .set({ ...snapshot.data(), ...data })
         }
       } catch (error) {
         // fail silently
@@ -116,7 +118,7 @@ class FirebaseService {
     }
   }
 
-  async updateLevelStats(scoring: any) {
+  async updateLevelStats({score}: {score: number}) {
     const { user } = firebaseStore
     const { level } = programStore
     if (user && level) {
@@ -124,7 +126,7 @@ class FirebaseService {
         const snapshot = await this.getLevelStats(level)
         if (snapshot !== null) {
           const data = snapshot.data()
-          const scores = data.scores ? data.scores.concat(scoring.score) : [scoring.score]
+          const scores = data.scores ? [...data.scores, score] : [score]
           const update = {
             ...data,
             scores,
