@@ -16,7 +16,7 @@ export interface LevelStats {
     id: string,
     number: number
   },
-  score?: number
+  scores: number[]
 }
 
 export default class FirebaseStore {

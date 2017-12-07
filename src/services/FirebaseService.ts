@@ -116,19 +116,21 @@ class FirebaseService {
     }
   }
 
-  async updateLevelStats(score: any) {
+  async updateLevelStats(scoring: any) {
     const { user } = firebaseStore
     const { level } = programStore
     if (user && level) {
       try {
         const snapshot = await this.getLevelStats(level)
         if (snapshot !== null) {
-          const data = {
-            ...snapshot.data(),
+          const data = snapshot.data()
+          const scores = data.scores ? data.scores.concat(scoring.score) : [scoring.score]
+          const update = {
+            ...data,
+            scores,
             timestamp: new Date().toISOString(),
-            score: score.score
           }
-          await this.db.collection('levels').doc(snapshot.id).set(data)
+          await this.db.collection('levels').doc(snapshot.id).set(update)
         }
       } catch (error) {
         // fail silently
