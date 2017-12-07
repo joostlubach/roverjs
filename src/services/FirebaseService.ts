@@ -1,7 +1,6 @@
 import * as firebase from 'firebase/app'
 import { User as FirebaseUser } from 'firebase/app'
 import 'firebase/auth'
-import 'firebase/database'
 import 'firebase/firestore'
 import axios from 'axios'
 import config from '../config'
