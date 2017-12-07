@@ -1,5 +1,6 @@
 const firebase = require('firebase/app')
 require('firebase/firestore')
+const YAML = require('js-yaml')
 
 const config = {
   apiKey: "AIzaSyCnYg-NrgWdtssBUFfhIwRTmLL_TcW-ww4",
@@ -17,7 +18,8 @@ function dumpData() {
     .orderBy('timestamp', 'desc')
     .get()
     .then(querySnapshot => {
-      querySnapshot.forEach(doc => console.log(doc.data()))
+      const docs = querySnapshot.docs.map(doc => doc.data())
+      console.log(YAML.safeDump(docs))
     })
 }
 

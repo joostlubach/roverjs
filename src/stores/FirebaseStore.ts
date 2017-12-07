@@ -12,6 +12,10 @@ export interface User {
 export interface LevelStats {
   id: string
   code: string,
+  chapter: {
+    id: string,
+    number: number
+  },
   score?: number
 }
 

@@ -5,7 +5,7 @@ import 'firebase/firestore'
 import axios from 'axios'
 import config from '../config'
 import {Level} from '../program'
-import { firebaseStore, programStore } from '../stores'
+import { firebaseStore, levelStore, programStore } from '../stores'
 import { User, LevelStats } from '../stores/FirebaseStore'
 
 const baseURL = 'https://api.github.com'
@@ -89,22 +89,25 @@ class FirebaseService {
 
   async writeLevelStats(stats: LevelStats) {
     const { user } = firebaseStore
+    const {currentChapter: chapter} = levelStore
     const { level } = programStore
 
-    if (user && level) {
+    if (user && chapter && level) {
       try {
         const snapshot = await this.getLevelStats(level)
         const data = {
+          ...stats,
           user: user.login,
-          timestamp: new Date().toISOString(),
-          ...stats
+          chapter: {
+            id: chapter.id,
+            number: chapter.number
+          },
+          timestamp: new Date().toISOString()
         }
         if (snapshot == null) {
-          const docRef = await this.db.collection('levels').add(data)
-          devLog('Document added with ID: ', docRef.id)
+          await this.db.collection('levels').add(data)
         } else {
           await this.db.collection('levels').doc(snapshot.id).set(data)
-          devLog('Document updated with ID: ', snapshot.id)
         }
       } catch (error) {
         // fail silently
@@ -126,7 +129,6 @@ class FirebaseService {
             score: score.score
           }
           await this.db.collection('levels').doc(snapshot.id).set(data)
-          devLog('Document updated with ID: ', snapshot.id)
         }
       } catch (error) {
         // fail silently
