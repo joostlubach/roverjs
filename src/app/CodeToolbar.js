@@ -4,7 +4,7 @@ import * as React from 'react'
 import {observer} from 'mobx-react'
 import {jss, layout, colors, fonts, shadows} from '../styles'
 import {SVG, Markdown, ToolbarButton, Button, MessageBox, LevelButton} from '../components'
-import {levelStore, programStore, userStore} from '../stores'
+import {levelStore, programStore, firebaseStore} from '../stores'
 
 export interface Props {}
 
@@ -41,9 +41,9 @@ export default class CodeToolbar extends React.Component<Props> {
           />
           <Button
             classNames={$.signinButton}
-            label={userStore.user ? 'sign-out' : 'sign-in'}
+            label={firebaseStore.user ? 'sign-out' : 'sign-in'}
             tiny
-            onTap={() => userStore.toggleSignIn()}
+            onTap={() => firebaseStore.toggleSignIn()}
           />
         </div>
         <div classNames={$.main}>

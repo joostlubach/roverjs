@@ -1,7 +1,6 @@
 import {observable, computed, action} from 'mobx'
 import {Chapter, Level} from '../program'
 import {programStore, viewStateStore} from '.'
-import firebaseService from '../services/FirebaseService'
 import * as URL from 'url'
 import config from '../config'
 
@@ -177,7 +176,6 @@ export default class LevelStore {
 
     const data = Array.from(this.levelScores)
     window.localStorage.levelScores = JSON.stringify(data)
-    firebaseService.writeLevelScores(data)
   }
 
 }

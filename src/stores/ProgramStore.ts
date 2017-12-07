@@ -86,6 +86,11 @@ export default class ProgramStore extends EventEmitter {
     if (this.level == null) { return false }
     if (simulatorStore.active) { return false }
 
+    this.emit('start', {
+      id: this.level.id,
+      code: this.code
+    })
+
     // Create a new program.
     const program = this.program = new Program(this.level, this.code)
 

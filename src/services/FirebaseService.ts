@@ -1,4 +1,3 @@
-import EventEmitter from 'events'
 import * as firebase from 'firebase/app'
 import { User as FirebaseUser } from 'firebase/app'
 import 'firebase/auth'
@@ -6,6 +5,9 @@ import 'firebase/database'
 import 'firebase/firestore'
 import axios from 'axios'
 import config from '../config'
+import {Level} from '../program'
+import { firebaseStore, programStore } from '../stores'
+import { User, LevelStats } from '../stores/FirebaseStore'
 
 const baseURL = 'https://api.github.com'
 
@@ -16,21 +18,21 @@ const requestConfig = (token: string) => ({
   }
 })
 
-export interface User {
-  name: string
-  email: string
-  login: string
+const devLog = (...args: any[]) => {
+  if (config.environment === 'dev') {
+    // tslint:disable-next-line:no-console
+    console.log(...args)
+  }
 }
 
-class FirebaseService extends EventEmitter {
+class FirebaseService {
 
   private provider = new firebase.auth.GithubAuthProvider()
-
-  user: User | null = null
+  private db: firebase.firestore.Firestore
 
   constructor() {
-    super()
     firebase.initializeApp(config.firebase)
+    this.db = firebase.firestore()
     firebase.auth().onAuthStateChanged(this.onAuthStateChangeHandler)
   }
 
@@ -45,12 +47,14 @@ class FirebaseService extends EventEmitter {
           return { email, login, name }
         })
         .then((user: User) => {
-          this.user = user
-          this.emit('authChange', user)
+          firebaseStore.user = user
+        })
+        .catch((error: Error) => {
+          devLog('sign-in error:', error)
+          firebaseStore.user = null
         })
     } else {
-      this.user = null
-      this.emit('authChange', null)
+      firebaseStore.user = null
     }
   }
 
@@ -61,8 +65,8 @@ class FirebaseService extends EventEmitter {
         const token = result.credential.accessToken
         window.localStorage.setItem('github:token', token)
       }).catch((error: any) => {
-        this.user = null
-        // TODO: Handle Errors here.
+        firebaseStore.user = null
+        devLog('sign-in error:', error)
         // const errorCode = error.code
         // const errorMessage = error.message
         // The email of the user's account used.
@@ -76,19 +80,71 @@ class FirebaseService extends EventEmitter {
   signOut() {
     firebase.auth().signOut()
       .then(() => {
-        this.user = null
+        firebaseStore.user = null
         // Sign-out successful.
-      }).catch((error: any) => {
+      }).catch((error: Error) => {
+        devLog('sign-out error:', error)
         // TODO: An error happened.
       })
   }
 
-  writeLevelScores(scores: any[]) {
-    if (this.user != null) {
-      firebase.database().ref(`scores/${this.user.login}`).set(scores)
-      const codes = JSON.parse(window.localStorage.codes || '{}')
-      firebase.database().ref(`codes/${this.user.login}`).set(codes)
+  async writeLevelStats(stats: LevelStats) {
+    const { user } = firebaseStore
+    const { level } = programStore
+
+    if (user && level) {
+      try {
+        const snapshot = await this.getLevelStats(level)
+        const data = {
+          user: user.login,
+          timestamp: new Date().toISOString(),
+          ...stats
+        }
+        if (snapshot == null) {
+          const docRef = await this.db.collection('levels').add(data)
+          devLog('Document added with ID: ', docRef.id)
+        } else {
+          await this.db.collection('levels').doc(snapshot.id).set(data)
+          devLog('Document updated with ID: ', snapshot.id)
+        }
+      } catch (error) {
+        // fail silently
+        devLog('Error adding document: ', error)
+      }
     }
+  }
+
+  async updateLevelStats(score: any) {
+    const { user } = firebaseStore
+    const { level } = programStore
+    if (user && level) {
+      try {
+        const snapshot = await this.getLevelStats(level)
+        if (snapshot !== null) {
+          const data = {
+            ...snapshot.data(),
+            timestamp: new Date().toISOString(),
+            score: score.score
+          }
+          await this.db.collection('levels').doc(snapshot.id).set(data)
+          devLog('Document updated with ID: ', snapshot.id)
+        }
+      } catch (error) {
+        // fail silently
+        devLog('Error updating document: ', error)
+      }
+    }
+  }
+
+  getLevelStats(level: Level) {
+    const { user } = firebaseStore
+    return this.db.collection('levels')
+      .where('user', '==', user!.login)
+      .where('id', '==', level.id)
+      .get()
+      .then(querySnapshot => {
+        return querySnapshot.empty ? null : querySnapshot.docs[0]
+      })
   }
 }
 
