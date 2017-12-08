@@ -38,11 +38,9 @@ class FirebaseService {
   onAuthStateChangeHandler = (user: FirebaseUser) => {
     const token = window.localStorage.getItem('github:token')
     if (user && token) {
-      axios.get(baseURL + '/user', requestConfig(token))
+      axios.get<User>(baseURL + '/user', requestConfig(token))
         .then(res => {
-          const email: string = res.data.email
-          const login: string = res.data.login
-          const name: string = res.data.name
+          const { email, login, name } = res.data
           return { email, login, name }
         })
         .then((user: User) => {
@@ -118,7 +116,7 @@ class FirebaseService {
     }
   }
 
-  async updateLevelStats({score}: {score: number}) {
+  async updateLevelStats({ score }: { score: number }) {
     const { user } = firebaseStore
     const { level } = programStore
     if (user && level) {
