@@ -1,6 +1,6 @@
-import {observable} from 'mobx'
+import { observable } from 'mobx'
 import firebaseService from '../services/FirebaseService'
-import {programStore, simulatorStore} from '.'
+import { programStore, simulatorStore } from '.'
 // import {User} from '../services/FirebaseService'
 
 export interface User {
@@ -29,7 +29,9 @@ export default class FirebaseStore {
       firebaseService.writeLevelStats(data)
     })
     simulatorStore.on('done', (score: any) => {
-      firebaseService.updateLevelStats(score)
+      if (score != null) {
+        firebaseService.updateLevelStats(score)
+      }
     })
   }
 
