@@ -9,6 +9,7 @@ import { firebaseStore, levelStore, programStore } from '../stores'
 import { User, LevelStats } from '../stores/FirebaseStore'
 
 const baseURL = 'https://api.github.com'
+const COLLECTION_NAME = 'runs'
 
 const requestConfig = (token: string) => ({
   headers: {
@@ -103,9 +104,9 @@ class FirebaseService {
           timestamp: new Date().toISOString()
         }
         if (snapshot == null) {
-          await this.db.collection('levels').add(data)
+          await this.db.collection(COLLECTION_NAME).add(data)
         } else {
-          await this.db.collection('levels')
+          await this.db.collection(COLLECTION_NAME)
             .doc(snapshot.id)
             .set({ ...snapshot.data(), ...data })
         }
@@ -130,7 +131,7 @@ class FirebaseService {
             scores,
             timestamp: new Date().toISOString(),
           }
-          await this.db.collection('levels').doc(snapshot.id).set(update)
+          await this.db.collection(COLLECTION_NAME).doc(snapshot.id).set(update)
         }
       } catch (error) {
         // fail silently
@@ -141,7 +142,7 @@ class FirebaseService {
 
   getLevelStats(level: Level) {
     const { user } = firebaseStore
-    return this.db.collection('levels')
+    return this.db.collection(COLLECTION_NAME)
       .where('user', '==', user!.login)
       .where('id', '==', level.id)
       .get()

@@ -34,16 +34,16 @@ export default class CodeToolbar extends React.Component<Props> {
         <div classNames={$.left}>
           <SVG name='logo' classNames={$.logo}/>
           <Button
-            classNames={$.aboutButton}
-            label="about"
-            tiny
-            onTap={this.onAboutTap}
-          />
-          <Button
             classNames={$.signinButton}
             label={firebaseStore.user ? 'sign-out' : 'sign-in'}
             tiny
             onTap={() => firebaseStore.toggleSignIn()}
+          />
+          <Button
+            classNames={$.aboutButton}
+            label="about"
+            tiny
+            onTap={this.onAboutTap}
           />
         </div>
         <div classNames={$.main}>
@@ -201,7 +201,7 @@ const $ = jss({
   },
 
   signinButton: {
-    marginTop: layout.padding.xs
+    marginBottom: layout.padding.xs
   },
 
   buttons: {

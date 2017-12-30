@@ -1,4 +1,4 @@
-require('dotenv').config({path: '../.env.local'})
+require('dotenv').config({path: __dirname + '/../.env.local'})
 const firebase = require('firebase/app')
 require('firebase/firestore')
 const YAML = require('js-yaml')
@@ -14,7 +14,7 @@ const config = {
 function dumpData() {
   firebase.initializeApp(config)
   const db = firebase.firestore()
-  return db.collection('levels')
+  return db.collection('runs')
     .orderBy('timestamp', 'desc')
     .get()
     .then(querySnapshot => {

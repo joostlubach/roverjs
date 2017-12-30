@@ -1,6 +1,7 @@
 import * as URL from 'url'
-import GitHubLevelFetcher from './services/GitHubLevelFetcher'
-import HTTPLevelFetcher from './services/HTTPLevelFetcher'
+// import GitHubLevelFetcher from './services/GitHubLevelFetcher'
+// import HTTPLevelFetcher from './services/HTTPLevelFetcher'
+import FireStoreLevelFetcher from './services/FireStoreLevelFetcher'
 
 function environment() {
   const url = URL.parse(document.location.href)
@@ -16,19 +17,23 @@ function is(env: string) {
   return env === environment()
 }
 
-function localLevelFetcher() {
-  return new HTTPLevelFetcher('http://localhost:3012')
-}
+// function localLevelFetcher() {
+//   return new HTTPLevelFetcher('http://localhost:3012')
+// }
 
-function tmpFetcher() {
-  return new HTTPLevelFetcher('https://rover-levels-ytvaktpxqm.now.sh')
-}
+// function tmpFetcher() {
+//   return new HTTPLevelFetcher('https://rover-levels-ytvaktpxqm.now.sh')
+// }
 
-function gitHubLevelFetcher() {
-  return new GitHubLevelFetcher(
-    'HackYourFuture/rover-levels',
-    is('live') ? 'live' : 'test'
-  )
+// function gitHubLevelFetcher() {
+//   return new GitHubLevelFetcher(
+//     'HackYourFuture/rover-levels',
+//     is('live') ? 'live' : 'test'
+//   )
+// }
+
+function fireStoreLevelFetcher() {
+  return new FireStoreLevelFetcher()
 }
 
 export default {
@@ -43,8 +48,8 @@ export default {
     firstLevelID: 'intro1',
 
     fetcher: is('dev')
-      ? tmpFetcher() //localLevelFetcher()
-      : tmpFetcher()
+      ? fireStoreLevelFetcher() //localLevelFetcher()
+      : fireStoreLevelFetcher()
       // : gitHubLevelFetcher()
   },
 
