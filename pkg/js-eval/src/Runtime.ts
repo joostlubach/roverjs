@@ -455,8 +455,8 @@ export default class Runtime {
 
   destructure(variables: Object, id: nodes.Pattern, value: any) {
     if (id.type === 'ArrayPattern') {
+      const remaining = [...value]
       for (const element of id.elements) {
-        const remaining = [...value]
         if (element.type === 'RestElement') {
           // TODO
           variables[(element.argument as nodes.Identifier).name] = remaining

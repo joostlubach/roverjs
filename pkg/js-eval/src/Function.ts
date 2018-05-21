@@ -40,6 +40,7 @@ export default class Function {
 
     const destructured = {}
     this.runtime.destructure(destructured, id, args)
+
     scope.assign(destructured)
   }
 
