@@ -1,7 +1,7 @@
 {
   "name": "rover",
   "description": "Learn JavaScript by helping Rover the Robot reach the flag.",
-  "version": "0.1.0+17",
+  "version": "0.1.0+18",
   "repository": "https://github.com/joostlubach/roverjs",
   "license": "MIT",
   "dependencies": {
