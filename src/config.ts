@@ -21,7 +21,7 @@ function localLevelFetcher() {
 }
 
 function tmpFetcher() {
-  return new HTTPLevelFetcher('https://rover-levels-ytvaktpxqm.now.sh')
+  return new HTTPLevelFetcher('https://rover-levels-urjktarwzy.now.sh')
 }
 
 function gitHubLevelFetcher() {

@@ -80,7 +80,7 @@ async function gulpBuild() {
 // Rsync
 
 async function rsyncDistribution() {
-	const destination = `rover:apps/client`
+	const destination = `rover@lab:apps/client`
 	await task(`-> Rsyncing distribution to ${blue(destination)}`,
 		exec('rsync', ['-uvaz', `${distDir}/`, destination, '--exclude', 'node_modules'])
 	)
